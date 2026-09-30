@@ -1,0 +1,74 @@
+[
+  {
+    "ad_id": "ad_001",
+    "title": "深夜咖啡外卖",
+    "copy": "加班夜，一杯热美式送到家",
+    "category": "food_delivery",
+    "target_tags": ["student", "office_worker"],
+    "scene_restrictions": {"not_night": false, "not_campus": false, "allowed_devices": ["mobile", "desktop"]},
+    "banned_check": "checked"
+  },
+  {
+    "ad_id": "ad_002",
+    "title": "晨间早餐套餐",
+    "copy": "早起十分钟，热粥配包子",
+    "category": "food_delivery",
+    "target_tags": ["office_worker", "student"],
+    "scene_restrictions": {"not_night": true, "not_campus": false, "allowed_devices": ["mobile", "desktop", "tablet"]},
+    "banned_check": "checked"
+  },
+  {
+    "ad_id": "ad_003",
+    "title": "周末手游礼包",
+    "copy": "新赛季礼包限时开启",
+    "category": "gaming",
+    "target_tags": ["student", "gamer"],
+    "scene_restrictions": {"not_night": true, "not_campus": false, "allowed_devices": ["mobile"]},
+    "banned_check": "checked"
+  },
+  {
+    "ad_id": "ad_004",
+    "title": "AI 编程在线课",
+    "copy": "零基础三个月入门大模型开发",
+    "category": "education",
+    "target_tags": ["student", "office_worker"],
+    "scene_restrictions": {"not_night": false, "not_campus": false, "allowed_devices": ["mobile", "desktop", "tablet"]},
+    "banned_check": "checked"
+  },
+  {
+    "ad_id": "ad_005",
+    "title": "校园周边文具店",
+    "copy": "开学季文具满减",
+    "category": "retail",
+    "target_tags": ["student"],
+    "scene_restrictions": {"not_night": false, "not_campus": false, "allowed_devices": ["mobile", "desktop", "tablet"]},
+    "banned_check": "checked"
+  },
+  {
+    "ad_id": "ad_006",
+    "title": "成人用品专卖",
+    "copy": "全场满 199 减 30",
+    "category": "adult",
+    "target_tags": ["office_worker"],
+    "scene_restrictions": {"not_night": false, "not_campus": true, "allowed_devices": ["mobile", "desktop"]},
+    "banned_check": "checked"
+  },
+  {
+    "ad_id": "ad_007",
+    "title": "理财保险顾问",
+    "copy": "一对一规划家庭保障",
+    "category": "financial_guarantee",
+    "target_tags": ["office_worker", "parent"],
+    "scene_restrictions": {"not_night": false, "not_campus": false, "allowed_devices": ["mobile", "desktop", "tablet"]},
+    "banned_check": "checked"
+  },
+  {
+    "ad_id": "ad_008",
+    "title": "在线视频会员",
+    "copy": "热播剧集抢先看",
+    "category": "subscription",
+    "target_tags": ["student", "office_worker", "gamer"],
+    "scene_restrictions": {"not_night": false, "not_campus": false, "allowed_devices": ["mobile", "desktop"]},
+    "banned_check": "checked"
+  }
+]

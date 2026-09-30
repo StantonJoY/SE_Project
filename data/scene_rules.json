@@ -1,0 +1,5 @@
+{
+  "category_blacklist": ["medical", "financial_guarantee", "adult"],
+  "night_blocked_categories": ["gaming"],
+  "campus_blocked_categories": ["adult"]
+}

@@ -1,0 +1,18 @@
+# V1 运行配置（REQ-014/018：延迟、token 预算由配置单一来源控制）
+llm:
+  provider: mock            # mock | openai_compatible（P8 再接真实 LLM）
+  model: ""
+  timeout_sec: 30
+  api_key_env: "LLM_API_KEY"
+
+selector:
+  confidence_threshold: 0.5  # REQ-010：低于此阈值视为不可信
+  max_retries: 1             # REQ-005：解析失败最多重试次数
+
+data:
+  ads_path: "data/ads.json"
+  banned_words_path: "data/banned_words.json"
+  scene_rules_path: "data/scene_rules.json"
+
+audit:
+  log_path: "logs/audit.jsonl"   # REQ-013：审计日志（追加写）
