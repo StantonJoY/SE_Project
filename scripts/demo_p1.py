@@ -15,17 +15,9 @@ if str(ROOT / "src") not in sys.path:
 
 from ads.banned_words import BannedWords
 from ads.repository import AdRepository
+from scene.models import Scene
 
 DATA = ROOT / "data"
-
-
-class FakeScene:
-    """场景桩（P3 换正式 scene 模块）。"""
-
-    def __init__(self, time_slot: str, device: str, user_tags: list[str] | None = None):
-        self.time_slot = time_slot
-        self.device = device
-        self.user_tags = user_tags or []
 
 
 def main() -> None:
@@ -37,9 +29,9 @@ def main() -> None:
     print(f"查询示例：ad_001 = {ad.title}（品类 {ad.category}）")
 
     scenes = [
-        ("夜间·手机·学生", FakeScene("night", "mobile", ["student"])),
-        ("午后·平板·上班族", FakeScene("afternoon", "tablet", ["office_worker"])),
-        ("上午·手机·学生", FakeScene("morning", "mobile", ["student"])),
+        ("夜间·手机·学生", Scene("night", "mobile", ("student",))),
+        ("午后·平板·上班族", Scene("afternoon", "tablet", ("office_worker",))),
+        ("上午·手机·学生", Scene("morning", "mobile", ("student",))),
     ]
     print("\n场景预筛（规则预筛，REQ-009 数据来源）：")
     for label, scene in scenes:

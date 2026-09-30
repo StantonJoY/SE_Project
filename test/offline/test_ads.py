@@ -12,18 +12,10 @@ import pytest
 
 from ads.banned_words import BannedWords
 from ads.repository import AdLoadError, AdRepository
+from scene.models import Scene
 
 ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = ROOT / "data"
-
-
-class FakeScene:
-    """场景桩（duck-typing；P3 换正式 scene 模块）。"""
-
-    def __init__(self, time_slot: str = "afternoon", device: str = "mobile", user_tags: list[str] | None = None):
-        self.time_slot = time_slot
-        self.device = device
-        self.user_tags = user_tags or []
 
 
 def valid_ad(ad_id: str = "ad_900") -> dict:
@@ -114,19 +106,19 @@ def test_get_missing_returns_none(repo: AdRepository) -> None:
 # ---- 场景预筛（规则预筛前置，REQ-009 数据来源） ----
 
 def test_filter_night_excludes_not_night(repo: AdRepository) -> None:
-    ids = {a.ad_id for a in repo.filter_by_scene(FakeScene(time_slot="night"))}
+    ids = {a.ad_id for a in repo.filter_by_scene(Scene(time_slot="night", device="mobile"))}
     assert "ad_002" not in ids  # not_night=true
     assert "ad_001" in ids      # 夜间可推
 
 
 def test_filter_campus_excludes_adult(repo: AdRepository) -> None:
-    ids = {a.ad_id for a in repo.filter_by_scene(FakeScene(user_tags=["student"]))}
+    ids = {a.ad_id for a in repo.filter_by_scene(Scene(time_slot="afternoon", device="mobile", user_tags=("student",)))}
     assert "ad_006" not in ids  # not_campus=true（成人品类校园禁）
     assert "ad_005" in ids
 
 
 def test_filter_device_excludes_unsupported(repo: AdRepository) -> None:
-    ids = {a.ad_id for a in repo.filter_by_scene(FakeScene(device="tablet"))}
+    ids = {a.ad_id for a in repo.filter_by_scene(Scene(time_slot="afternoon", device="tablet"))}
     assert "ad_003" not in ids  # 仅 mobile
     assert "ad_008" not in ids  # 仅 mobile/desktop
     assert "ad_004" in ids      # 全设备

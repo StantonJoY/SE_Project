@@ -21,16 +21,10 @@ from compliance.pipeline import (
     run_compliance,
 )
 from compliance.rules import SceneRules
+from scene.models import Scene
 
 ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = ROOT / "data"
-
-
-class FakeScene:
-    def __init__(self, time_slot: str = "afternoon", device: str = "mobile", user_tags: list[str] | None = None):
-        self.time_slot = time_slot
-        self.device = device
-        self.user_tags = user_tags or []
 
 
 @pytest.fixture
@@ -99,32 +93,32 @@ def test_check_category_reject_adult(repo: AdRepository, rules: SceneRules) -> N
 # ---- REQ-009 场景硬约束（反例测试） ----
 
 def test_check_scene_night_gaming(repo: AdRepository, rules: SceneRules) -> None:
-    r = check_scene(repo.get("ad_003"), FakeScene("night", "mobile"), rules)
+    r = check_scene(repo.get("ad_003"), Scene("night", "mobile"), rules)
     assert not r.ok
     assert "夜间禁展示" in r.detail
 
 
 def test_check_scene_campus_adult(repo: AdRepository, rules: SceneRules) -> None:
-    r = check_scene(repo.get("ad_006"), FakeScene("afternoon", "mobile", ["student"]), rules)
+    r = check_scene(repo.get("ad_006"), Scene("afternoon", "mobile", ["student"]), rules)
     assert not r.ok
     assert "校园" in r.detail
 
 
 def test_check_scene_device_mismatch(repo: AdRepository, rules: SceneRules) -> None:
-    r = check_scene(repo.get("ad_003"), FakeScene("afternoon", "tablet"), rules)
+    r = check_scene(repo.get("ad_003"), Scene("afternoon", "tablet"), rules)
     assert not r.ok
     assert "设备" in r.detail
 
 
 def test_check_scene_ok_normal(repo: AdRepository, rules: SceneRules) -> None:
-    r = check_scene(repo.get("ad_001"), FakeScene("night", "mobile"), rules)
+    r = check_scene(repo.get("ad_001"), Scene("night", "mobile"), rules)
     assert r.ok
 
 
 # ---- REQ-006 管道：正常通过 / 任一失败即 REJECT ----
 
 def test_run_compliance_approve_normal_ad(repo, banned: BannedWords, rules: SceneRules) -> None:
-    scene = FakeScene("night", "mobile", ["student"])
+    scene = Scene("night", "mobile", ["student"])
     candidates = repo.filter_by_scene(scene)
     v = run_compliance(repo.get("ad_001"), scene, candidates, banned, rules)
     assert v.approved
@@ -132,7 +126,7 @@ def test_run_compliance_approve_normal_ad(repo, banned: BannedWords, rules: Scen
 
 
 def test_run_compliance_reject_financial_category(repo, banned: BannedWords, rules: SceneRules) -> None:
-    scene = FakeScene("afternoon", "mobile")
+    scene = Scene("afternoon", "mobile")
     candidates = repo.all()  # 预筛未过滤品类，compliance 必须兜住
     v = run_compliance(repo.get("ad_007"), scene, candidates, banned, rules)
     assert not v.approved
@@ -140,7 +134,7 @@ def test_run_compliance_reject_financial_category(repo, banned: BannedWords, rul
 
 
 def test_run_compliance_reject_output_mismatch(repo, banned: BannedWords, rules: SceneRules) -> None:
-    scene = FakeScene("afternoon", "mobile")
+    scene = Scene("afternoon", "mobile")
     v = run_compliance(repo.get("ad_001"), scene, candidates_of(repo, "ad_002"), banned, rules)
     assert not v.approved
     assert v.rejected_rule() == "output_exists"
