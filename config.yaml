@@ -1,4 +1,11 @@
 # V1 运行配置（REQ-014/018：延迟、token 预算由配置单一来源控制）
+#
+# 配置治理四规则（课程 note 行 1452–1461，落地于 src/app/config.py）：
+#   1. 每个环境变量映射到唯一配置键（api_key_env 显式声明，代码不读环境变量）
+#   2. **非法值在启动时大声失败**（FAIL LOUDLY）—— 写错即启动报错，不静默取默认值
+#   3. 无环境变量则用默认值
+#   4. 初始化后不可变（AppConfig 为 frozen dataclass）
+
 llm:
   provider: mock            # mock | openai_compatible（P8 再接真实 LLM）
   model: ""
@@ -6,8 +13,9 @@ llm:
   api_key_env: "LLM_API_KEY"
 
 selector:
-  confidence_threshold: 0.5  # REQ-010：低于此阈值视为不可信
+  confidence_threshold: 0.5  # REQ-010：低于此阈值视为不可信（OQ-004 已定案）
   max_retries: 1             # REQ-005：解析失败最多重试次数
+  context_budget_tokens: 2000  # REQ-018：上下文 token 上限（与需求登记一致）
 
 data:
   ads_path: "data/ads.json"
@@ -16,3 +24,12 @@ data:
 
 audit:
   log_path: "logs/audit.jsonl"   # REQ-013：审计日志（追加写）
+
+eval:
+  # ADR-003 D4：评估门的阈值**单点来源**（不在代码里硬编码）
+  cases_path: "eval/eval_cases.json"
+  reports_dir: "eval/reports"
+  # 通过率阈值只作用于 MUST_PASS 分母（ADR-003 D3：分母分离）
+  pass_rate_threshold: 0.95
+  # p95 延迟是**独立**的硬判据，不参与通过率平均（ADR-003 D6）
+  latency_p95_threshold_sec: 5.0

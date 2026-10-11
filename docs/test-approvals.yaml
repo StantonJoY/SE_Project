@@ -1,0 +1,191 @@
+# 测试批准记录（Test Approvals）— D7 门禁 1 的载体
+#
+# 课程 §6 门禁 1 原文：
+#   "Test approval gate — no code change merges unless the tests for the change
+#    were approved before implementation began."
+#
+# 载体选择理由：机器可读、可追溯、不依赖 GitHub 权限，且与仓库既有工件体系
+# （YAML + schema + 校验脚本）一致。详见 docs/branch-protection.md。
+#
+# 校验：scripts/check_test_approval.py
+#
+# ⚠️ 诚实性声明（必读）
+#   本机制自 2026-10-06 引入。**此前 P0~P3 的四次提交从未经过测试批准**，
+#   且无法追溯满足（测试与实现同批产出）。该事实登记于：
+#     - docs/ai-use-log.yaml（AIU-0002 ~ AIU-0004 的 notes）
+#     - docs/debt-register.md（TD-016）
+#   本文件 `scope.note` 亦声明生效起点，不伪装为全程合规。
+
+schema_version: "1.0"
+
+scope:
+  effective_from: "2026-10-06"
+  applies_to: "自 effective_from 起**新增或修改**的测试；历史提交不受本机制约束（无法追溯满足）"
+  enforcement: "CI job「Gate 1 · Test approval」→ scripts/check_test_approval.py"
+  note: >-
+    历史缺口：2026-09-30 的 4 次构建提交（edac673 / 3ea7868 / d85f910 / d097d34）
+    中，测试与实现同批产出，无「实现前获批」记录。此缺口不可追溯修复，
+    仅登记并前向生效。
+
+# ---------------------------------------------------------------------------
+# 批准记录。每条 = 一次"测试先于实现获批"的事件。
+#
+#   req_ids          本次批准覆盖的需求 ID（必须在 docs/req/requirements.yaml 中存在）
+#   test_files       为这些需求新增/修改的测试文件
+#   approved_by      具名人类批准者（课程 DoD 第 1 条：AI 生成的变更须有具名人类所有者）
+#   approved_at      批准时间（ISO 8601，含时区）—— **必须早于实现提交时间**
+#   implementation_commit
+#                    对应实现的提交哈希（可为 "pending"，表示批准已下、实现未开始）
+#   status           approved | superseded | revoked
+#   evidence         批准的可核查依据（评审记录、对话、工单等）
+# ---------------------------------------------------------------------------
+approvals:
+
+  # ---------------------------------------------------------------------------
+  # 引导悖论说明（必读）
+  #
+  # 本仓库的测试是**先于本批准机制**写成的（bug 修复时与实现同批产出）。
+  # 因此 TA-0001 的 approved_at **晚于** test_banned_words.py 的创建时间 ——
+  # 这在时序上**不满足**课程门禁 1 的 "approved BEFORE implementation began"。
+  #
+  # 本记录的作用是**自生效起点起前向生效**，而非追溯合规。该悖论不掩盖：
+  #   · 由 check_ai_use_log.py / check_test_approval.py 如实报告
+  #   · 登记于 docs/debt-register.md（TD-018 历史缺口、TD-021 引导悖论）
+  #   · 在 docs/branch-protection.md §6 显式声明
+  #
+  # 严格按课程字面（测试必须**先**获批）的后果是：本仓库无法通过自己的门禁 1，
+  # 因为"第一个测试"永远不可能在"第一次实现"之前就获得批准记录。
+  # 本项目的处置：承认该悖论，记录之，并对**此后新增**的测试严格前置批准。
+  # ---------------------------------------------------------------------------
+
+  - id: "TA-0001"
+    req_ids: ["REQ-ADS-NFR-SAFETY-003", "REQ-ADS-ARCH-004"]
+    test_files:
+      - "test/offline/test_banned_words.py"
+    approved_by: "Shane"
+    approved_at: "2026-10-06T14:00:00+08:00"
+    implementation_commit: "pending"
+    status: "approved"
+    evidence: "人类直接授权（2026-10-06 会话）：确认该测试集覆盖 REQ-ADS-NFR-SAFETY-003（违禁词拦截）与 REQ-ADS-ARCH-004（确定性可复现），并要求将其登记为获批测试。"
+    note: >-
+      本记录覆盖 test_banned_words.py 的 13 个测试（含 24 词逐一反例、7 项 load
+      fail-closed 反例、等长命中确定性）。时序悖论见文件头说明，登记为 TD-021。
+      implementation_commit 为 pending：该测试对应 BUG-006/BUG-007 的修复，
+      修复提交早于本批准记录。
+
+  # ---------------------------------------------------------------------------
+  # P4 的正例：测试**按设计**先获批，实现尚未开始
+  # ---------------------------------------------------------------------------
+  - id: "TA-0002"
+    req_ids:
+      - "REQ-ADS-ARCH-002"
+      - "REQ-ADS-ARCH-003"
+      - "REQ-ADS-ARCH-004"
+      - "REQ-ADS-NFR-SAFETY-005"
+      - "REQ-ADS-NFR-COST-001"
+      - "REQ-ADS-AI-001"
+    test_files:
+      - "test/offline/test_selector.py"
+      - "test/offline/test_context_assembly.py"
+      - "test/offline/test_explanation.py"
+    approved_by: "Shane"
+    approved_at: "2026-10-06T15:00:00+08:00"
+    implementation_commit: "pending"
+    status: "approved"
+    plan: "docs/plans/P4-selector.md"
+    pre_registered: true
+    evidence: >-
+      批准依据 = docs/plans/P4-selector.md §4「Testing Strategy」
+      （14 个用例 ↔ fit criterion ↔ 不变量的映射表），
+      由人类于 2026-10-06 批准该执行计划时一并批准。
+    note: >-
+      **本记录是门禁 1 的正例**：测试**按设计**先获批，实现尚未开始
+      （implementation_commit = pending，三个测试文件此刻尚不存在，
+      故设 pre_registered: true 并指向来源计划）。
+      批准依据是**接口契约与规格**（计划的 §2 与 §4），而非任何实现 ——
+      符合课程角色分离要求（TESTER 只读 specs / interfaces，不读 src/）。
+      实现完成后须回填 implementation_commit；届时 approved_at 已早于实现时间，
+      时序要求全程成立。
+
+  # ---------------------------------------------------------------------------
+  # TA-0003 —— ⚠️ 反例：本批测试的批准**晚于**实现
+  #
+  # 处置方式：如实记录，不用假时间掩盖。
+  # 人类于 2026-10-06 指示「P5，先跑通」——即优先让端到端可运行，
+  # 明确接受了"先实现、后补测试与批准"的顺序。这与课程门禁 1 的意图
+  # （tests approved BEFORE implementation began）**相反**。
+  #
+  # 为什么不用一个更早的 approved_at：
+  #   把 approved_at 填成实现之前 = 伪造治理证据。本项目的立场是
+  #   "缺口可登记、不可掩盖"（见 TD-018 的历史缺口处理）。
+  #   因此本记录的 approved_at 如实晚于实现，并据此**暴露**时序违规。
+  #
+  # 影响：门禁 1 对本批测试将 FAIL（批准时间不早于实现开始）——
+  #       这是门禁在**正确工作**。该 FAIL 状态登记为 TD-023，
+  #       须由人工决定如何收敛（见该条目的"补法"）。
+  # ---------------------------------------------------------------------------
+  - id: "TA-0003"
+    req_ids:
+      - "REQ-ADS-FR-003"
+      - "REQ-ADS-FR-004"
+      - "REQ-ADS-GOV-001"
+      - "REQ-ADS-GOV-002"
+      - "REQ-ADS-NFR-PERF-001"
+      - "REQ-ADS-SEC-001"
+      - "REQ-ADS-AI-002"
+      - "REQ-ADS-NFR-SAFETY-005"
+    test_files:
+      - "test/offline/test_app_pipeline.py"
+      - "test/offline/test_render.py"
+      - "test/offline/test_audit.py"
+    approved_by: "Shane"
+    approved_at: "2026-10-06T18:00:00+08:00"
+    implementation_commit: "pending"
+    status: "approved"
+    plan: "docs/plans/P4-selector.md"   # P5/P6 尚未出独立计划（见 TD-023）
+    pre_registered: false
+    evidence: >-
+      人类指示「P5，先跑通」——批准端到端优先，接受先实现后补测试的顺序。
+      批准者 Shane。
+    note: >-
+      **本记录是门禁 1 的反例，刻意保留**：approved_at 晚于 P5/P6 的实现时间，
+      故门禁 1 会如实 FAIL。不用假时间掩盖，理由见本条目上方的说明。
+      处置去向见 docs/debt-register.md 的 TD-023。
+
+  # ---------------------------------------------------------------------------
+  # TA-0004 —— ✅ 正例（TD-023 的纠正动作）
+  #
+  # P7 是 TD-023 的纠正轮：先把测试登记为预批准（pre_registered: true，
+  # 指向已批准的执行计划），**然后才开始实现**。
+  # 批准依据是**接口契约与规格**（计划 §2 与 §4），而非任何实现 ——
+  # 符合课程角色分离（TESTER 只读 specs / interfaces，不读 src/）。
+  #
+  # 时序：approved_at（本记录）早于 P7 实现的提交时间，故门禁 1 对本批测试 PASS。
+  # 这证明「先批测试再实现」在本项目中**可被遵守**，而非只在 P4 被遵守过一次。
+  # ---------------------------------------------------------------------------
+  - id: "TA-0004"
+    req_ids:
+      - "REQ-ADS-NFR-QA-001"
+      - "REQ-ADS-NFR-QA-002"
+      - "REQ-ADS-NFR-PERF-001"
+      - "REQ-ADS-AI-002"
+      - "REQ-ADS-ARCH-004"
+    test_files:
+      - "test/offline/test_eval_runner.py"
+      - "test/offline/test_mutation_check.py"
+      - "test/offline/test_provenance.py"
+    approved_by: "Shane"
+    approved_at: "2026-10-06T20:00:00+08:00"
+    implementation_commit: "pending"
+    status: "approved"
+    plan: "docs/plans/P7-eval.md"
+    pre_registered: true
+    evidence: >-
+      批准依据 = docs/plans/P7-eval.md §4「Testing Strategy」的 26 条用例映射
+      （每条标出 anchors → REQ/INV 与 type），由人类于 2026-10-06 批准该执行计划时一并批准。
+      同一批准同时确认两项决定：OQ-005 口径（agent 自造 + 人类审查）与通过率阈值 0.95。
+    note: >-
+      **本记录是门禁 1 的第二个正例，且意义特殊**：它是 TD-023 的**纠正动作**。
+      P5/P6 曾跳过"先批测试再实现"的链条；本批测试在实现**之前**登记并获批，
+      使该流程在本项目中得到第二次、也是**第一次完全按序**的执行。
+      实现完成后须回填 implementation_commit；届时 approved_at 已早于实现时间。

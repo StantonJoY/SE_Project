@@ -9,16 +9,84 @@ description = "Scenario-based ad recommendation engine with deterministic compli
 requires-python = ">=3.10"
 dependencies = [
     "jsonschema>=4.20",
+    # Python 3.10 无 tomllib；scripts/check_dependencies.py 读 pyproject.toml 时需要回退
+    "tomli>=2.0; python_version < '3.11'",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0",
+    "PyYAML>=6.0",
+    "ruff>=0.6",
+    "mypy>=1.10",
+    "types-jsonschema>=4.20",
+    "tomli>=2.0; python_version < '3.11'",
 ]
+
+# ---------------------------------------------------------------------------
+# Tier 1 / Tier 2 验证工具配置（课程 D7 门禁 2：静态分析）
+# ---------------------------------------------------------------------------
 
 [tool.pytest.ini_options]
 testpaths = ["test"]
 addopts = "-q"
+
+# 依赖检查（scripts/check_dependencies.py）的显式豁免。
+# 声明在此处而非硬编码在脚本里，避免"检查规则藏在代码里"。
+[tool.depcheck]
+# 仅由环境标记触发的 import 回退：src/ 不 import，但确实需要声明
+import_fallbacks = ["tomli"]
+# 已知未声明的第三方 import 来源（应为空；非空即技术债，须登记并清理）
+known_undeclared = []
+
+# --- ruff：lint（门禁 2） ---------------------------------------------------
+# 规则集刻意保持**有观点但可达成**：默认集 + import 排序 + 现代语法 + 精简写法。
+# 刻意**不启用** preview 规则（如 RUF100 未用 noqa、UP020 强制 open 取代 io.open），
+# 因为本项目多处 noqa 是**有意保留**的（scripts/ 需在 sys.path.insert 后导入，
+# 且该行为由 fitness_functions.py 显式检查），批量清理会削弱可追溯性。
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+# 缓存目录必须可写；受限环境下无法在仓库内建缓存，改用环境变量覆盖（见 ci.yml）
+cache-dir = ".ruff_cache"
+# 下划线前缀为**临时/一次性**脚本，不属于交付物（其存在由
+# scripts/check_dependencies.py 报告，须清理）。排除出 lint 范围，
+# 以免它们阻断门禁 2。
+extend-exclude = ["scripts/_*.py"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "F",    # pyflakes（未用导入/未定义名）
+    "W",    # pycodestyle warnings
+    "I",    # isort（导入排序）
+    "UP",   # pyupgrade（现代语法）
+    "B",    # flake8-bugbear（常见 bug 模式）
+    "SIM",  # flake8-simplify
+]
+ignore = [
+    "E501",  # 行太长由 line-length + formatter 管，不在 lint 报错
+    "SIM108",# 三元表达式强制化会降低可读性（本项目多处 if/else 更清楚）
+]
+
+[tool.ruff.lint.per-file-ignores]
+# scripts/ 与测试都需要在 sys.path / monkeypatch 之后导入 → 允许 E402
+"scripts/*.py" = ["E402"]
+"test/**/*.py" = ["E402"]
+# 测试里刻意使用 __init__ 直接调用以验证构造器契约
+"test/offline/test_banned_words.py" = ["E402", "SIM115"]
+
+# --- mypy：类型检查（门禁 2） ---------------------------------------------
+# 现状为"务实基线"：检查函数签名与明显类型错误，但不强制全量标注。
+# 提高严格度属于后续演进（记入 docs/debt-register.md）。
+[tool.mypy]
+python_version = "3.10"
+files = ["src"]
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+no_implicit_optional = true
+check_untyped_defs = true
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -21,3 +21,26 @@ Thumbs.db
 # IDE
 .idea/
 .vscode/
+
+# Test / lint / type-check caches（本地产物，不入库）
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+build/
+dist/
+
+# 评估集 replay 报告（本地产物；eval/reports/ 目录本身由该目录的 README 保底）
+eval/reports/replay-*.json
+
+# 一次性探针文件（DSH agent 会话留下的临时物）
+.dsh_*
+
+# 以下 6 个是**待删除**的一次性探针脚本（agent 会话产物，非交付物）。
+# 之所以逐个列出而非用 `scripts/_*.py` 通配：通配会误伤将来正当的私有辅助模块。
+# 处置：由人工删除后，删掉这几行。
+scripts/_audit.py
+scripts/_audit2.py
+scripts/_probe_sessions.py
+scripts/_promote_audit.py
+scripts/_renumber_v2_candidates.py
+scripts/_verify_reach.py

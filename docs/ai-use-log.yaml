@@ -1,0 +1,291 @@
+# AI 使用日志（AI-use Log）— D1 交付物
+#
+# 用途：课程门禁第 6 条 —— 改动代码或 prompt 却未更新本日志的 PR 被阻塞。
+# 校验：scripts/check_ai_use_log.py（本文件的 schema 与内容自洽性）
+#
+# ⚠️ 诚实性声明（必读）
+#   2026-09-30 的四条 entry 是**事后补录**（retrospective: true），依据是 git 提交历史。
+#   它们不是当时的实时记录，且**前置治理缺失**：当时的测试并未"在实现开始前获批"
+#   （课程门禁第 1 条），且仓库当时尚无 CI 门禁。此事实同时登记于
+#   docs/debt-register.md（TD-018：门禁 1 的历史缺口；TD-013：治理批次晚于首批实现）。
+#   自 2026-10-06 起，本日志为实时记录。
+
+schema_version: "1.0"
+
+entries:
+
+  # ------------------------- 补录：P0~P3 构建（2026-09-30） -------------------------
+  - id: "AIU-0001"
+    date: "2026-09-30"
+    retrospective: true
+    agent: "Doubao（豆包）编码 agent"
+    tool: "AI coding agent（非本仓库当前工具链）"
+    role: "build"
+    task: "撰写 V1 需求草案、V2 竞价候选需求、V1 技术方案三份文档"
+    artifacts: ["docs/req/requirements-v1-draft.md", "docs/req/requirements-v2-bidding-draft.md", "docs/design/technical-design-v1.md"]
+    outcome: "accepted"
+    commit: "d097d34"
+    human_owner: "（当时未登记具名人类所有者——课程 DoD 第 1 条的缺口）"
+    notes: "文档未按课程 D1 要求产出机器可读格式（requirements.yaml + req-schema.json），于 2026-10-06 补做。"
+
+  - id: "AIU-0002"
+    date: "2026-09-30"
+    retrospective: true
+    agent: "Doubao（豆包）编码 agent"
+    tool: "AI coding agent（非本仓库当前工具链）"
+    role: "build"
+    task: "产出 P0 工程骨架（pyproject/config/.gitignore）与 P1 ads 素材库模块（schema/加载/查询/违禁词）"
+    artifacts: ["pyproject.toml", "config.yaml", "src/ads/", "data/ads.json", "data/banned_words.json", "data/scene_rules.json", "test/offline/test_ads.py"]
+    outcome: "accepted"
+    commit: "edac673"
+    human_owner: "（当时未登记）"
+    notes: "本 entry 即课程门禁第 1 条的**违规实例**：测试与实现同时产出，无「实现前测试获批」记录。"
+
+  - id: "AIU-0003"
+    date: "2026-09-30"
+    retrospective: true
+    agent: "Doubao（豆包）编码 agent"
+    tool: "AI coding agent（非本仓库当前工具链）"
+    role: "build"
+    task: "产出 P2 合规过滤管道（四步纯函数）与 P1 演示脚本"
+    artifacts: ["src/compliance/", "test/offline/test_compliance.py", "scripts/demo_p1.py"]
+    outcome: "accepted"
+    commit: "3ea7868"
+    human_owner: "（当时未登记）"
+    notes: "该管道于 2026-10-06 扩展为五步（新增 check_banned_check），见 AIU-0010。"
+
+  - id: "AIU-0004"
+    date: "2026-09-30"
+    retrospective: true
+    agent: "Doubao（豆包）编码 agent"
+    tool: "AI coding agent（非本仓库当前工具链）"
+    role: "build"
+    task: "产出 P3 场景模块（SCENE_SCHEMA / Scene / parse_scene），并移除测试中的 FakeScene 桩"
+    artifacts: ["src/scene/", "test/offline/test_scene.py", "test/offline/test_ads.py", "test/offline/test_compliance.py"]
+    outcome: "accepted"
+    commit: "d85f910"
+    human_owner: "（当时未登记）"
+    notes: "此提交修改了 test_ads.py 与 test_compliance.py——测试与实现同批变更，违反课程角色分离（TESTER 应独立于 BUILD）。"
+
+  - id: "AIU-0005"
+    date: "2026-10-04"
+    retrospective: true
+    agent: "Doubao（豆包）编码 agent"
+    tool: "AI coding agent（非本仓库当前工具链）"
+    role: "build"
+    task: "撰写项目交接文档（HANDOVER）"
+    artifacts: ["docs/HANDOVER.md"]
+    outcome: "accepted"
+    commit: "4c80445"
+    human_owner: "（当时未登记）"
+    notes: "该文档若干统计（测试数、素材数）在 2026-10-06 审计后被更新。"
+
+  # ------------------------- 实时记录（2026-10-06 起） -------------------------
+  - id: "AIU-0006"
+    date: "2026-10-06"
+    retrospective: false
+    agent: "DeepSeek Harness（本会话 agent）"
+    tool: "DSH（deepseek harness）"
+    role: "plan"
+    task: "审计现有仓库：核对课程要求（Week1 PDF）与项目文档，判定是否需要推倒重来，提出按 A1–A5 推进"
+    artifacts: ["docs/architecture/asr-register.md", "docs/architecture/concern-clusters.md"]
+    outcome: "accepted"
+    human_approval: "人类确认：保留代码层、重估需求层；V2 另建 docs2/ 轮次；补解释质量 ASR 与 token 预算 gate"
+    notes: "人类介入点：质疑「之前用的模型比较差」并要求先梳理需求，而非直接继续写代码。"
+
+  - id: "AIU-0007"
+    date: "2026-10-06"
+    retrospective: false
+    agent: "DeepSeek Harness（本会话 agent）"
+    tool: "DSH（deepseek harness）"
+    role: "build"
+    task: "D1：把需求草案转为机器可读注册表——语义化 ID、MoSCoW、fit criterion、A1 的 asr 判定与双向回指"
+    artifacts: ["docs/req/requirements.yaml", "docs/req/req-schema.json", "scripts/validate_requirements.py", "test/offline/test_requirements_registry.py"]
+    outcome: "accepted"
+    human_approval: "人类确认按建议推进"
+    notes: "引入 PyYAML dev 依赖。校验器在开发中抓出 5 处真实不一致（见 docs/bug-diary.md BUG-002/003/004）。"
+
+  - id: "AIU-0008"
+    date: "2026-10-06"
+    retrospective: false
+    agent: "DeepSeek Harness（本会话 agent）"
+    tool: "DSH（deepseek harness）"
+    role: "build"
+    task: "A1/A2/A5：产出 ASR 登记册（18 ASR + 4 impl）、不变量登记册（16 条，六字段，fail-closed fallback）、concern cluster"
+    artifacts: ["docs/architecture/asr-register.md", "docs/architecture/invariants.md", "docs/architecture/concern-clusters.md"]
+    outcome: "accepted"
+    human_approval: "人类确认按建议推进"
+    notes: "人类修正：指出笔记全文（5775 行）应作为输入，并要求按 A1–A5 而非交付物顺序推进。"
+
+  - id: "AIU-0009"
+    date: "2026-10-06"
+    retrospective: false
+    agent: "DeepSeek Harness（本会话 agent）"
+    tool: "DSH（deepseek harness）"
+    role: "build"
+    task: "D2/D3/D4：产出 5 份 CORE 工件（ADR-001/002、blueprint、trace-matrix、memory-design）与治理文件（结构/验证约束、fitness function、覆盖映射、债务册、缺陷日记、评审备忘录、AGENTS.md）"
+    artifacts: ["architecture-blueprint.md", "AGENTS.md", "docs/architecture/adr-001-guarded-hybrid.md", "docs/architecture/adr-002-fail-closed-and-governance.md", "docs/architecture/trace-matrix.md", "docs/architecture/memory-design.md", "docs/architecture/runtime-policy-catalog.md", "docs/code-governance/", "docs/debt-register.md", "docs/bug-diary.md", "docs/review-memo.md", "scripts/fitness_functions.py"]
+    outcome: "accepted"
+    human_approval: "人类指示「接着做」「先补 core」"
+    notes: "评审备忘录判定 CHANGES REQUIRED（PR 规模超标、AI-use 日志未更新、安全路径无人工批准、无具名所有者）。本 entry 即为补齐 AI-use 日志门禁的动作。"
+
+  - id: "AIU-0010"
+    date: "2026-10-06"
+    retrospective: false
+    agent: "DeepSeek Harness（本会话 agent）"
+    tool: "DSH（deepseek harness）"
+    role: "build"
+    task: "代码审计并修复：违禁词命中非确定性（BUG-006）、BannedWords.load fail-closed 不一致（BUG-007）；补齐素材使四条规则可达；把 banned_check 实装为管道第五步"
+    artifacts: ["src/ads/banned_words.py", "src/compliance/pipeline.py", "data/ads.json", "test/offline/test_banned_words.py", "test/offline/test_compliance.py", "test/offline/test_ads.py", "scripts/audit_implementation.py", "docs/bug-diary.md", "docs/debt-register.md"]
+    outcome: "accepted"
+    human_approval: "人类授权：「你发现问题你可以直接改」；并确认素材由 agent 自造补齐"
+    notes: "触及 safety-critical 路径（src/compliance/、data/、src/ads/schema.py 的消费方），按 ADR-002 D4 本应先请 ADR 批准——本次为人类口头直接授权，记录为 TD-013。"
+
+  - id: "AIU-0011"
+    date: "2026-10-06"
+    retrospective: false
+    agent: "DeepSeek Harness（本会话 agent）"
+    tool: "DSH（deepseek harness）"
+    role: "plan"
+    task: "关闭 OQ-004/OQ-009/OQ-010；ADR-001/002 转为 Accepted；起草并获批 P4 执行计划；按门禁 1 预登记 P4 测试"
+    artifacts: ["docs/architecture/adr-001-guarded-hybrid.md", "docs/architecture/adr-002-fail-closed-and-governance.md", "docs/plans/P4-selector.md", "docs/test-approvals.yaml", "docs/req/requirements.yaml", "docs/req/req-schema.json", "docs/architecture/asr-register.md", "docs/architecture/concern-clusters.md", "docs/execution-plan-template.md", "Prompt.md"]
+    outcome: "accepted"
+    human_approval: "人类指示：解释口径 = 「为什么选这条」；置信度 = 0.5；批准者 = Shane；并确认「看过了没问题，继续推进」"
+    notes: >-
+      本 entry 即 Prompt.md §5 要求的「每阶段都要有人工批准」的落地：
+      ① ADR 由 Proposed 转 Accepted；② 执行计划获批（批准者 Shane）；
+      ③ 测试按设计**先于实现**获批（TA-0002，门禁 1 的正例）。
+      No agent may self-approve —— 以上三步均由人类做出。
+      OQ-004/OQ-009/OQ-010 关闭后，需求基线冻结的前置条件仅剩 ADR 批准（已完成）。
+
+  - id: "AIU-0012"
+    date: "2026-10-06"
+    retrospective: false
+    agent: "DeepSeek Harness（本会话 agent）"
+    tool: "DSH（deepseek harness）"
+    role: "build"
+    task: "实现 P4 src/selector/：LLMClient 协议 + MockLLM + 严格输出解析（闭集执行点）+ 六层上下文装配与 token 预算 + 解释路径隔离"
+    artifacts: ["src/selector/__init__.py", "src/selector/types.py", "src/selector/client.py", "src/selector/parser.py", "src/selector/context.py", "src/selector/explanation.py", "test/offline/test_selector.py", "test/offline/test_context_assembly.py", "test/offline/test_explanation.py", "scripts/fitness_functions.py", "docs/code-governance/acceptance-coverage-map.yaml", "docs/architecture/trace-matrix.md", "docs/debt-register.md"]
+    outcome: "accepted"
+    human_approval: "依据已批准的 docs/plans/P4-selector.md；实现未偏离计划的 target_files 与 allowed_imports"
+    notes: >-
+      按计划 §5 的 8 步执行。新增 45 个测试（套件 86 → 131，全绿）。
+      治理工件同步：覆盖表 test_backed 9→12、negative_test_backed 5→8；
+      追踪矩阵 5 条需求 Status 转 tested；关闭 TD-020（课程硬性要求的 AI 组件已落地），
+      新立 TD-022（元素 ⑤–⑦ 仍空，系统尚不能端到端跑通）。
+      纪律：未修改任何冻结路径（src/ads、src/scene、src/compliance、data/）——
+      由 fitness function 的 S2 机械检查（selector ↮ compliance 双向禁止依赖）。
+      实现中修正了 3 处我自己的测试期望错误（parser 检查顺序、compaction 档位边界），
+      均以实测数据定案而非推断。
+
+  - id: "AIU-0013"
+    date: "2026-10-06"
+    retrospective: false
+    agent: "DeepSeek Harness（本会话 agent）"
+    tool: "DSH（deepseek harness）"
+    role: "build"
+    task: "实现 P5+P6 使系统端到端跑通：src/app/（编排 + 10 条降级路径 + timeout gate + 阈值判定 + 注入门 + 配置启动期校验）、src/render/（两形态判别联合 schema）、src/audit/（JSONL 恰好一条 + 22 条 monitor 登记册）"
+    artifacts: ["src/app/pipeline.py", "src/app/cli.py", "src/app/__main__.py", "src/app/sanitize.py", "src/app/config.py", "src/app/__init__.py", "src/render/schema.py", "src/render/serializer.py", "src/render/__init__.py", "src/audit/store.py", "src/audit/metrics.py", "src/audit/__init__.py", "test/offline/test_app_pipeline.py", "test/offline/test_render.py", "test/offline/test_audit.py", "test/offline/test_sanitize.py", "scripts/demo_p4_selector.py", "scripts/fitness_functions.py", "docs/code-governance/acceptance-coverage-map.yaml", "docs/architecture/trace-matrix.md", "docs/debt-register.md", "docs/test-approvals.yaml"]
+    outcome: "accepted"
+    human_approval: "人类指示「P5，先跑通」——明确优先端到端可运行"
+    notes: >-
+      端到端已跑通：`python -m app --time-slot night --device mobile --tag student`
+      → 广告形态 + 恰好 1 条审计记录。套件 131 → 216（新增 85 个）。
+      覆盖表由 12/22 → **17/22** 需求、8/16 → **12/16** 不变量（计数经脚本核对）。
+      关闭 TD-020（AI 组件缺失）与 TD-022（元素 ⑤–⑦ 为空）。
+      **⚠️ 治理顺序倒置**：按人类"先跑通"的指示，测试与实现同批产出，
+      TA-0003 的批准时间晚于实现 —— 未用假时间掩盖，登记为 TD-023。
+      实现中被自己的机制抓到 1 处错误：管道误用未登记的指标名
+      `llm_output_parse_failure_count`（登记册中为 `..._rate`），
+      被 MetricSnapshot 当场拒绝 —— 证明"指标名登记册"有效。
+      另修正 2 处我自己的测试期望错误（未知标签不会清空候选集；上午/桌面时
+      MockLLM 选中的是合规通过的 ad_002，而非我预期的拒绝）。
+
+  - id: "AIU-0014"
+    date: "2026-10-06"
+    retrospective: false
+    agent: "DeepSeek Harness（本会话 agent）"
+    tool: "DSH（deepseek harness）"
+    role: "verify"
+    task: "P5/P6 后的治理同步与自检：覆盖表/追踪矩阵/债务册更新、AGENTS.md ④ 一致性核对、全量九项检查"
+    artifacts: ["docs/debt-register.md", "docs/architecture/trace-matrix.md", "docs/code-governance/acceptance-coverage-map.yaml", "docs/HANDOVER.md"]
+    outcome: "accepted"
+    human_approval: "无需人工批准（只读核对与登记）"
+    notes: >-
+      发现并登记 TD-024：src/app/config.py 与 __main__.py 不在 AGENTS.md ④
+      的模块组织表内（S1 是包级检查故不违规，但文档与实现已不一致，
+      须由人工决定更新文档还是合并文件）。
+      全量九项检查中曾出现 fitness V2 FAIL（INV-ADS-005/006 声明已覆盖
+      但测试缺"反例"标记），已通过按既有标记约定补充 docstring 修复 ——
+      即"声明与证据必须字面一致"这一检查在起作用。
+
+  - id: "AIU-0015"
+    date: "2026-10-06"
+    retrospective: false
+    agent: "DeepSeek Harness（本会话 agent）"
+    tool: "DSH（deepseek harness）"
+    role: "plan"
+    task: "起草 P7 执行计划；关闭 OQ-005；建立 ADR-003（评估集作为一等架构资产）；按门禁 1 预登记 P7 测试（TA-0004）"
+    artifacts: ["docs/plans/P7-eval.md", "docs/architecture/adr-003-evaluation-set-as-architecture.md", "docs/test-approvals.yaml", "docs/req/requirements.yaml", "architecture-blueprint.md", "AGENTS.md", "config.yaml", "src/selector/context.py", "src/app/pipeline.py"]
+    outcome: "accepted"
+    human_approval: "人类批准计划，并确认：OQ-005 口径 = agent 自造为主 + 人类审查后可增改；通过率阈值 0.95（FAIL 也是有效观测）；并指示「新造 ADR，评测也是重要决策」"
+    notes: >-
+      本轮是 TD-023 的**纠正轮**：先计划 → 获批 → **测试先获批（TA-0004,
+      pre_registered）** → 才实现。门禁 1 因此首次获得一个**完全按序**的正例。
+      人类的一句话改变了设计：「FAIL 也是一种情况」⇒ 写入 ADR-003 D3
+      （MUST_FAIL 不计入通过率分母），避免了"预期降级稀释通过率"并使
+      "系统正确地说不"成为可观测项。
+      经核实修正了计划初稿中的 ASR 引用错误（评估集承载于 ASR-ADS-15 而非
+      A3 系列），并显式处理 AGENTS.md ⑦ 的"新增顶层包先改文档"要求。
+
+  - id: "AIU-0016"
+    date: "2026-10-06"
+    retrospective: false
+    agent: "DeepSeek Harness（本会话 agent）"
+    tool: "DSH（deepseek harness）"
+    role: "build"
+    task: "实现 P7：固定评估集（25 条）+ replay runner（分母分离 + 违规独立判据）+ 版本溯源 + 变异验证"
+    artifacts: ["eval/__init__.py", "eval/eval_cases.json", "eval/eval_runner.py", "scripts/mutation_check.py", "test/offline/test_eval_runner.py", "test/offline/test_mutation_check.py", "test/offline/test_provenance.py", "docs/code-governance/acceptance-coverage-map.yaml", "docs/architecture/trace-matrix.md", "docs/debt-register.md"]
+    outcome: "accepted"
+    human_approval: "依据已批准的 docs/plans/P7-eval.md；实现未偏离计划的 target_files"
+    notes: >-
+      套件 216 → 284（新增 68 个测试）。覆盖表 17/22 → **21/22**、12/16 → **13/16**
+      （计数经脚本核对）。
+      **变异验证 12/12 全部被检出** —— 且过程中该机制抓到了它**自己的**两类缺陷：
+      ① 插件 ImportError（exit 4）被误判为"变异被检出"（假通过），
+         已把"必须出现注入标记且非 exit 4"写成 `_classify` 并加了 4 项回归测试；
+      ② 补丁打在**错误绑定**上 —— `selector/__init__` 重导出的名称有**包级绑定**，
+         而管道持有**导入引用**，改定义模块对二者均无效，导致变异假通过。
+         已在变异表中为每条显式列出**全部绑定**并写明理由。
+      另修正 2 处我自己的用例设计错误：EC-016 期望的"空 ad_id"在真实管道中
+      不可达（空候选更早降级）；EC-025 我一度标注为 MUST_PASS 却自知会失败 ——
+      那是伪造失败，已改。
+      **残留**：新立 TD-025（评估集本身无保护，改动它即可让门禁变绿）——
+      补法需人工决定是否把它加入 ADR-002 D4 受保护清单，agent 不自行扩大。
+
+  - id: "AIU-0017"
+    date: "2026-10-06"
+    retrospective: false
+    agent: "DeepSeek Harness（本会话 agent）"
+    tool: "DSH（deepseek harness）"
+    role: "build"
+    task: "补齐 D3 缺失的 4 个治理文件；产出本地 hook 安装器；按人类选定的方案甲新建 ADR-004 把验证平面纳入受保护路径"
+    artifacts: ["docs/code-governance/mcp-tool-manifest.md", ".opencode/permissions.jsonc", ".opencode/rules.md", ".agent/rules.md", "scripts/install_hooks.py", "docs/architecture/adr-004-verification-plane-protection.md", "scripts/check_safety_paths.py", "docs/architecture/adr-002-fail-closed-and-governance.md", "docs/debt-register.md", "README.md"]
+    outcome: "accepted"
+    human_approval: "人类批准 D3 文件；对 TD-025 在三个方案中选择「甲 —— 新建 ADR-004」（符合 ADR-002 的冻结语义）"
+    notes: >-
+      D3 的 4 个缺失文件补齐后，D3 转为完成。
+      **ADR-004 的实质扩展**：TD-025 只提到 eval/，但审查发现同一漏洞模式
+      波及整个「验证平面」—— 新增受保护路径 9 → 19 条（含六道门禁检查器、
+      fitness_functions.py、mutation_check.py、覆盖映射表）。
+      据此提出 D2「运行平面 vs 验证平面」的判据，使后续归类有据可依。
+      **未改写已冻结的 ADR-002 路径表**：只加一个标记，补充清单由 ADR-004 承载；
+      检查器改为标记驱动的多 ADR 合并（**用显式标记而非全表扫描** ——
+      其它 ADR 表格也含路径字符串，无差别解析会造成假拦截）。
+      **开发中被自己的机制抓到 2 处错误**：
+      ① 标记匹配用了朴素子串 —— ADR-004 说明段里引用了标记字符串，
+         导致解析到错误的表格、10 条清单全部被判为「仅只读」；已改为严格整行匹配。
+      ② ADR-004 初稿路径表的列序与 ADR-002 不一致，被同一处调试发现。
+      残留：新立 TD-028（清单「忘放标记」是静默失败，须加机械断言）。
+      TD-026 只完成一半：安装器就位，但 agent 会话的沙箱不允许写 .git/hooks/，
+      须由人类执行 `python scripts/install_hooks.py`。
