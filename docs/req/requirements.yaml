@@ -1,0 +1,1015 @@
+# CS5351 场景化广告推荐引擎 — 机器可读需求注册表（D1）
+#
+# 课程格式依据：note/3. 软件架构.md 行 995–1014（示例 YAML 需求）
+#   - id         语义化，ID 本身编码类别（FR / ARCH / NFR-SAFETY / SEC / GOV ...）
+#   - enforced_by 扁平字符串，指向具体代码元素
+# 本文件是**唯一需求单一来源**；docs/req/*-draft.md 为内容底稿（informative），冲突时以本文件为准。
+# ID 一经发布不可复用、不可重编号。旧编号 REQ-001~039 的映射见 §legacy_id_map。
+#
+# 校验：python scripts/validate_requirements.py
+
+schema_version: "2.0"
+registry_revision: "2026-10-06.1"
+
+project:
+  name: "场景化广告推荐引擎 / Scenario-based Ad Recommendation Engine"
+  course: "CS5351 Agentic Software Engineering Project"
+  repository: "https://github.com/StantonJoY/SE_Project"
+  baseline_version: "V1"
+  target_versions: ["V1", "V2"]
+
+# ---------------------------------------------------------------------------
+# 版本轮次 ↔ 目录映射（课程 note 行 1531/1562：每轮 ADD append-only，绝不合并轮次）
+# ---------------------------------------------------------------------------
+evolution_rounds:
+  - round: "V1"
+    governs: "docs/architecture/"
+    docs_dir: "docs/architecture/"
+    status: "active"
+    note: "B1 基线：架构工件在当前轮次目录下，AI 可改。"
+  - round: "V2"
+    governs: "docs2/architecture/"
+    docs_dir: "docs2/architecture/"
+    status: "not_started"
+    note: "竞价轮次。V2 启动时 V1 层冻结（IMMUTABLE）；新条目只追加到 docs2/。"
+
+scope:
+  in:
+    - "给定本地广告素材库与场景特征（时段/设备/用户标签），选出一条广告并渲染结构化结果。"
+    - "LLM 在规则预筛后的候选集内做闭集选择，输出结构化 JSON（ad_id/reason/confidence）。"
+    - "确定性合规过滤作为安全边界，拦截违禁词、敏感品类、场景冲突与非法输出。"
+    - "全流程审计日志（JSONL），可重放每次决策。"
+    - "V2（docs2/ 轮次）：报价竞价框架，LLM 降级为相关性建议，成交/花费/胜负由确定性数学代码决定。"
+  out:
+    - item: "RAG / 向量检索召回"
+      deferred_to: "V3"
+      rationale: "课程只要求至少一个真实 AI 组件；V1 用闭集 LLM 选择已满足，且无数据库约束下 RAG 成本高。"
+      source_refs:
+        - {source: "proposal", locator: "§2 核心流程（RAG 检索层）"}
+        - {source: "req_v1_draft", locator: "§1 不做什么"}
+    - item: "接入真实广告投放平台 / 实时竞价"
+      deferred_to: "V3+"
+      rationale: "无外部依赖约束，V1/V2 为本地离线可测系统。"
+      source_refs:
+        - {source: "req_v1_draft", locator: "§1 不做什么"}
+    - item: "LLM 自由生成全新文案"
+      deferred_to: "V3"
+      rationale: "生成式文案扩大合规逃逸面；V1 只做闭集选择，安全故事更可证。"
+      source_refs:
+        - {source: "req_v1_draft", locator: "§1 不做什么"}
+    - item: "用户画像系统 / 多轮上下文记忆"
+      deferred_to: "V3"
+      rationale: "V1 场景特征为无状态单轮输入，降低状态治理复杂度；对应六层上下文的 HISTORY 层不适用。"
+      source_refs:
+        - {source: "req_v1_draft", locator: "§1 不做什么"}
+    - item: "Web 前端界面"
+      deferred_to: "V3"
+      rationale: "V1 渲染 = JSON/简单 HTML，课程评分权重在治理与安全边界而非 UI。"
+      source_refs:
+        - {source: "req_v1_draft", locator: "§1 不做什么"}
+
+sources:
+  - key: "req_v1_draft"
+    path: "docs/req/requirements-v1-draft.md"
+    kind: "requirement_draft"
+    authority: "normative"
+    note: "V1 内容底稿，已固定为 V1 基线。"
+  - key: "req_v2_draft"
+    path: "docs/req/requirements-v2-bidding-draft.md"
+    kind: "requirement_draft"
+    authority: "candidate"
+    note: "V2 竞价候选需求，归属 docs2/ 轮次。"
+  - key: "design_v1"
+    path: "docs/design/technical-design-v1.md"
+    kind: "design_draft"
+    authority: "informative"
+    note: "实现现状参考；其架构性内容正在迁移至 docs/architecture/。"
+  - key: "proposal"
+    path: "docs/req/requirements-v1-draft.md"
+    kind: "proposal"
+    authority: "informative"
+    note: "立项提案（工作区副本 project-proposal.md）；原始范围含 RAG，已按 scope.out 后移。"
+  - key: "course_spec"
+    path: "Week1_Project_Requirements.pdf"
+    kind: "course_spec"
+    authority: "normative"
+    note: "交付物 D1~D9 与 6 道阻塞门禁来源。"
+  - key: "sa_lecture"
+    path: "SE/note/3. 软件架构.md"
+    kind: "course_spec"
+    authority: "normative"
+    note: "A1~A5 五动作、11 类架构工件、Capstone 评分量规；架构需求分类依据。"
+
+# ---------------------------------------------------------------------------
+# A1 产物（ASR 登记册）与 A2 产物（不变量登记册）的机器可读回指
+# 一致性由 scripts/validate_requirements.py 双向校验
+# ---------------------------------------------------------------------------
+architecture_inputs:
+  asr_register: "docs/architecture/asr-register.md"
+  invariant_register: "docs/architecture/invariants.md"
+  adr_dir: "docs/architecture/adr/"
+
+# ===========================================================================
+# B1 基线需求（docs/architecture/ 轮次）
+# ===========================================================================
+baseline_requirements:
+
+  # ---- 功能性需求 ----
+  - id: "REQ-ADS-FR-001"
+    version: "V1"
+    type: "functional"
+    statement: "系统从本地 JSON 文件加载广告素材库。"
+    priority: "must"
+    fit_criterion: "加载后素材条数 = 文件条数；重复 ad_id 立即报错并终止加载。"
+    verification: ["unit_test", "negative_test"]
+    enforced_by: "ads.repository.AdRepository.load"
+    enforcement: ["ads.repository.AdRepository.load"]
+    asr: false
+    legacy_id: "REQ-001"
+    source_refs:
+      - {source: "req_v1_draft", locator: "F1.1, REQ-001"}
+      - {source: "design_v1", locator: "§3.1"}
+    status: "implemented"
+    notes: "AdLoadError 覆盖文件缺失/非法 JSON/顶层非数组/重复 ad_id。判为 implementation（litmus 1 维）。"
+
+  - id: "REQ-ADS-FR-002"
+    version: "V1"
+    type: "functional"
+    statement: "场景输入（时段/设备/用户标签）必须通过校验后才能进入推荐流程。"
+    priority: "must"
+    fit_criterion: "非法/缺失/多余字段的输入 100% 被拒绝并返回明确原因；合法输入被规范化为 Scene。"
+    verification: ["unit_test", "negative_test", "schema_validation"]
+    enforced_by: "scene.parser.parse_scene"
+    enforcement: ["scene.parser.parse_scene", "scene.schema.SCENE_SCHEMA"]
+    asr: false
+    legacy_id: "REQ-003"
+    source_refs:
+      - {source: "req_v1_draft", locator: "F2.1, F2.2, REQ-003"}
+      - {source: "design_v1", locator: "§3.2"}
+    status: "implemented"
+    notes: "判为 implementation（litmus 1 维）。user_tags 去重保序；非法输入不进入 LLM。"
+
+  - id: "REQ-ADS-FR-003"
+    version: "V1"
+    type: "functional"
+    statement: "无候选、LLM 失败/超时、合规全拒等场景必须降级为结构化「无广告」，系统不得崩溃。"
+    priority: "must"
+    fit_criterion: "上述全部降级场景返回符合 render schema 的明确结果且进程正常退出，崩溃次数 = 0。"
+    verification: ["unit_test", "negative_test", "evaluation_replay"]
+    enforced_by: "app.recommend（fallback path）"
+    enforcement: ["app.recommend", "render"]
+    asr: true
+    asr_id: "ASR-ADS-09"
+    invariants: ["INV-ADS-013"]
+    legacy_id: "REQ-011"
+    source_refs:
+      - {source: "req_v1_draft", locator: "F4.5, F6.4, REQ-011"}
+      - {source: "design_v1", locator: "§4.2"}
+    status: "specified"
+    notes: "强制 fallback path + 结构化原因码。降级一律 no_ad，不做换候选重选。"
+
+  - id: "REQ-ADS-FR-004"
+    version: "V1"
+    type: "functional"
+    statement: "渲染输出为结构化推荐结果，含广告形态与无广告形态两种。"
+    priority: "must"
+    fit_criterion: "输出符合 render schema，两种形态均通过校验，通过率 100%。"
+    verification: ["schema_validation", "unit_test"]
+    enforced_by: "render"
+    enforcement: ["render"]
+    asr: false
+    legacy_id: "REQ-012"
+    source_refs:
+      - {source: "req_v1_draft", locator: "F5.1, REQ-012"}
+    status: "specified"
+    notes: "判为 implementation（litmus 1 维）。"
+
+  # ---- 架构约束类不变量 ----
+  - id: "REQ-ADS-ARCH-001"
+    version: "V1"
+    type: "invariant"
+    statement: "每条素材字段完整且合法，不满足 schema 的素材不得进入系统。"
+    priority: "must"
+    fit_criterion: "全量素材通过 AD_SCHEMA 校验，通过率 100%；任一不合法使加载整体失败并指明第几条。"
+    verification: ["schema_validation", "negative_test"]
+    enforced_by: "ads.repository.AdRepository.load（加载期 schema gate）"
+    enforcement: ["ads.schema.AD_SCHEMA", "ads.repository.AdRepository.load"]
+    asr: true
+    asr_id: "ASR-ADS-01"
+    invariants: ["INV-ADS-015"]
+    legacy_id: "REQ-002"
+    fallback: "拒绝整批加载并报错（不降级、不跳过），阻断服务启动直至素材修复。"
+    source_refs:
+      - {source: "req_v1_draft", locator: "F1.2, REQ-002"}
+      - {source: "design_v1", locator: "§3.1"}
+    status: "implemented"
+
+  - id: "REQ-ADS-ARCH-002"
+    version: "V1"
+    type: "invariant"
+    statement: "LLM 只能在规则预筛后的候选集内选择广告，不得输出候选集外的广告。"
+    priority: "must"
+    fit_criterion: "返回的 ad_id 必须存在于候选集；候选集外 ad_id 的被展示数为 0。"
+    verification: ["unit_test", "negative_test", "deterministic_replay"]
+    enforced_by: "compliance.pipeline.check_output"
+    enforcement: ["ads.repository.AdRepository.filter_by_scene", "compliance.pipeline.check_output", "selector.LLMClient"]
+    asr: true
+    asr_id: "ASR-ADS-02"
+    invariants: ["INV-ADS-002"]
+    legacy_id: "REQ-004"
+    fallback: "REJECT 该输出 → 降级 no_ad（原因码 output_not_in_candidates）。"
+    source_refs:
+      - {source: "req_v1_draft", locator: "F3.1, F3.2, REQ-004"}
+      - {source: "design_v1", locator: "§4.1"}
+    status: "specified"
+    notes: "闭集决策是本项目 AI 安全叙事的核心；对应课程 ARCH-001（AI 非最终权威）。"
+
+  - id: "REQ-ADS-ARCH-003"
+    version: "V1"
+    type: "invariant"
+    statement: "LLM 输出必须是合法结构化 JSON，且字段类型与取值合法。"
+    priority: "must"
+    fit_criterion: "schema 校验通过率 100%；解析失败重试 1 次，仍失败则降级，违规展示数 = 0。"
+    verification: ["schema_validation", "unit_test", "negative_test"]
+    enforced_by: "selector.parser.parse_llm_output"
+    enforcement: ["selector.parser.parse_llm_output", "selector.LLMClient"]
+    asr: true
+    asr_id: "ASR-ADS-03"
+    invariants: ["INV-ADS-003"]
+    legacy_id: "REQ-005"
+    fallback: "重试 1 次 → 仍失败 → 降级 no_ad（原因码 llm_output_invalid）。重试期间不展示任何广告。"
+    source_refs:
+      - {source: "req_v1_draft", locator: "F3.3, F4.4, REQ-005"}
+      - {source: "design_v1", locator: "§4.2"}
+    status: "specified"
+
+  - id: "REQ-ADS-ARCH-004"
+    version: "V1"
+    type: "invariant"
+    statement: "确定性部分的输出必须可复现：同输入给出逐位一致的结果。"
+    priority: "must"
+    fit_criterion: "固定输入下确定性过滤结果零差异；重复 replay 输出完全一致。"
+    verification: ["deterministic_replay", "property_test"]
+    enforced_by: "compliance.pipeline.run_compliance（无状态纯函数）"
+    enforcement: ["compliance.pipeline.run_compliance", "ads.repository.AdRepository.filter_by_scene"]
+    asr: false
+    legacy_id: "REQ-015"
+    fallback: "不一致即判定结果不可信，本轮降级 no_ad 并记录差异样本。"
+    source_refs:
+      - {source: "req_v1_draft", locator: "REQ-015"}
+    status: "implemented"
+    notes: "判为 implementation（litmus 1 维）：纯函数 + 无全局状态即可满足。正式 replay 证据待评估集落地。"
+
+  # ---- 安全不变式（核心） ----
+  - id: "REQ-ADS-NFR-SAFETY-001"
+    version: "V1"
+    type: "invariant"
+    statement: "展示的广告必须全部通过确定性合规过滤（零逃逸）。"
+    priority: "must"
+    fit_criterion: "已展示广告的合规通过率 100%，合规逃逸数 = 0；过滤为纯函数，同输入同输出。"
+    verification: ["unit_test", "negative_test", "deterministic_replay", "evaluation_replay"]
+    enforced_by: "compliance.pipeline.run_compliance"
+    enforcement: ["compliance.pipeline.run_compliance"]
+    asr: true
+    asr_id: "ASR-ADS-04"
+    invariants: ["INV-ADS-001"]
+    legacy_id: "REQ-006"
+    fallback: "任一检查失败即 REJECT → 降级 no_ad（原因码 compliance_rejected + 失败规则名），并写审计告警。"
+    source_refs:
+      - {source: "req_v1_draft", locator: "M4, REQ-006"}
+      - {source: "design_v1", locator: "§4.1, §4.2"}
+    status: "implemented"
+    notes: "对应课程核心 ASR NFR-SAFETY-001。管道顺序固定 output_exists → banned_words → banned_check → category → scene。"
+
+  - id: "REQ-ADS-NFR-SAFETY-002"
+    version: "V1"
+    type: "invariant"
+    statement: "敏感品类（医疗、金融承诺、成人等）禁止展示。"
+    priority: "must"
+    fit_criterion: "黑名单品类广告展示数 = 0。"
+    verification: ["unit_test", "negative_test"]
+    enforced_by: "compliance.pipeline.check_category"
+    enforcement: ["compliance.pipeline.check_category", "compliance.rules.SceneRules.category_blacklist"]
+    asr: true
+    asr_id: "ASR-ADS-05"
+    invariants: ["INV-ADS-007"]
+    legacy_id: "REQ-007"
+    fallback: "REJECT → 降级 no_ad；品类黑名单变更须走架构决策（安全关键路径）。"
+    source_refs:
+      - {source: "req_v1_draft", locator: "F4.2, REQ-007"}
+      - {source: "design_v1", locator: "§3.3"}
+    status: "implemented"
+
+  - id: "REQ-ADS-NFR-SAFETY-003"
+    version: "V1"
+    type: "invariant"
+    statement: "含违禁词的广告（标题或文案）禁止展示。"
+    priority: "must"
+    fit_criterion: "违禁词命中广告的展示数 = 0；命中时返回最长命中词以便定位。"
+    verification: ["unit_test", "negative_test"]
+    enforced_by: "compliance.pipeline.check_banned_words"
+    enforcement: ["ads.banned_words.BannedWords.check_all", "compliance.pipeline.check_banned_words"]
+    asr: true
+    asr_id: "ASR-ADS-06"
+    invariants: ["INV-ADS-007"]
+    legacy_id: "REQ-008"
+    fallback: "REJECT → 降级 no_ad；命中词写入审计日志，用于词表迭代。"
+    source_refs:
+      - {source: "req_v1_draft", locator: "F4.1, REQ-008"}
+      - {source: "design_v1", locator: "§3.3"}
+    status: "implemented"
+
+  - id: "REQ-ADS-NFR-SAFETY-004"
+    version: "V1"
+    type: "invariant"
+    statement: "广告不得违反自身声明的场景限制，也不得违反规则级场景禁忌。"
+    priority: "must"
+    fit_criterion: "违反场景限制（夜间/校园/设备）的广告展示数 = 0。"
+    verification: ["unit_test", "negative_test"]
+    enforced_by: "compliance.pipeline.check_scene"
+    enforcement: ["compliance.pipeline.check_scene", "compliance.rules.SceneRules", "ads.repository.AdRepository.filter_by_scene"]
+    asr: true
+    asr_id: "ASR-ADS-07"
+    invariants: ["INV-ADS-008"]
+    legacy_id: "REQ-009"
+    fallback: "REJECT → 降级 no_ad；预筛与终检双保险，任一层拦截即阻断展示。"
+    source_refs:
+      - {source: "req_v1_draft", locator: "F4.3, REQ-009"}
+      - {source: "design_v1", locator: "§3.1, §3.3"}
+    status: "implemented"
+
+  - id: "REQ-ADS-NFR-SAFETY-005"
+    version: "V1"
+    type: "invariant"
+    statement: "LLM 低置信度或异常输出不得直接展示。"
+    priority: "must"
+    fit_criterion: "confidence < 阈值的样本展示数 = 0，100% 走降级路径。"
+    verification: ["unit_test", "negative_test"]
+    enforced_by: "app.recommend（threshold gate）"
+    enforcement: ["app.recommend", "selector.LLMClient"]
+    asr: true
+    asr_id: "ASR-ADS-08"
+    invariants: ["INV-ADS-006"]
+    legacy_id: "REQ-010"
+    fallback: "视为不可信 → 降级 no_ad（原因码 low_confidence）并记录原始 confidence。"
+    source_refs:
+      - {source: "req_v1_draft", locator: "F3.4, REQ-010"}
+      - {source: "design_v1", locator: "§4.2"}
+    status: "specified"
+    notes: "阈值 = 0.5，由 config.yaml 的 selector.confidence_threshold 单点控制（非本条的 metric——invariant 的 metric 会与『可度量质量属性』语义混淆）。OQ-004 已于 2026-10-06 关闭；后续若评估集显示过松/过紧，按『评估集落地时』重开。"
+
+  # ---- 安全类（输入侧） ----
+  - id: "REQ-ADS-SEC-001"
+    version: "V1"
+    type: "security"
+    statement: "已知注入模式必须在抵达 LLM 之前被中和；LLM 输出不得含可执行指令。"
+    priority: "must"
+    fit_criterion: "注入样本 100% 被拦截或中和，被当作指令执行的样本数 = 0。"
+    verification: ["negative_test", "evaluation_replay"]
+    enforced_by: "输入 sanitize gate（pre-model）+ selector.parser.parse_llm_output"
+    enforcement: ["app.recommend（sanitize gate）", "selector.parser.parse_llm_output"]
+    asr: true
+    asr_id: "ASR-ADS-12"
+    invariants: ["INV-ADS-005"]
+    legacy_id: "REQ-016"
+    source_refs:
+      - {source: "req_v1_draft", locator: "REQ-016"}
+      - {source: "sa_lecture", locator: "§4.6 P41（把注入规格化为误用用例）、§3.2 INV-005"}
+    status: "specified"
+    notes: "对应课程 SEC-001 → INV-005。防御纵深两层：pre-model 中和 + 输出侧 schema 校验。"
+
+  # ---- 性能 / 成本 / 质量类非功能需求 ----
+  - id: "REQ-ADS-NFR-PERF-001"
+    version: "V1"
+    type: "performance"
+    statement: "端到端推荐延迟可控；延迟违规必须被处理。"
+    priority: "must"
+    fit_criterion: "离线评估集上 p95 端到端延迟 ≤ 5s；超时请求 100% 走 fallback 路径并触发 drift alert。"
+    verification: ["metric_measurement", "unit_test", "evaluation_replay"]
+    enforced_by: "timeout gate + fallback path + p95 监控"
+    enforcement: ["app.recommend（timeout gate）", "audit（latency metric）"]
+    asr: true
+    asr_id: "ASR-ADS-11"
+    invariants: ["INV-ADS-013"]
+    legacy_id: "REQ-014"
+    metric:
+      name: "e2e_recommend_latency_p95"
+      unit: "s"
+      threshold: 5
+      direction: "at_most"
+      window: "离线评估集 replay，n >= 20；LLM 走 mock 与 live 分别记录"
+    source_refs:
+      - {source: "req_v1_draft", locator: "REQ-014"}
+      - {source: "sa_lecture", locator: "§3.9 P23 Row 3（性能陷阱：违规必须被处理）"}
+    status: "specified"
+    notes: "课程明确的性能陷阱。强制四元素：timeout gate、fallback path、p95 监控、SLA drift alert。无 fallback 则需求未实现。优先级由 should 升为 must。"
+
+  - id: "REQ-ADS-NFR-COST-001"
+    version: "V1"
+    type: "cost"
+    statement: "单次推荐的 LLM 上下文 token 消耗不得超过配置上限；关键约束不得因压缩而消失。"
+    priority: "must"
+    fit_criterion: "超预算请求被裁剪并记录，超预算未记录数 = 0；compaction 后 standing constraints 仍在最终 prompt 中。"
+    verification: ["unit_test", "metric_measurement"]
+    enforced_by: "route_budget + summarization gate + re-injection"
+    enforcement: ["selector（context assembly）", "config.yaml"]
+    asr: true
+    asr_id: "ASR-ADS-14"
+    asr_ids: ["ASR-ADS-14", "ASR-ADS-A3-01"]
+    invariants: ["INV-ADS-014"]
+    legacy_id: "REQ-018"
+    metric:
+      name: "llm_context_tokens_per_request"
+      unit: "token"
+      threshold: 2000
+      direction: "at_most"
+      window: "单次推荐请求，LLM 走 mock 与 live 分别记录"
+    fallback: "降级 SUMMARIZE 路径；仍超上限 → no_ad（原因码 budget_exceeded），记录 token 计数。"
+    source_refs:
+      - {source: "req_v1_draft", locator: "REQ-018"}
+      - {source: "sa_lecture", locator: "§3.3.1 NFR-COST-001（≤2000 tokens）、§8.4 P163–165"}
+    status: "specified"
+    notes: "由 ASR-ADS-A3-01（Token Budget）派生；另见 INV-ADS-014。阈值沿用课程量级（2000），待真实 LLM 接入后按候选集规模标定。优先级由 should 升为 must。"
+
+  - id: "REQ-ADS-NFR-QA-001"
+    version: "V1"
+    type: "quality"
+    statement: "内置固定评估集供语义评估门禁使用。"
+    priority: "must"
+    fit_criterion: "评估集 ≥ 20 条，可一键 replay 并输出通过率与违规数。"
+    verification: ["evaluation_replay", "ci_gate"]
+    enforced_by: "eval.eval_runner（CI 阻断门）"
+    enforcement: ["eval.eval_runner"]
+    asr: true
+    asr_id: "ASR-ADS-15"
+    invariants: ["INV-ADS-016"]
+    legacy_id: "REQ-019"
+    metric:
+      name: "eval_case_count"
+      unit: "条"
+      threshold: 20
+      direction: "at_least"
+      window: "eval/eval_cases.json"
+    source_refs:
+      - {source: "req_v1_draft", locator: "F6.2, REQ-019"}
+      - {source: "course_spec", locator: "D7 gate 4（语义评估门）"}
+    status: "specified"
+    notes: "对应课程门禁第 4 条。期望值口径见 OQ-005。"
+
+  - id: "REQ-ADS-NFR-QA-002"
+    version: "V1"
+    type: "quality"
+    statement: "每个验收标准至少 1 个测试；每个不变量至少 1 个会在违规时失败的测试。"
+    priority: "must"
+    fit_criterion: "CI 全部通过，且每个不变量的失败测试在注入违规时确实失败（变异验证）。"
+    verification: ["unit_test", "negative_test", "ci_gate"]
+    enforced_by: "test/offline + 覆盖面校验 + CI 门"
+    enforcement: ["test.offline", "docs/code-governance/verification-constraints.md"]
+    asr: true
+    asr_id: "ASR-ADS-16"
+    invariants: ["INV-ADS-011"]
+    legacy_id: "REQ-020"
+    metric:
+      name: "fit_criterion_test_coverage"
+      unit: "%"
+      threshold: 100
+      direction: "exactly"
+      window: "trace matrix 全量 fit criterion"
+    source_refs:
+      - {source: "req_v1_draft", locator: "REQ-020"}
+      - {source: "course_spec", locator: "D4 验证治理"}
+    status: "specified"
+    notes: "流程不变量来源（INV-ADS-011）。课程标注流程不变量 Required for full marks。"
+
+  # ---- 治理类 ----
+  - id: "REQ-ADS-GOV-001"
+    version: "V1"
+    type: "governance"
+    statement: "每次推荐请求写入恰好一条完整审计证据。"
+    priority: "must"
+    fit_criterion: "每次请求恰好 1 条日志，字段完整（场景、候选集规模、LLM 原始输出、过滤结果、最终输出、模型与 prompt 版本）。"
+    verification: ["unit_test", "deterministic_replay"]
+    enforced_by: "audit（JSONL 追加写）"
+    enforcement: ["audit"]
+    asr: true
+    asr_id: "ASR-ADS-10"
+    invariants: ["INV-ADS-012"]
+    legacy_id: "REQ-013"
+    metric:
+      name: "audit_entries_per_request"
+      unit: "条"
+      threshold: 1
+      direction: "exactly"
+      window: "全量离线测试与评估集 replay，含异常路径"
+    fallback: "审计写入失败 → 本次推荐失败（fail-closed），不静默继续；写告警。"
+    source_refs:
+      - {source: "req_v1_draft", locator: "F5.2, REQ-013"}
+      - {source: "sa_lecture", locator: "§4.7 P42（可解释性 by Design）、§5.5 Trace Matrix"}
+    status: "specified"
+    notes: "对应课程 GOV-001。课程行 538：audit logging 不可协商，token 节省不能绕过它。"
+
+  - id: "REQ-ADS-GOV-002"
+    version: "V1"
+    type: "governance"
+    statement: "代码或 Prompt 变更必须同步更新 AI-use 日志；safety-critical 路径变更必须有 ADR。"
+    priority: "must"
+    fit_criterion: "CI AI-use 日志门禁通过；改动代码/Prompt 未更新日志的 PR 被阻塞；safety-critical 路径的未记录变更数 = 0。"
+    verification: ["ci_gate", "static_analysis", "negative_test"]
+    enforced_by: "permission model + pre-commit hook"
+    enforcement: [".opencode/permissions.jsonc", ".github/workflows/ci.yml", "docs/ai-use-log.yaml"]
+    asr: true
+    asr_id: "ASR-ADS-13"
+    invariants: ["INV-ADS-009", "INV-ADS-010"]
+    legacy_id: "REQ-017"
+    source_refs:
+      - {source: "req_v1_draft", locator: "REQ-017"}
+      - {source: "course_spec", locator: "D7 gate 6（AI-use log gate）、branch protection"}
+      - {source: "sa_lecture", locator: "§5.7 Permission Model、§10.1 失败归因 decision gate"}
+    status: "specified"
+    notes: "对应课程 GOV-002。Permission 定义 WHO，Hook 强制 WHEN，两者都需要。"
+
+  # ---- A3 新增 ASR 的承载需求（RE 未捕获，源自部署 AI 组件） ----
+  - id: "REQ-ADS-AI-001"
+    version: "V1"
+    type: "quality"
+    statement: "解释（reason）必须是结构上独立于决策路径的建议性输出，且不得绕过合规 gate。"
+    priority: "must"
+    fit_criterion: "解释评估失败时 ad_id 不变；解释文本中含违禁词时被剥离，剥离率 100%。"
+    verification: ["unit_test", "negative_test"]
+    enforced_by: "解释路径组装元素（与决策路径结构分离）"
+    enforcement: ["selector（explanation path）"]
+    asr: true
+    asr_id: "ASR-ADS-A3-02"
+    invariants: ["INV-ADS-004"]
+    metric:
+      name: "explanation_decision_isolation_violations"
+      unit: "次"
+      threshold: 0
+      direction: "exactly"
+      window: "隔离测试：注入解释失败与违禁解释"
+    source_refs:
+      - {source: "sa_lecture", locator: "§3.3.2 NFR-002（Explanation Quality）、INV-004"}
+    status: "specified"
+    notes: "A3 新增。对应课程 INV-004。领域口径见 asr-register.md 假设 A-01（待团队定义）。"
+
+  - id: "REQ-ADS-AI-002"
+    version: "V1"
+    type: "governance"
+    statement: "每条决策的证据记录必须捕获模型版本、prompt 版本与关键阈值；safety-critical 变更必须被结构性拦截。"
+    priority: "must"
+    fit_criterion: "每条决策记录含 model_version + prompt_version + threshold；safety-critical 文件零未记录变更。"
+    verification: ["unit_test", "negative_test", "static_analysis"]
+    enforced_by: "audit（配置捕获）+ pre_write_hook"
+    enforcement: ["audit", "scripts/（pre-write hook）"]
+    asr: true
+    asr_id: "ASR-ADS-A3-03"
+    invariants: ["INV-ADS-009", "INV-ADS-012"]
+    source_refs:
+      - {source: "sa_lecture", locator: "§3.3.3 GOV-001（Traceability）、§5.7 Configuration Governance"}
+    status: "specified"
+    notes: "A3 新增。把 REQ-ADS-GOV-001 的字段清单升级为结构性 hook 强制。"
+
+# ===========================================================================
+# V2 候选需求 —— 归属 docs2/ 轮次，尚未并入基线（OQ-008）
+# 与 V1 基线同时列出以便追溯；ID 已重编为语义化格式，旧编号见 legacy_id 与 legacy_id_map。
+# 候选需求的 asr_id 留待 docs2/ 轮次建立；本文件只记录 A1 预判结果（见 asr-register.md §9）。
+# ===========================================================================
+candidate_requirements:
+
+  - id: "REQ-ADS-NFR-SAFETY-006"
+    version: "V2"
+    type: "invariant"
+    statement: "出价必须为有限正整数且落在合法区间内。"
+    priority: "must"
+    fit_criterion: "全量素材满足 bid ∈ [bid_floor, bid_ceiling]，通过率 100%；非法值在加载期被拒绝并报错。"
+    verification: ["schema_validation", "negative_test", "unit_test"]
+    enforced_by: "ads.schema（加载期范围双重校验）"
+    asr: false
+    legacy_id: "REQ-021"
+    deferred_to_round: "V2"
+    fallback: "加载期整体拒绝该素材批次（与 REQ-ADS-ARCH-001 同策略），不将非法报价带入任何决策。"
+    source_refs:
+      - {source: "req_v2_draft", locator: "§2, REQ-021"}
+    status: "deferred"
+
+  - id: "REQ-ADS-ARCH-005"
+    version: "V2"
+    type: "invariant"
+    statement: "预算不变式恒成立：0 ≤ spent ≤ total 且 remaining = total − spent。"
+    priority: "must"
+    fit_criterion: "任意时刻该等式精确成立（整数运算），违例数 = 0；重放核对一致。"
+    verification: ["property_test", "unit_test", "deterministic_replay"]
+    enforced_by: "bidding.budget"
+    asr: true
+    legacy_id: "REQ-022"
+    deferred_to_round: "V2"
+    fallback: "冻结该广告（转 exhausted）并写审计告警，阻断后续展示直至人工核对台账。"
+    source_refs:
+      - {source: "req_v2_draft", locator: "§4, REQ-022"}
+    status: "deferred"
+    notes: "litmus 命中 State + QA + Evidence = 3 维 → ASR 预判（引入跨轮持久状态）。"
+
+  - id: "REQ-ADS-ARCH-006"
+    version: "V2"
+    type: "invariant"
+    statement: "预算耗尽的广告不得被选中展示。"
+    priority: "must"
+    fit_criterion: "被展示广告满足 budget_remaining > 0（或 ≥ 最低可成交额），违规数 = 0。"
+    verification: ["unit_test", "negative_test"]
+    enforced_by: "bidding.engine（候选过滤）"
+    asr: true
+    legacy_id: "REQ-023"
+    deferred_to_round: "V2"
+    fallback: "该广告退出候选集并转 exhausted；本轮若无其他候选则降级 no_ad。"
+    source_refs:
+      - {source: "req_v2_draft", locator: "REQ-023"}
+    status: "deferred"
+
+  - id: "REQ-ADS-ARCH-007"
+    version: "V2"
+    type: "invariant"
+    statement: "花费入账精确：每次展示后 spent 增量恰好等于成交价。"
+    priority: "must"
+    fit_criterion: "每轮 spent 增量 = 成交价；全量 Σspent = Σ成交价（重放核对一致），差额 = 0。"
+    verification: ["property_test", "deterministic_replay", "unit_test"]
+    enforced_by: "bidding.budget"
+    asr: true
+    legacy_id: "REQ-024"
+    deferred_to_round: "V2"
+    fallback: "停止竞价模块计费并回滚到上一份已核对台账快照，同时人工介入。"
+    source_refs:
+      - {source: "req_v2_draft", locator: "§4, REQ-024"}
+    status: "deferred"
+
+  - id: "REQ-ADS-ARCH-008"
+    version: "V2"
+    type: "invariant"
+    statement: "金额一律以整数分计算，禁止浮点累计。"
+    priority: "must"
+    fit_criterion: "全量金额字段为整数类型，累计过程零精度丢失（属性测试）。"
+    verification: ["property_test", "static_analysis"]
+    enforced_by: "bidding.budget"
+    asr: false
+    legacy_id: "REQ-025"
+    deferred_to_round: "V2"
+    fallback: "类型校验拦截非整数金额输入并拒绝该素材/请求；已产生的浮点台账作废重算。"
+    source_refs:
+      - {source: "req_v2_draft", locator: "§2, REQ-025"}
+    status: "deferred"
+
+  - id: "REQ-ADS-ARCH-009"
+    version: "V2"
+    type: "invariant"
+    statement: "评分计算是确定性纯函数。"
+    priority: "must"
+    fit_criterion: "相同输入重复计算得分逐位一致；评估集 replay 零差异。"
+    verification: ["property_test", "deterministic_replay"]
+    enforced_by: "bidding.scoring"
+    asr: false
+    legacy_id: "REQ-026"
+    deferred_to_round: "V2"
+    fallback: "两次计算结果不一致即判定分数不可信，本轮降级 no_ad 并记录差异样本。"
+    source_refs:
+      - {source: "req_v2_draft", locator: "REQ-026"}
+    status: "deferred"
+
+  - id: "REQ-ADS-NFR-SAFETY-007"
+    version: "V2"
+    type: "invariant"
+    statement: "数值异常（NaN/Inf/溢出）必须被拦截，不得进入决策。"
+    priority: "must"
+    fit_criterion: "注入异常数值样本 100% 被拒绝并走降级。"
+    verification: ["negative_test", "property_test"]
+    enforced_by: "bidding.engine（数值校验 gate）"
+    asr: true
+    legacy_id: "REQ-027"
+    deferred_to_round: "V2"
+    fallback: "拒绝该广告与请求，降级 no_ad 并记录异常样本用于回归。"
+    source_refs:
+      - {source: "req_v2_draft", locator: "§4, REQ-027"}
+    status: "deferred"
+
+  - id: "REQ-ADS-ARCH-010"
+    version: "V2"
+    type: "invariant"
+    statement: "成交价规则唯一且确定（pay-as-bid 或次价，二选一）。"
+    priority: "must"
+    fit_criterion: "成交价按唯一指定规则计算，实现唯一、文档明确；不存在第二条计价路径。"
+    verification: ["unit_test", "deterministic_replay"]
+    enforced_by: "bidding.engine（单一计价路径）"
+    asr: true
+    legacy_id: "REQ-028"
+    deferred_to_round: "V2"
+    fallback: "规则未定义或出现多路径时拒绝成交并降级 no_ad，同时按安全关键路径要求人工批准。"
+    source_refs:
+      - {source: "req_v2_draft", locator: "REQ-028, §5"}
+    status: "deferred"
+    notes: "规则选择本身是待决项，见 OQ-006。"
+
+  - id: "REQ-ADS-ARCH-011"
+    version: "V2"
+    type: "invariant"
+    statement: "平局必须有确定性 tie-break，不允许随机结果。"
+    priority: "must"
+    fit_criterion: "分数相同时按固定规则（如 ad_id 升序）胜出，重复运行胜者完全一致。"
+    verification: ["unit_test", "property_test", "deterministic_replay"]
+    enforced_by: "bidding.engine（tie-break）"
+    asr: true
+    legacy_id: "REQ-029"
+    deferred_to_round: "V2"
+    fallback: "tie-break 未命中或结果不稳定时拒绝本轮成交并降级 no_ad。"
+    source_refs:
+      - {source: "req_v2_draft", locator: "REQ-029"}
+    status: "deferred"
+
+  - id: "REQ-ADS-FR-005"
+    version: "V2"
+    type: "functional"
+    statement: "竞价引擎在候选集内按最终分数选出胜者。"
+    priority: "must"
+    fit_criterion: "胜者 = 分数最高且预算充足者；分数公式为单一来源且可配置。"
+    verification: ["unit_test", "deterministic_replay"]
+    enforced_by: "bidding.engine"
+    asr: false
+    legacy_id: "REQ-030"
+    deferred_to_round: "V2"
+    source_refs:
+      - {source: "req_v2_draft", locator: "REQ-030"}
+    status: "deferred"
+
+  - id: "REQ-ADS-FR-006"
+    version: "V2"
+    type: "functional"
+    statement: "最终分数公式明确且单一来源，变更必须触发评估 replay。"
+    priority: "must"
+    fit_criterion: "final_score 公式在 config 中单点定义；变更触发评估 replay。"
+    verification: ["unit_test", "evaluation_replay", "ci_gate"]
+    enforced_by: "bidding.scoring + config.yaml"
+    asr: true
+    legacy_id: "REQ-031"
+    deferred_to_round: "V2"
+    source_refs:
+      - {source: "req_v2_draft", locator: "REQ-031"}
+      - {source: "sa_lecture", locator: "§5.7 Configuration Governance"}
+    status: "deferred"
+    notes: "公式形态为待决项，见 OQ-007。单一来源 + 变更触发 replay 使其成为 ASR 预判。"
+
+  - id: "REQ-ADS-ARCH-012"
+    version: "V2"
+    type: "invariant"
+    statement: "LLM 仅提供相关性建议，不直接决定成交；成交价与花费字段由竞价引擎写入。"
+    priority: "must"
+    fit_criterion: "LLM 输出 schema 不含成交价/花费字段（schema 层强制）；上述字段仅由竞价引擎产生。"
+    verification: ["schema_validation", "negative_test"]
+    enforced_by: "selector.parser.parse_llm_output（schema 层权限边界）"
+    asr: true
+    legacy_id: "REQ-032"
+    deferred_to_round: "V2"
+    fallback: "输出 schema 校验拒绝含成交/花费字段的 LLM 输出，降级 no_ad 并记录违规样本。"
+    source_refs:
+      - {source: "req_v2_draft", locator: "REQ-032, §4"}
+    status: "deferred"
+    notes: "权限边界：LLM 对成交/花费无写权限，在 schema 层而非约定层强制。V2 把 V1 的 ARCH-001 推进到极致。"
+
+  - id: "REQ-ADS-FR-007"
+    version: "V2"
+    type: "functional"
+    statement: "预算耗尽的广告自动转 exhausted 并退出候选集。"
+    priority: "must"
+    fit_criterion: "展示后 remaining = 0 的广告在下一轮不再进入候选集。"
+    verification: ["unit_test", "deterministic_replay"]
+    enforced_by: "bidding.budget + 候选集构建"
+    asr: false
+    legacy_id: "REQ-033"
+    deferred_to_round: "V2"
+    source_refs:
+      - {source: "req_v2_draft", locator: "REQ-033"}
+    status: "deferred"
+
+  - id: "REQ-ADS-FR-008"
+    version: "V2"
+    type: "functional"
+    statement: "每次竞价决策写入含完整竞价格局的审计快照。"
+    priority: "must"
+    fit_criterion: "每次决策日志含 bid / budget / spend / final_score / 成交价，可完整重放决策过程。"
+    verification: ["unit_test", "deterministic_replay"]
+    enforced_by: "audit（竞价快照）"
+    asr: false
+    legacy_id: "REQ-034"
+    deferred_to_round: "V2"
+    source_refs:
+      - {source: "req_v2_draft", locator: "REQ-034"}
+    status: "deferred"
+
+  - id: "REQ-ADS-NFR-QA-003"
+    version: "V2"
+    type: "quality"
+    statement: "竞价模块全部离线可测，不依赖 LLM。"
+    priority: "must"
+    fit_criterion: "竞价引擎为纯逻辑模块（无 LLM 依赖），test/offline 全覆盖。"
+    verification: ["unit_test", "static_analysis"]
+    enforced_by: "test.offline（结构约束）"
+    asr: false
+    legacy_id: "REQ-035"
+    deferred_to_round: "V2"
+    metric:
+      name: "bidding_offline_line_coverage"
+      unit: "%"
+      threshold: 90
+      direction: "at_least"
+      window: "test/offline 对 src/bidding 的语句覆盖率"
+    source_refs:
+      - {source: "req_v2_draft", locator: "REQ-035"}
+    status: "deferred"
+
+  - id: "REQ-ADS-SEC-002"
+    version: "V2"
+    type: "security"
+    statement: "报价数据防篡改、防注入。"
+    priority: "should"
+    fit_criterion: "素材加载期 schema + 范围双重校验；异常报价样本 100% 被拒绝。"
+    verification: ["schema_validation", "negative_test"]
+    enforced_by: "ads.repository.AdRepository.load"
+    asr: false
+    legacy_id: "REQ-036"
+    deferred_to_round: "V2"
+    source_refs:
+      - {source: "req_v2_draft", locator: "REQ-036"}
+    status: "deferred"
+
+  - id: "REQ-ADS-GOV-003"
+    version: "V2"
+    type: "governance"
+    statement: "竞价规则变更须经评估 replay 与架构决策，安全关键路径需人工批准。"
+    priority: "must"
+    fit_criterion: "语义评估门禁覆盖竞价变更；AI-use 日志同步；安全关键路径变更附带 ADR 与人工批准记录。"
+    verification: ["ci_gate", "evaluation_replay"]
+    enforced_by: "permission model + pre-commit hook + CI 门"
+    asr: true
+    legacy_id: "REQ-037"
+    deferred_to_round: "V2"
+    source_refs:
+      - {source: "req_v2_draft", locator: "REQ-037"}
+      - {source: "course_spec", locator: "D7 gate 4, gate 6; branch protection"}
+    status: "deferred"
+
+  - id: "REQ-ADS-NFR-QA-004"
+    version: "V2"
+    type: "quality"
+    statement: "评估集扩展竞价场景。"
+    priority: "should"
+    fit_criterion: "新增用例覆盖预算耗尽、出价越界、平局、数值异常、花费重放，合计 ≥ 10 条。"
+    verification: ["evaluation_replay"]
+    enforced_by: "eval（竞价分区）"
+    asr: false
+    legacy_id: "REQ-038"
+    deferred_to_round: "V2"
+    metric:
+      name: "bidding_eval_case_count"
+      unit: "条"
+      threshold: 10
+      direction: "at_least"
+      window: "eval/eval_cases.json 竞价分区"
+    source_refs:
+      - {source: "req_v2_draft", locator: "REQ-038"}
+    status: "deferred"
+
+  - id: "REQ-ADS-NFR-PERF-002"
+    version: "V2"
+    type: "performance"
+    statement: "竞价计算开销可忽略。"
+    priority: "should"
+    fit_criterion: "100 条候选内单次竞价计算耗时 < 50ms（离线基准）。"
+    verification: ["metric_measurement", "unit_test"]
+    enforced_by: "bidding.engine"
+    asr: false
+    legacy_id: "REQ-039"
+    deferred_to_round: "V2"
+    metric:
+      name: "bidding_compute_latency"
+      unit: "ms"
+      threshold: 50
+      direction: "at_most"
+      window: "100 条候选离线基准，取多次运行中位数"
+    source_refs:
+      - {source: "req_v2_draft", locator: "REQ-039"}
+    status: "deferred"
+
+# ---------------------------------------------------------------------------
+# 旧编号映射（D1 v1 → v2）。旧编号已废弃，仅用于追溯历史讨论与文档。
+# ---------------------------------------------------------------------------
+legacy_id_map:
+  "REQ-001": "REQ-ADS-FR-001"
+  "REQ-002": "REQ-ADS-ARCH-001"
+  "REQ-003": "REQ-ADS-FR-002"
+  "REQ-004": "REQ-ADS-ARCH-002"
+  "REQ-005": "REQ-ADS-ARCH-003"
+  "REQ-006": "REQ-ADS-NFR-SAFETY-001"
+  "REQ-007": "REQ-ADS-NFR-SAFETY-002"
+  "REQ-008": "REQ-ADS-NFR-SAFETY-003"
+  "REQ-009": "REQ-ADS-NFR-SAFETY-004"
+  "REQ-010": "REQ-ADS-NFR-SAFETY-005"
+  "REQ-011": "REQ-ADS-FR-003"
+  "REQ-012": "REQ-ADS-FR-004"
+  "REQ-013": "REQ-ADS-GOV-001"
+  "REQ-014": "REQ-ADS-NFR-PERF-001"
+  "REQ-015": "REQ-ADS-ARCH-004"
+  "REQ-016": "REQ-ADS-SEC-001"
+  "REQ-017": "REQ-ADS-GOV-002"
+  "REQ-018": "REQ-ADS-NFR-COST-001"
+  "REQ-019": "REQ-ADS-NFR-QA-001"
+  "REQ-020": "REQ-ADS-NFR-QA-002"
+  "REQ-021": "REQ-ADS-NFR-SAFETY-006"
+  "REQ-022": "REQ-ADS-ARCH-005"
+  "REQ-023": "REQ-ADS-ARCH-006"
+  "REQ-024": "REQ-ADS-ARCH-007"
+  "REQ-025": "REQ-ADS-ARCH-008"
+  "REQ-026": "REQ-ADS-ARCH-009"
+  "REQ-027": "REQ-ADS-NFR-SAFETY-007"
+  "REQ-028": "REQ-ADS-ARCH-010"
+  "REQ-029": "REQ-ADS-ARCH-011"
+  "REQ-030": "REQ-ADS-FR-005"
+  "REQ-031": "REQ-ADS-FR-006"
+  "REQ-032": "REQ-ADS-ARCH-012"
+  "REQ-033": "REQ-ADS-FR-007"
+  "REQ-034": "REQ-ADS-FR-008"
+  "REQ-035": "REQ-ADS-NFR-QA-003"
+  "REQ-036": "REQ-ADS-SEC-002"
+  "REQ-037": "REQ-ADS-GOV-003"
+  "REQ-038": "REQ-ADS-NFR-QA-004"
+  "REQ-039": "REQ-ADS-NFR-PERF-002"
+
+open_questions:
+  - id: "OQ-001"
+    question: "LLM 供应商选型（考虑香港/内地可用性与成本），以及 live 测试与 CI 密钥如何管理（不入库）。"
+    owner: "B"
+    blocks: ["REQ-ADS-ARCH-002", "REQ-ADS-NFR-COST-001"]
+    due_gate: "P8 前，Sprint 3 结束"
+  - id: "OQ-002"
+    question: "违禁词表范围：当前 24 词，目标 20~50 词，范围与评审流程如何定。"
+    owner: "A"
+    blocks: ["REQ-ADS-NFR-SAFETY-003"]
+    due_gate: "评估集冻结前"
+  - id: "OQ-003"
+    question: "素材库规模与品类分布：当前 8 条种子，目标 30~50 条，需覆盖全部规则分支。"
+    owner: "C"
+    blocks: ["REQ-ADS-ARCH-001", "REQ-ADS-NFR-QA-001"]
+    due_gate: "评估集冻结前"
+  - id: "OQ-004"
+    question: "confidence 阈值 0.5 是否合适，需用评估集调参确定。"
+    owner: "B"
+    blocks: ["REQ-ADS-NFR-SAFETY-005"]
+    due_gate: "**已于 2026-10-06 关闭** —— 阈值定为 **0.5**，由 config.yaml 的 selector.confidence_threshold 单点控制。评估集落地后若显示过松/过紧则重开。"
+    status: "closed"
+    resolution: "阈值 = 0.5（人类决策，2026-10-06）"
+  - id: "OQ-009"
+    question: "「解释（reason）」的领域口径：广告推荐系统中什么算 explanation，如何评估其质量。"
+    owner: "team"
+    blocks: ["REQ-ADS-AI-001"]
+    due_gate: "**已于 2026-10-06 关闭**"
+    status: "closed"
+    resolution: >-
+      口径定为「**为什么选这条广告**」——即解释须说明在当前场景特征下
+      选择该广告而非候选集中其他广告的理由。据此：① 解释是建议性输出，
+      不得改写 ad_id；② 解释不得绕过 compliance（含违禁词复查）；
+      ③ 解释质量不达标只降级解释，不影响决策（INV-ADS-004）。
+  - id: "OQ-005"
+    question: "评估集口径：期望广告由人工标注，还是按品类匹配判定。"
+    owner: "D"
+    blocks: ["REQ-ADS-NFR-QA-001", "REQ-ADS-NFR-QA-004"]
+    due_gate: "**已于 2026-10-06 关闭**（随 docs/plans/P7-eval.md 批准）"
+    status: "closed"
+    resolution: >-
+      口径 = **agent 自造标注集为主 + 人类审查后可增改**（记作「甲/混合」方案）。
+      每条用例同时含：`expected`（ad | no_ad）、`expected_ad_id`（**人工标注的正确答案**，
+      提供强信号，能测出同品类内选错）、`expected_category`、`basis` 与 `anchors`。
+      判定通过率阈值 = **0.95**（人类指示：仅做 demo）。
+      关键补充：**`FAIL` 也是一种有效观测** —— `MUST_FAIL` 用例（预期降级）**单独统计**，
+      不作为阻断理由；只有 `MUST_PASS` 达成率 < 0.95 才阻断。理由：若把预期降级计入分母，
+      95% 这个数会被降级用例稀释，失去意义。
+  - id: "OQ-006"
+    question: "成交价规则：pay-as-bid（付自己的出价）还是次价（Vickrey），V2 建议 pay-as-bid 最简。"
+    owner: "B"
+    blocks: ["REQ-ADS-ARCH-010"]
+    due_gate: "V2 需求批准前"
+  - id: "OQ-007"
+    question: "最终分数公式：relevance × bid 是否够，是否需要加权（场景匹配度 × 相关性 × bid）。"
+    owner: "B"
+    blocks: ["REQ-ADS-FR-006"]
+    due_gate: "V2 需求批准前"
+  - id: "OQ-008"
+    question: "V2 竞价需求是否正式并入基线（从 candidate_requirements 迁至 baseline_requirements，并启用 docs2/）。"
+    owner: "team"
+    blocks: ["REQ-ADS-ARCH-005", "REQ-ADS-FR-005", "REQ-ADS-FR-006", "REQ-ADS-FR-008"]
+    due_gate: "V1 收尾后、V2 开工前"
+  - id: "OQ-010"
+    question: "受限沙箱下子进程无法在子目录建临时目录，导致使用 pytest `tmp_path` 的用例无法执行。"
+    owner: "D"
+    blocks: ["REQ-ADS-NFR-QA-002"]
+    due_gate: "**已于 2026-10-06 关闭**"
+    status: "closed"
+    resolution: >-
+      已移除全部 `tmp_path` 依赖：test_ads.py 改为在文件 I/O 边界打桩
+      （`_FakePath` + monkeypatch `builtins.open`），test_banned_words.py 同法。
+      离线套件现为 86 passed / 0 error，不再依赖宿主临时目录可写性。
+      该约束已写入 verification-constraints.md §5；见 BUG-001。

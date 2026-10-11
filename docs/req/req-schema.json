@@ -1,0 +1,363 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/StantonJoY/SE_Project/docs/req/req-schema.json",
+  "title": "CS5351 Requirements Registry Schema (v2)",
+  "description": "Validates docs/req/requirements.yaml. Course format follows note/3. 软件架构.md lines 995-1014: semantic IDs that encode category, plus a flat enforced_by. Two sections: baseline_requirements (current round) and candidate_requirements (deferred to a later evolution round). Every requirement carries an ID, type, statement, MoSCoW priority and a machine-checkable fit criterion. Non-functional requirements must be expressed as metric + threshold + verification (course D1). Invariants must declare an operational fallback (course D2.3). Every requirement must declare whether it is architecturally significant (A1) and point at its ASR/invariant IDs.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "project",
+    "evolution_rounds",
+    "scope",
+    "sources",
+    "architecture_inputs",
+    "baseline_requirements",
+    "candidate_requirements"
+  ],
+  "additionalProperties": false,
+
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+(\\.[0-9]+)?$"},
+    "registry_revision": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}\\.[0-9]+$"},
+
+    "project": {
+      "type": "object",
+      "required": ["name", "course", "repository", "baseline_version", "target_versions"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "course": {"type": "string", "minLength": 1},
+        "repository": {"type": "string", "minLength": 1},
+        "baseline_version": {"type": "string", "pattern": "^V[0-9]+$"},
+        "target_versions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^V[0-9]+$"}
+        }
+      }
+    },
+
+    "evolution_rounds": {
+      "type": "array",
+      "description": "ADD rounds and the docs directory each governs. Course rule (note line 1531/1562): every round is append-only and directories are never merged.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["round", "governs", "docs_dir", "status"],
+        "additionalProperties": false,
+        "properties": {
+          "round": {"type": "string", "pattern": "^V[0-9]+$"},
+          "governs": {"type": "string", "minLength": 1},
+          "docs_dir": {"type": "string", "minLength": 1},
+          "status": {"type": "string", "enum": ["active", "frozen", "not_started"]},
+          "note": {"type": "string"}
+        }
+      }
+    },
+
+    "scope": {
+      "type": "object",
+      "required": ["in", "out"],
+      "additionalProperties": false,
+      "properties": {
+        "in": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "out": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["item", "deferred_to", "rationale"],
+            "additionalProperties": false,
+            "properties": {
+              "item": {"type": "string", "minLength": 1},
+              "deferred_to": {"type": "string", "minLength": 1},
+              "rationale": {"type": "string", "minLength": 1},
+              "source_refs": {"$ref": "#/$defs/source_refs"}
+            }
+          }
+        }
+      }
+    },
+
+    "sources": {
+      "type": "array",
+      "description": "Upstream artifacts requirements were derived from. Course D1: requirements discovered through analysis must link to their sources.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["key", "path", "kind", "authority"],
+        "additionalProperties": false,
+        "properties": {
+          "key": {"type": "string", "pattern": "^[a-z0-9_]+$"},
+          "path": {"type": "string", "minLength": 1},
+          "kind": {
+            "type": "string",
+            "enum": ["requirement_draft", "design_draft", "proposal", "course_spec", "governance_plan", "analysis"]
+          },
+          "authority": {"type": "string", "enum": ["normative", "candidate", "informative"]},
+          "note": {"type": "string"}
+        }
+      }
+    },
+
+    "architecture_inputs": {
+      "type": "object",
+      "description": "A1/A2 artifacts this registry is cross-linked with. Bidirectional consistency is verified by scripts/validate_requirements.py.",
+      "required": ["asr_register", "invariant_register", "adr_dir"],
+      "additionalProperties": false,
+      "properties": {
+        "asr_register": {"type": "string", "minLength": 1},
+        "invariant_register": {"type": "string", "minLength": 1},
+        "adr_dir": {"type": "string", "minLength": 1}
+      }
+    },
+
+    "baseline_requirements": {
+      "type": "array",
+      "description": "Requirements of the current build target. Must all share project.baseline_version.",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/requirement"}
+    },
+
+    "candidate_requirements": {
+      "type": "array",
+      "description": "Requirements reserved for a later evolution round; not part of the current build target.",
+      "items": {"$ref": "#/$defs/requirement"}
+    },
+
+    "legacy_id_map": {
+      "type": "object",
+      "description": "Superseded requirement IDs mapped to their replacements. IDs are immutable once published, so this preserves traceability across renumbering.",
+      "additionalProperties": {"type": "string", "pattern": "^REQ-[A-Z0-9-]+$"}
+    },
+
+    "open_questions": {
+      "type": "array",
+      "description": "Unresolved decisions. Closed entries are KEPT (not deleted) so that the decision history stays auditable — the registry doubles as a decision log (course: requirements co-evolve with artifacts).",
+      "items": {
+        "type": "object",
+        "required": ["id", "question", "owner", "blocks", "due_gate"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^OQ-[0-9]{3}$"},
+          "question": {"type": "string", "minLength": 1},
+          "owner": {"type": "string", "enum": ["A", "B", "C", "D", "team"]},
+          "blocks": {
+            "type": "array",
+            "minItems": 1,
+            "items": {"type": "string", "pattern": "^REQ(-[A-Z0-9]+)+$"}
+          },
+          "due_gate": {"type": "string", "minLength": 1},
+          "status": {
+            "type": "string",
+            "enum": ["open", "closed"],
+            "description": "Defaults to 'open' when absent."
+          },
+          "resolution": {
+            "type": "string",
+            "minLength": 1,
+            "description": "How it was decided, by whom, and when. Required once status is closed."
+          }
+        },
+        "allOf": [
+          {
+            "if": {"properties": {"status": {"const": "closed"}}, "required": ["status"]},
+            "then": {"required": ["resolution"]}
+          }
+        ]
+      }
+    }
+  },
+
+  "$defs": {
+    "source_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["source", "locator"],
+        "additionalProperties": false,
+        "properties": {
+          "source": {"type": "string", "pattern": "^[a-z0-9_]+$"},
+          "locator": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+
+    "metric": {
+      "type": "object",
+      "required": ["name", "unit", "threshold", "direction"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "unit": {"type": "string", "minLength": 1},
+        "threshold": {"type": "number"},
+        "direction": {"type": "string", "enum": ["at_most", "at_least", "exactly"]},
+        "window": {"type": "string", "minLength": 1}
+      }
+    },
+
+    "requirement": {
+      "type": "object",
+      "required": [
+        "id",
+        "version",
+        "type",
+        "statement",
+        "priority",
+        "fit_criterion",
+        "verification",
+        "enforced_by",
+        "asr",
+        "source_refs",
+        "status"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^REQ-[A-Z0-9]+(-[A-Z0-9]+)+$",
+          "description": "Semantic ID. Category is encoded in the ID itself (course note line 995-1014)."
+        },
+        "version": {"type": "string", "pattern": "^V[0-9]+$"},
+        "type": {
+          "type": "string",
+          "enum": ["functional", "invariant", "quality", "performance", "cost", "governance", "security"],
+          "description": "Course taxonomy (note line 511-516): FR / NFR / INV / GOV. invariant = must hold with zero exceptions, enforced in deterministic code, never in a prompt."
+        },
+        "statement": {"type": "string", "minLength": 1},
+        "priority": {
+          "type": "string",
+          "enum": ["must", "should", "could", "wont"],
+          "description": "MoSCoW."
+        },
+        "fit_criterion": {"type": "string", "minLength": 1},
+        "verification": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "unit_test",
+              "negative_test",
+              "property_test",
+              "schema_validation",
+              "deterministic_replay",
+              "evaluation_replay",
+              "static_analysis",
+              "ci_gate",
+              "metric_measurement",
+              "code_review"
+            ]
+          }
+        },
+        "enforced_by": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The concrete code element that guarantees this requirement. Course note line 1000. Without it an invariant is only a wish."
+        },
+        "enforcement": {
+          "type": "array",
+          "description": "Structured form of enforced_by for tooling: one entry per enforcing component.",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "asr": {
+          "type": "boolean",
+          "description": "A1 verdict: does this requirement force a structural decision (wrapper/gate/path/checkpoint/permission)? Litmus > 1 aspect altered."
+        },
+        "asr_id": {
+          "type": "string",
+          "pattern": "^ASR-[A-Z0-9-]+$",
+          "description": "Primary ASR register entry. Required (for non-deferred requirements) when asr is true."
+        },
+        "asr_ids": {
+          "type": "array",
+          "description": "All ASR register entries this requirement forces. Use when one requirement forces more than one structural decision (e.g. a cost ceiling that also forces a context-assembly ASR).",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^ASR-[A-Z0-9-]+$"}
+        },
+        "invariants": {
+          "type": "array",
+          "description": "Invariant Register entries derived from this requirement. Invariants carry the enforcing/verification/fallback trio.",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^INV-[A-Z0-9-]+$"}
+        },
+        "legacy_id": {
+          "type": "string",
+          "pattern": "^REQ-[0-9]{3}$",
+          "description": "The pre-v2 requirement ID this entry replaces."
+        },
+        "deferred_to_round": {
+          "type": "string",
+          "pattern": "^V[0-9]+$",
+          "description": "Evolution round that will own this requirement. Candidate entries must declare it."
+        },
+        "metric": {"$ref": "#/$defs/metric"},
+        "fallback": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Concrete operational action if the invariant is violated. Never 'fix the bug' or 'retry'."
+        },
+        "source_refs": {"$ref": "#/$defs/source_refs"},
+        "status": {
+          "type": "string",
+          "enum": ["specified", "approved", "implemented", "verified", "deferred", "withdrawn"]
+        },
+        "rationale": {"type": "string", "minLength": 1},
+        "notes": {"type": "string"}
+      },
+
+      "allOf": [
+        {
+          "if": {"properties": {"type": {"const": "invariant"}}, "required": ["type"]},
+          "then": {
+            "required": ["fallback"],
+            "properties": {
+              "priority": {
+                "const": "must",
+                "description": "Invariants are zero-tolerance, therefore always MoSCoW must."
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {"type": {"enum": ["quality", "performance", "cost"]}},
+            "required": ["type"]
+          },
+          "then": {
+            "required": ["metric"],
+            "description": "Non-functional requirements must be metric + threshold + verification (course D1)."
+          }
+        },
+        {
+          "if": {"properties": {"asr": {"const": true}}, "required": ["asr"]},
+          "then": {
+            "description": "An ASR must point at its ASR register entry. A requirement deferred to a later evolution round gets its ASR entry when that round starts, so asr_id is only mandatory for the current baseline."
+          }
+        },
+        {
+          "if": {
+            "properties": {"asr": {"const": true}},
+            "required": ["asr"],
+            "not": {"required": ["deferred_to_round"]},
+            "allOf": [{"not": {"required": ["asr_ids"]}}]
+          },
+          "then": {"required": ["asr_id"]}
+        },
+        {
+          "if": {"properties": {"priority": {"const": "wont"}}, "required": ["priority"]},
+          "then": {
+            "required": ["rationale"],
+            "properties": {"status": {"const": "withdrawn"}}
+          }
+        }
+      ]
+    }
+  }
+}
