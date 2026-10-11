@@ -1,6 +1,11 @@
 # CS5351 项目交接文档（HANDOVER）
 
-> 快照日期：2026-10-04 · 新对话开场先读本文件再动手，可无缝继续。
+> 快照日期：2026-10-04 · **本文档为 V1 技术交接**（状态字段已于 2026-10-06 更新至最新）。
+>
+> **接手 V2（竞价轮次）的人请先读 → [`docs/HANDOVER-V2.md`](HANDOVER-V2.md)**
+> —— 那份包含 V1 的欠缺清单（三类）、V2 的两个必须先解决的设计冲突
+> （状态设计 / 审计可读性）、V2 开工前的必备清单、以及本项目踩过的九个坑。
+>
 > 配套文档：`docs/req/requirements-v1-draft.md`（REQ-001~020）、`docs/req/requirements-v2-bidding-draft.md`（REQ-021~039）、`docs/design/technical-design-v1.md`（V1 技术方案）。
 
 ---
