@@ -22,7 +22,7 @@ class AdRepository:
     # ---- 加载 ----
 
     @classmethod
-    def load(cls, path: str | Path) -> "AdRepository":
+    def load(cls, path: str | Path) -> AdRepository:
         """从 JSON 文件加载素材库（REQ-001/002）。
 
         逐条 schema 校验，任一不合法即抛 AdLoadError；

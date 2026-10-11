@@ -1,4 +1,9 @@
-"""Ad 数据模型。"""
+"""Ad 数据模型。
+
+Implements: ADR-001（Guarded Hybrid——素材是候选集的唯一数据来源）
+Enforces: INV-ADS-015（素材契约：schema 不合法绝不进入系统）
+Verifies: REQ-ADS-ARCH-001（素材字段完整且合法）
+"""
 
 from __future__ import annotations
 
@@ -14,7 +19,7 @@ class SceneRestrictions:
     allowed_devices: list[str] = field(default_factory=list)
 
     @classmethod
-    def from_dict(cls, raw: dict) -> "SceneRestrictions":
+    def from_dict(cls, raw: dict) -> SceneRestrictions:
         return cls(
             not_night=bool(raw.get("not_night", False)),
             not_campus=bool(raw.get("not_campus", False)),
@@ -35,7 +40,7 @@ class Ad:
     banned_check: str = "pending"
 
     @classmethod
-    def from_dict(cls, raw: dict) -> "Ad":
+    def from_dict(cls, raw: dict) -> Ad:
         return cls(
             ad_id=raw["ad_id"],
             title=raw["title"],

@@ -1,4 +1,8 @@
-"""场景数据模型。"""
+"""场景数据模型。
+
+Implements: ADR-001（场景特征是推荐的唯一输入契约）
+Verifies: REQ-ADS-FR-002（场景输入校验后方可进入流程）
+"""
 
 from __future__ import annotations
 

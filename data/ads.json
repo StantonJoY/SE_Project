@@ -70,5 +70,59 @@
     "target_tags": ["student", "office_worker", "gamer"],
     "scene_restrictions": {"not_night": false, "not_campus": false, "allowed_devices": ["mobile", "desktop"]},
     "banned_check": "checked"
+  },
+  {
+    "ad_id": "ad_009",
+    "title": "健康体检套餐咨询",
+    "copy": "年度综合体检，含多项常规筛查",
+    "category": "medical",
+    "target_tags": ["office_worker", "parent"],
+    "scene_restrictions": {"not_night": false, "not_campus": false, "allowed_devices": ["mobile", "desktop", "tablet"]},
+    "banned_check": "checked"
+  },
+  {
+    "ad_id": "ad_010",
+    "title": "深夜手游榜单",
+    "copy": "夜间场热玩榜，随时开局",
+    "category": "gaming",
+    "target_tags": ["student", "gamer"],
+    "scene_restrictions": {"not_night": false, "not_campus": false, "allowed_devices": ["mobile", "tablet"]},
+    "banned_check": "checked"
+  },
+  {
+    "ad_id": "ad_011",
+    "title": "轻游戏合集推荐",
+    "copy": "碎片时间来一局，校园玩家友好",
+    "category": "gaming",
+    "target_tags": ["student", "gamer"],
+    "scene_restrictions": {"not_night": false, "not_campus": false, "allowed_devices": ["mobile", "desktop", "tablet"]},
+    "banned_check": "checked"
+  },
+  {
+    "ad_id": "ad_012",
+    "title": "成人护理用品",
+    "copy": "日常护理选品，全场满减",
+    "category": "adult",
+    "target_tags": ["office_worker"],
+    "scene_restrictions": {"not_night": false, "not_campus": false, "allowed_devices": ["mobile", "desktop"]},
+    "banned_check": "checked"
+  },
+  {
+    "ad_id": "ad_013",
+    "title": "口腔护理门诊预约",
+    "copy": "定期洁牙与口腔检查预约",
+    "category": "medical",
+    "target_tags": ["office_worker", "student"],
+    "scene_restrictions": {"not_night": true, "not_campus": false, "allowed_devices": ["mobile", "desktop"]},
+    "banned_check": "pending"
+  },
+  {
+    "ad_id": "ad_014",
+    "title": "限时折扣聚合页",
+    "copy": "多品类折扣聚合，随时查看",
+    "category": "retail",
+    "target_tags": ["student", "office_worker"],
+    "scene_restrictions": {"not_night": false, "not_campus": false, "allowed_devices": ["mobile", "desktop", "tablet"]},
+    "banned_check": "banned"
   }
 ]

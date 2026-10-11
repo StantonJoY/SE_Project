@@ -23,7 +23,7 @@ class SceneRules:
     campus_blocked_categories: tuple[str, ...] = ()
 
     @classmethod
-    def load(cls, path: str | Path) -> "SceneRules":
+    def load(cls, path: str | Path) -> SceneRules:
         p = Path(path)
         if not p.exists():
             raise SceneRulesLoadError(f"规则文件不存在: {p}")

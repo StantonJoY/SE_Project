@@ -1,8 +1,13 @@
-"""确定性合规过滤管道（REQ-006~009）。
+"""确定性合规过滤管道。
 
 纯函数：不依赖外部状态、不调用 LLM、同输入同输出。
-管道顺序固定：output 存在性 → 违禁词 → 品类禁忌 → 场景约束。
-任一失败 → REJECT；全部通过 → APPROVE（REQ-006 零逃逸）。
+管道顺序固定：output 存在性 → 违禁词 → **banned_check 状态** → 品类禁忌 → 场景约束。
+任一失败 → REJECT；全部通过 → APPROVE（零逃逸）。
+
+Implements: ADR-001（确定性 compliance 管道为 FINAL AUTHORITY）
+            ADR-002 D1（降级终态 no_ad，fail-closed）
+Enforces: INV-ADS-001（未经确定性合规过滤的广告绝不被展示）
+Verifies: REQ-ADS-NFR-SAFETY-001、REQ-ADS-ARCH-001（素材契约 fail-closed）
 """
 
 from __future__ import annotations
@@ -15,7 +20,7 @@ from .rules import SceneRules
 
 
 def check_output(ad: Ad, candidates: list[Ad]) -> CheckResult:
-    """REQ-004/005：LLM 选择的 ad_id 必须存在于候选集。"""
+    """REQ-ADS-ARCH-002：LLM 选择的 ad_id 必须存在于候选集。"""
     ids = {c.ad_id for c in candidates}
     ok = ad.ad_id in ids
     return CheckResult(
@@ -25,8 +30,26 @@ def check_output(ad: Ad, candidates: list[Ad]) -> CheckResult:
     )
 
 
+def check_banned_check(ad: Ad) -> CheckResult:
+    """REQ-ADS-ARCH-001：素材的违禁内容核验状态必须为 `checked` 才允许展示。
+
+    **fail-closed**：只有显式 `checked` 放行。`pending`（未核验）与 `banned`（已判禁投）
+    一律 REJECT —— 未经违禁内容核验的素材不得展示。
+
+    语义说明：本字段此前被 schema 与模型声明、被全部素材填写，但**无任何代码读取**，
+    导致标为 `banned` 的素材仍会被展示。本检查消除该"声明了却不强制"的落差。
+    """
+    status = ad.banned_check
+    ok = status == "checked"
+    return CheckResult(
+        ok=ok,
+        rule="banned_check",
+        detail="" if ok else f"素材违禁内容核验状态为 {status!r}（仅 'checked' 放行）",
+    )
+
+
 def check_banned_words(ad: Ad, banned_words: BannedWords) -> CheckResult:
-    """REQ-008：含违禁词的广告禁止展示（对 title + copy 全量检查）。"""
+    """REQ-ADS-NFR-SAFETY-003：含违禁词的广告禁止展示（对 title + copy 全量检查）。"""
     hit = banned_words.check_all(ad.title, ad.copy)
     return CheckResult(
         ok=hit is None,
@@ -87,13 +110,14 @@ def run_compliance(
     banned_words: BannedWords,
     rules: SceneRules,
 ) -> ComplianceVerdict:
-    """合规管道（REQ-006）：任一检查失败 → REJECT。
+    """合规管道（REQ-ADS-NFR-SAFETY-001）：任一检查失败 → REJECT。
 
-    顺序：output_exists → banned_words → category → scene。
+    顺序：output_exists → banned_words → banned_check → category → scene。
     """
     results = (
         check_output(ad, candidates),
         check_banned_words(ad, banned_words),
+        check_banned_check(ad),
         check_category(ad, rules),
         check_scene(ad, scene, rules),
     )

@@ -1,4 +1,10 @@
-"""合规检查结果模型。"""
+"""合规检查结果模型（CheckResult / ComplianceVerdict）。
+
+Implements: ADR-001（确定性 compliance 管道为 FINAL AUTHORITY）
+            ADR-002 D1（降级终态 no_ad，fail-closed）
+Enforces: INV-ADS-001（未经确定性合规过滤的广告绝不被展示）
+Verifies: REQ-ADS-NFR-SAFETY-001（零逃逸）
+"""
 
 from __future__ import annotations
 
