@@ -1,0 +1,313 @@
+{
+  "_meta": {
+    "purpose": "V1 场景化广告推荐引擎的固定评估集（ADR-003 / ASR-ADS-15 / REQ-ADS-NFR-QA-001）",
+    "authority": "只读验证资产，不参与运行时决策（ADR-003 D1/D7）",
+    "replay": "python eval/eval_runner.py",
+    "label_semantics": {
+      "MUST_PASS": "期望产出广告；**计入**通过率分母（ADR-003 D3）",
+      "MUST_FAIL": "期望降级为 no_ad；**不计入**分母，单独统计（ADR-003 D3）",
+      "MUST_FAIL_ON_REPLAY": "已知且被接受的失败；不计入分母但必须列出并附理由（ADR-003 D3）"
+    },
+    "reason_code_checked": "expect_reason 在 MUST_FAIL 用例中会被严格比对 —— 防止「降级了但不是因为预期原因」被误判为通过",
+    "mock_capabilities": {
+      "confidence": "固定置信度（默认 0.85）；用于低置信度路径",
+      "raw_override": "原样返回该文本；用于构造畸形输出",
+      "fail_with": "抛出 LLMUnavailable；用于测试不可用路径"
+    },
+    "author_note": "由 agent 自造并逐条实测确认（OQ-005 resolution）；人类审查后可增改。每条 basis 说明它为何存在。"
+  },
+
+  "cases": [
+    {
+      "id": "EC-001",
+      "scene": {"time_slot": "night", "device": "mobile", "user_tags": ["student"]},
+      "expected": "ad",
+      "label": "MUST_PASS",
+      "expect_reason": null,
+      "expected_ad_id": "ad_001",
+      "expected_category": "food_delivery",
+      "basis": "基础正常路径：深夜/手机/学生，MockLLM 取候选集中字典序最小者 ad_001（深夜咖啡外卖），合规通过",
+      "anchors": ["REQ-ADS-FR-003", "REQ-ADS-NFR-SAFETY-001"]
+    },
+    {
+      "id": "EC-002",
+      "scene": {"time_slot": "morning", "device": "desktop", "user_tags": ["office_worker"]},
+      "expected": "ad",
+      "label": "MUST_PASS",
+      "expect_reason": null,
+      "expected_ad_id": "ad_001",
+      "expected_category": "food_delivery",
+      "basis": "换时段/设备/标签组合后仍应正常出广告（预筛不误杀）",
+      "anchors": ["REQ-ADS-NFR-SAFETY-004"]
+    },
+    {
+      "id": "EC-003",
+      "scene": {"time_slot": "afternoon", "device": "tablet", "user_tags": ["student"]},
+      "expected": "ad",
+      "label": "MUST_PASS",
+      "expect_reason": null,
+      "expected_ad_id": "ad_002",
+      "expected_category": "food_delivery",
+      "basis": "午间场景下 ad_001 因 not_night 声明被预筛，故 MockLLM 落到 ad_002（晨间早餐套餐，未声明 not_night）—— 验证预筛真的在起作用",
+      "anchors": ["REQ-ADS-NFR-SAFETY-004", "INV-ADS-008"]
+    },
+    {
+      "id": "EC-004",
+      "scene": {"time_slot": "evening", "device": "mobile", "user_tags": ["parent"]},
+      "expected": "ad",
+      "label": "MUST_PASS",
+      "expect_reason": null,
+      "expected_ad_id": "ad_001",
+      "expected_category": "food_delivery",
+      "basis": "parent 标签场景（非学生、非上班族）仍应有可用候选",
+      "anchors": ["REQ-ADS-FR-001"]
+    },
+    {
+      "id": "EC-005",
+      "scene": {"time_slot": "morning", "device": "mobile"},
+      "expected": "ad",
+      "label": "MUST_PASS",
+      "expect_reason": null,
+      "expected_ad_id": "ad_001",
+      "expected_category": "food_delivery",
+      "basis": "**空 user_tags 的合法路径**：REQ-ADS-FR-002 允许不提供标签，不得因缺标签而拒绝请求",
+      "anchors": ["REQ-ADS-FR-002"]
+    },
+    {
+      "id": "EC-006",
+      "scene": {"time_slot": "night", "device": "mobile", "user_tags": ["student"]},
+      "expected": "ad",
+      "label": "MUST_PASS",
+      "expect_reason": null,
+      "expected_ad_id": "ad_001",
+      "expected_category": "food_delivery",
+      "mock": {"confidence": 0.5},
+      "basis": "**阈值边界**：confidence 恰等于阈值 0.5 必须**放行**（判定为 `<` 而非 `<=`）。若此条失败，说明阈值语义被改成了拒绝边界值",
+      "anchors": ["REQ-ADS-NFR-SAFETY-005", "INV-ADS-006"]
+    },
+
+    {
+      "id": "EC-007",
+      "scene": {"time_slot": "night", "device": "mobile", "user_tags": ["student"]},
+      "expected": "no_ad",
+      "label": "MUST_FAIL",
+      "expect_reason": "compliance_rejected",
+      "expected_ad_id": null,
+      "expected_category": null,
+      "mock": {"raw_override": "{\"ad_id\": \"ad_009\", \"reason\": \"强制选择\", \"confidence\": 0.9}"},
+      "basis": "**合规对抗**：强制选中 medical（规则黑名单品类）。LLM 想展示它，compliance 必须拦下 —— 这是本项目最重要的不变量：未经合规过滤绝不展示",
+      "anchors": ["INV-ADS-001", "REQ-ADS-NFR-SAFETY-002"]
+    },
+    {
+      "id": "EC-008",
+      "scene": {"time_slot": "night", "device": "mobile", "user_tags": ["student"]},
+      "expected": "no_ad",
+      "label": "MUST_FAIL",
+      "expect_reason": "compliance_rejected",
+      "expected_ad_id": null,
+      "expected_category": null,
+      "mock": {"raw_override": "{\"ad_id\": \"ad_007\", \"reason\": \"强制选择\", \"confidence\": 0.9}"},
+      "basis": "**合规对抗**：强制选中 financial_guarantee（黑名单品类）。与 EC-007 分列，使两类黑名单各自有独立回归锚点",
+      "anchors": ["INV-ADS-001", "REQ-ADS-NFR-SAFETY-002"]
+    },
+    {
+      "id": "EC-009",
+      "scene": {"time_slot": "night", "device": "mobile", "user_tags": ["student"]},
+      "expected": "no_ad",
+      "label": "MUST_FAIL",
+      "expect_reason": "compliance_rejected",
+      "expected_ad_id": null,
+      "expected_category": null,
+      "mock": {"raw_override": "{\"ad_id\": \"ad_012\", \"reason\": \"强制选择\", \"confidence\": 0.9}"},
+      "basis": "**合规对抗**：强制选中 adult（黑名单品类）",
+      "anchors": ["INV-ADS-001", "REQ-ADS-NFR-SAFETY-002"]
+    },
+    {
+      "id": "EC-010",
+      "scene": {"time_slot": "night", "device": "mobile", "user_tags": ["student"]},
+      "expected": "no_ad",
+      "label": "MUST_FAIL",
+      "expect_reason": "compliance_rejected",
+      "expected_ad_id": null,
+      "expected_category": null,
+      "mock": {"raw_override": "{\"ad_id\": \"ad_014\", \"reason\": \"强制选择\", \"confidence\": 0.9}"},
+      "basis": "**素材自声明核验**：ad_014 的 banned_check=banned，即使 LLM 选中也不得展示。验证 banned_check 状态门真的在拦",
+      "anchors": ["INV-ADS-001", "REQ-ADS-NFR-SAFETY-003"]
+    },
+    {
+      "id": "EC-011",
+      "scene": {"time_slot": "evening", "device": "mobile", "user_tags": ["office_worker"]},
+      "expected": "no_ad",
+      "label": "MUST_FAIL",
+      "expect_reason": "compliance_rejected",
+      "expected_ad_id": null,
+      "expected_category": null,
+      "mock": {"raw_override": "{\"ad_id\": \"ad_013\", \"reason\": \"强制选择\", \"confidence\": 0.9}"},
+      "basis": "**banned_check=pending 也必须拒绝**：未核验 ≠ 安全。此场景（不含 student）使 ad_013 进入候选集，从而真正走到 banned_check 规则而非被预筛拦掉 —— 场景是刻意选的",
+      "anchors": ["INV-ADS-001", "REQ-ADS-NFR-SAFETY-003"]
+    },
+    {
+      "id": "EC-012",
+      "scene": {"time_slot": "night", "device": "mobile", "user_tags": ["student"]},
+      "expected": "no_ad",
+      "label": "MUST_FAIL",
+      "expect_reason": "compliance_rejected",
+      "expected_ad_id": null,
+      "expected_category": null,
+      "mock": {"raw_override": "{\"ad_id\": \"ad_010\", \"reason\": \"强制选择\", \"confidence\": 0.9}"},
+      "basis": "**规则级场景 gate 独立生效**：ad_010 未声明 not_night，故通过预筛；但夜间禁 gaming 的**规则级**约束必须由终检拦下。验证双层防护的第二层真的在工作（而非仅靠素材自声明）",
+      "anchors": ["INV-ADS-008", "REQ-ADS-NFR-SAFETY-004"]
+    },
+    {
+      "id": "EC-013",
+      "scene": {"time_slot": "night", "device": "mobile", "user_tags": ["student"]},
+      "expected": "no_ad",
+      "label": "MUST_FAIL",
+      "expect_reason": "low_confidence",
+      "expected_ad_id": null,
+      "expected_category": null,
+      "mock": {"confidence": 0.4999},
+      "basis": "**阈值边界另一侧**：0.4999 < 0.5 必须降级。与 EC-006 配对，夹住阈值，使 `<=` / `<` 的语义错误必然被检出",
+      "anchors": ["REQ-ADS-NFR-SAFETY-005", "INV-ADS-006"]
+    },
+    {
+      "id": "EC-014",
+      "scene": {"time_slot": "night", "device": "mobile", "user_tags": ["student"]},
+      "expected": "no_ad",
+      "label": "MUST_FAIL",
+      "expect_reason": "llm_output_invalid",
+      "expected_ad_id": null,
+      "expected_category": null,
+      "mock": {"raw_override": "我选择 ad_001，因为它适合深夜场景。"},
+      "basis": "**非 JSON 输出**（最典型的 LLM 失控形态：把结构化输出写成自然语言）。必须 fail-closed 降级，不得尝试解析",
+      "anchors": ["INV-ADS-003", "REQ-ADS-ARCH-003"]
+    },
+    {
+      "id": "EC-015",
+      "scene": {"time_slot": "night", "device": "mobile", "user_tags": ["student"]},
+      "expected": "no_ad",
+      "label": "MUST_FAIL",
+      "expect_reason": "llm_output_invalid",
+      "expected_ad_id": null,
+      "expected_category": null,
+      "mock": {"raw_override": "{\"ad_id\": \"ad_001\", \"reason\": \"理由\", \"confidence\": 0.9, \"override\": true}"},
+      "basis": "**多余字段**：LLM 试图注入未声明的控制字段。必须拒绝（否则等于让模型扩展协议）",
+      "anchors": ["INV-ADS-003", "REQ-ADS-ARCH-003"]
+    },
+    {
+      "id": "EC-016",
+      "scene": {"time_slot": "night", "device": "mobile", "user_tags": ["student"]},
+      "expected": "no_ad",
+      "label": "MUST_FAIL",
+      "expect_reason": "llm_output_invalid",
+      "expected_ad_id": null,
+      "expected_category": null,
+      "mock": {"raw_override": "{\"ad_id\": \"ad_001\", \"reason\": \"理由\"}"},
+      "basis": "**缺必需字段**：LLM 只给了 ad_id 与 reason，缺 confidence。必须拒绝 —— 缺失字段不得由代码补默认值（补默认值等于替模型编造置信度，会绕过阈值 gate）",
+      "anchors": ["INV-ADS-003", "REQ-ADS-ARCH-003"]
+    },
+    {
+      "id": "EC-017",
+      "scene": {"time_slot": "night", "device": "mobile", "user_tags": ["student"]},
+      "expected": "no_ad",
+      "label": "MUST_FAIL",
+      "expect_reason": "llm_output_invalid",
+      "expected_ad_id": null,
+      "expected_category": null,
+      "mock": {"raw_override": "{\"ad_id\": \"ad_999\", \"reason\": \"理由\", \"confidence\": 0.9}"},
+      "basis": "**闭集 gate 的直接行使**：ad_999 格式合法但不在候选集内。必须拒绝，且**绝不得被「纠正」为最接近的候选**",
+      "anchors": ["INV-ADS-002", "REQ-ADS-ARCH-002"]
+    },
+    {
+      "id": "EC-018",
+      "scene": {"time_slot": "midnight", "device": "mobile", "user_tags": ["student"]},
+      "expected": "no_ad",
+      "label": "MUST_FAIL",
+      "expect_reason": "scene_invalid",
+      "expected_ad_id": null,
+      "expected_category": null,
+      "basis": "**非法枚举输入**：time_slot=midnight 不在允许集合内。必须在入口被拒绝，不得进入候选构建",
+      "anchors": ["REQ-ADS-FR-002", "INV-ADS-013"]
+    },
+    {
+      "id": "EC-019",
+      "scene": {"time_slot": "night", "device": "mobile", "user_tags": ["student"]},
+      "expected": "no_ad",
+      "label": "MUST_FAIL",
+      "expect_reason": "llm_error",
+      "expected_ad_id": null,
+      "expected_category": null,
+      "mock": {"fail_with": "不可用"},
+      "basis": "**LLM 不可用**：必须降级而非崩溃（INV-ADS-013）。降级原因码须可区分于「输出非法」—— 运维需要知道是模型挂了还是模型乱说",
+      "anchors": ["INV-ADS-013", "REQ-ADS-FR-003"]
+    },
+    {
+      "id": "EC-020",
+      "scene": {"time_slot": "midnight", "device": "unknown_device", "user_tags": ["student"]},
+      "expected": "no_ad",
+      "label": "MUST_FAIL",
+      "expect_reason": "scene_invalid",
+      "expected_ad_id": null,
+      "expected_category": null,
+      "basis": "**多字段同时非法**：验证场景校验一次报出问题而非在后续阶段才崩（fail-fast 在入口）",
+      "anchors": ["REQ-ADS-FR-002", "INV-ADS-013"]
+    },
+    {
+      "id": "EC-021",
+      "scene": {"time_slot": "night", "device": "mobile", "user_tags": ["student"]},
+      "expected": "ad",
+      "label": "MUST_PASS",
+      "expect_reason": null,
+      "expected_ad_id": "ad_001",
+      "expected_category": "food_delivery",
+      "basis": "**确定性回归**：与 EC-001 同输入。同输入必须同输出 —— 若 EC-001 与 EC-021 结果不一致，说明存在隐藏状态（违反 memory-design.md 的无状态设计）",
+      "anchors": ["REQ-ADS-ARCH-004"]
+    },
+    {
+      "id": "EC-022",
+      "scene": {"time_slot": "morning", "device": "mobile", "user_tags": ["office_worker"]},
+      "expected": "ad",
+      "label": "MUST_PASS",
+      "expect_reason": null,
+      "expected_ad_id": "ad_001",
+      "expected_category": "food_delivery",
+      "basis": "**候选集规模较大的场景**（此处候选数最多）。验证上下文装配与预算在该规模下不触发压缩且不越过预算",
+      "anchors": ["REQ-ADS-NFR-COST-001", "INV-ADS-014"]
+    },
+    {
+      "id": "EC-023",
+      "scene": {"time_slot": "afternoon", "device": "tablet", "user_tags": ["student", "gamer"]},
+      "expected": "ad",
+      "label": "MUST_PASS",
+      "expect_reason": null,
+      "expected_ad_id": "ad_002",
+      "expected_category": "food_delivery",
+      "basis": "**多标签**：验证 user_tags 为多元素时预筛与装配均正常（标签是加分维度，不应导致候选清空）",
+      "anchors": ["REQ-ADS-FR-001", "REQ-ADS-FR-002"]
+    },
+    {
+      "id": "EC-024",
+      "scene": {"time_slot": "night", "device": "mobile", "user_tags": ["student"]},
+      "expected": "ad",
+      "label": "MUST_PASS",
+      "expect_reason": null,
+      "expected_ad_id": "ad_001",
+      "expected_category": "food_delivery",
+      "mock": {"confidence": 1.0},
+      "basis": "**confidence 上界**：1.0 必须被接受（闭区间上端）",
+      "anchors": ["REQ-ADS-ARCH-003", "REQ-ADS-NFR-SAFETY-005"]
+    },
+    {
+      "id": "EC-025",
+      "scene": {"time_slot": "night", "device": "mobile", "user_tags": ["student"]},
+      "expected": "ad",
+      "label": "MUST_PASS",
+      "expect_reason": null,
+      "expected_ad_id": "ad_001",
+      "expected_category": "food_delivery",
+      "mock": {"confidence": 0.51},
+      "basis": "**阈值紧邻上侧**：0.51 略高于 0.5，必须放行。与 EC-006（恰为 0.5）、EC-013（0.4999）三档夹住阈值，使任何一侧的边界错误都无法逃逸",
+      "anchors": ["REQ-ADS-NFR-SAFETY-005", "REQ-ADS-ARCH-003"]
+    }
+  ]
+}

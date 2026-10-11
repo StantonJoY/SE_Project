@@ -1,0 +1,397 @@
+{
+  // ===========================================================================
+  // .opencode/permissions.jsonc —— 项目级权限模型（机器可读）
+  //
+  // 课程对应：D3 第 4 项 —— "the project-level permission model in machine-readable
+  // form, with guard rules and enforcement mechanisms."
+  //
+  // 配套说明文档：docs/code-governance/mcp-tool-manifest.md（工具清单与角色授权）
+  //
+  // 设计依据（每条规则都可追溯）：
+  //   · 课程行 599  —— "Permission 定义 WHO，Hook 强制 WHEN；两者都需要"
+  //   · ADR-002 §2 D4 —— safety-critical 路径清单（唯一来源，此处**不重复其内容**，
+  //                      而是引用；避免两处漂移 —— 这是 BUG-007 的教训）
+  //   · AGENTS.md ⑥  —— 三个角色与 blindness invariants
+  //   · INV-ADS-010  —— safety-critical 变更须 ADR + 人工批准
+  //   · INV-ADS-011  —— 测试不得被删除或跳过
+  //
+  // ⚠️ 诚实声明：本文件是**授权声明**，不是强制机制本身。
+  //    真正的强制发生在 scripts/check_safety_paths.py（CI）与分支保护。
+  //    哪些规则可机械强制、哪些不能，见文件末尾的 "enforcement_reality"。
+  // ===========================================================================
+
+  "$schema": "https://opencode.ai/schemas/permissions.jsonc",
+
+  "version": "1.0.0",
+  "project": "SE_Project",
+  "round": "V1（docs/architecture/ 轮次）",
+  "updated_at": "2026-10-06",
+
+  // ---------------------------------------------------------------------------
+  // 1. 角色定义
+  // ---------------------------------------------------------------------------
+  "roles": {
+    "plan": {
+      "description": "产出执行计划清单（五要素），不写代码",
+      "may_read": ["**"],
+      "may_write": ["docs/plans/**"],
+      "must_not_access": ["src/**", "test/**"],
+      "requires_human_approval_for": ["docs/plans/**"]
+    },
+    "build": {
+      "description": "按已批准的计划实现代码",
+      "may_read": [
+        "AGENTS.md",
+        "architecture-blueprint.md",
+        "Prompt.md",
+        "config.yaml",
+        "docs/req/**",
+        "docs/architecture/**",
+        "docs/code-governance/**",
+        "docs/plans/**",
+        "docs/execution-plan-template.md",
+        "src/**",
+        "eval/**",
+        "data/**",
+        ".github/**"
+      ],
+      "may_write": [
+        "src/selector/**",
+        "src/render/**",
+        "src/audit/**",
+        "src/app/**",
+        "eval/**"
+      ],
+      // blindness invariant ①（不可协商）：BUILD 不得读测试源码。
+      // 理由：若 Build 能读测试，它会把测试改成匹配其破损实现 ——
+      //       测试通过、不变量被违反、无人察觉。
+      // Build 只接收 stripped error report：失败测试 ID + 断言摘要。
+      "must_not_access": ["test/**"],
+      "may_run_tests_but_not_modify_them": true
+    },
+    "verify": {
+      "description": "独立验证：跑门禁、审计一致性、出合规报告",
+      "may_read": ["**"],
+      "may_write": ["docs/review-memo.md"],
+      "must_not_access": [],
+      "forbidden_actions": [
+        "modify_source_code",
+        "write_adr",
+        "modify_tests"
+      ]
+    },
+    "tester": {
+      "description": "编写并维护测试",
+      "may_read": [
+        "docs/req/requirements.yaml",
+        "docs/code-governance/acceptance-coverage-map.yaml",
+        "AGENTS.md",
+        "docs/plans/**"
+      ],
+      // 接口契约即 AGENTS.md ④⑤ —— TESTER 读规格与接口，**不读实现**
+      "may_write": ["test/**"],
+      // blindness invariant ②
+      "must_not_access": ["src/**"]
+    },
+    "human": {
+      "description": "批准、决策、豁免；唯一可改 .opencode/rules.md 的角色",
+      "may_read": ["**"],
+      "may_write": ["**"],
+      "sole_authority_over": [
+        ".opencode/rules.md",
+        "docs/architecture/invariants.md",
+        "docs/architecture/adr-*.md"
+      ]
+    }
+  },
+
+  // ---------------------------------------------------------------------------
+  // 2. 路径规则（guard rules）
+  //
+  // safety-critical 清单**不在本文件重复列出** —— 唯一来源是 ADR-002 §2 D4，
+  // 由 scripts/check_safety_paths.py 解析。此处只声明"如何处置该清单"。
+  // ---------------------------------------------------------------------------
+  "path_rules": [
+    {
+      "id": "P-001",
+      "match": "src/compliance/**",
+      "guard": "safety_critical",
+      "agent_access": "none",
+      "requires": ["adr", "human_approval"],
+      "rationale": "FINAL AUTHORITY —— 合规裁决层，绕过它即绕过全部安全保证",
+      "invariants": ["INV-ADS-001"]
+    },
+    {
+      "id": "P-002",
+      "match": "src/ads/schema.py",
+      "guard": "safety_critical",
+      "agent_access": "none",
+      "requires": ["adr", "human_approval"],
+      "rationale": "素材契约 —— 决定哪些字段可被信任",
+      "invariants": ["INV-ADS-007", "INV-ADS-008"]
+    },
+    {
+      "id": "P-003",
+      "match": "data/*.json",
+      "guard": "safety_critical",
+      "agent_access": "none",
+      "requires": ["adr", "human_approval"],
+      "rationale": "违禁词表、场景规则、素材库 —— 安全判据的数据载体",
+      "invariants": ["INV-ADS-007", "INV-ADS-008"]
+    },
+    {
+      "id": "P-004",
+      "match": "docs/req/requirements.yaml",
+      "guard": "safety_critical",
+      "agent_access": "read",
+      "requires": ["adr", "human_approval"],
+      "rationale": "需求单一来源 —— 改它即改验收标准",
+      "invariants": ["INV-ADS-010"]
+    },
+    {
+      "id": "P-005",
+      "match": "docs/architecture/invariants.md",
+      "guard": "human_only",
+      "agent_access": "read",
+      "requires": ["human_approval"],
+      "rationale": "课程行 5183 明示 HUMAN ONLY；不变量是全部验证的基准",
+      "invariants": ["INV-ADS-010"]
+    },
+    {
+      "id": "P-006",
+      "match": "docs/architecture/adr-*.md",
+      "guard": "human_only",
+      "agent_access": "read",
+      "requires": ["human_approval"],
+      "rationale": "ADR 是决策记录；agent 自批即违反课程 §11.3（No agent may self-approve）"
+    },
+    {
+      "id": "P-007",
+      "match": "src/selector/**",
+      "guard": "adr_on_threshold_change",
+      "agent_access": "write",
+      "requires": [],
+      "requires_on": {
+        "condition": "改动阈值逻辑时",
+        "requires": ["adr", "human_approval"]
+      },
+      "rationale": "AI 建议层可写；但阈值语义是安全相关决策，不可静默改动",
+      "invariants": ["INV-ADS-006"]
+    },
+    {
+      "id": "P-008",
+      "match": "test/**",
+      "guard": "protected_from_build",
+      "agent_access": {"build": "none", "tester": "write", "verify": "read"},
+      "requires": [],
+      "rationale": "blindness invariant ①/②：BUILD 不得读测试；测试归属 TESTER",
+      "invariants": ["INV-ADS-011"]
+    },
+    {
+      "id": "P-009",
+      "match": "eval/**",
+      "guard": "safety_critical",
+      "agent_access": "read",
+      "requires": ["adr", "human_approval"],
+      "rationale": "评估集是门禁 4 的判据来源；改判据以通过判据 = 掩盖而非失败（.agent/rules.md R2）",
+      "invariants": ["INV-ADS-016"],
+      "closed_debt": "TD-025",
+      "protected_by": "ADR-004（D1 验证平面）"
+    },
+    {
+      "id": "P-013",
+      "match": "scripts/check_*.py",
+      "guard": "safety_critical",
+      "agent_access": "read",
+      "requires": ["adr", "human_approval"],
+      "rationale": "六道门禁的检查器 —— 改它们即让门禁恒通过",
+      "protected_by": "ADR-004（D1 验证平面）"
+    },
+    {
+      "id": "P-014",
+      "match": "scripts/fitness_functions.py",
+      "guard": "safety_critical",
+      "agent_access": "read",
+      "requires": ["adr", "human_approval"],
+      "rationale": "S1–S3 与 V1–V4 结构门的实现",
+      "protected_by": "ADR-004（D1 验证平面）"
+    },
+    {
+      "id": "P-015",
+      "match": "scripts/mutation_check.py",
+      "guard": "safety_critical",
+      "agent_access": "read",
+      "requires": ["adr", "human_approval"],
+      "rationale": "证明测试具备证伪能力的机制本身 —— 改它即可伪造『已覆盖』",
+      "invariants": ["INV-ADS-011"],
+      "protected_by": "ADR-004（D1 验证平面）"
+    },
+    {
+      "id": "P-016",
+      "match": "docs/code-governance/acceptance-coverage-map.yaml",
+      "guard": "safety_critical",
+      "agent_access": "read",
+      "requires": ["adr", "human_approval"],
+      "rationale": "覆盖声明 —— 把 test_backed 改 true 而无证据 = 伪造覆盖",
+      "protected_by": "ADR-004（D1 验证平面）"
+    },
+    {
+      "id": "P-010",
+      "match": ".opencode/rules.md",
+      "guard": "human_only",
+      "agent_access": "none",
+      "requires": ["human_approval"],
+      "rationale": "课程 D3 明示 human-only file —— 行为规则不可由被约束者自行修改"
+    },
+    {
+      "id": "P-011",
+      "match": ".github/workflows/**",
+      "guard": "requires_approval",
+      "agent_access": "read",
+      "requires": ["human_approval"],
+      "rationale": "改 CI 即改门禁本身 —— 被约束者不得改判据"
+    },
+    {
+      "id": "P-012",
+      "match": "pyproject.toml",
+      "guard": "requires_approval",
+      "agent_access": "read",
+      "requires": ["human_approval"],
+      "rationale": "依赖面变更影响供应链安全；由 scripts/check_dependencies.py 强制声明一致"
+    }
+  ],
+
+  // ---------------------------------------------------------------------------
+  // 3. 全局禁止（任何角色都不可为）
+  // ---------------------------------------------------------------------------
+  "deny": [
+    {
+      "id": "D-001",
+      "action": "network_access",
+      "rationale": "V1 离线。真实 LLM 接入属 P8 且须先定 OQ-001；联网会破坏 MockLLM 的确定性前提",
+      "enforced_by": ["check_dependencies.py（禁 requests/httpx/openai）"]
+    },
+    {
+      "id": "D-002",
+      "action": "read_environment_variables",
+      "rationale": "配置只走 config.yaml（配置治理规则 1、4）；环境变量是不可审计的隐式输入",
+      "enforced_by": ["人工审查（CI 不可观测）"]
+    },
+    {
+      "id": "D-003",
+      "action": "delete_or_skip_existing_tests",
+      "rationale": "回归门的基础 —— 删除测试即降低标准",
+      "enforced_by": ["fitness_functions.py 的 V4 检查（REQUIRED_TEST_MODULES）"],
+      "invariants": ["INV-ADS-011"]
+    },
+    {
+      "id": "D-004",
+      "action": "modify_architecture_artifacts",
+      "rationale": "架构工件属 HUMAN ONLY",
+      "enforced_by": ["人工审查"],
+      "invariants": ["INV-ADS-010"]
+    },
+    {
+      "id": "D-005",
+      "action": "invoke_write_tools_before_plan_approval",
+      "rationale": "课程行 3830 MANDATE：执行计划清单获批前，严格禁止输出源代码、修改文件或调用执行类工具",
+      "enforced_by": ["流程纪律 + docs/ai-use-log.yaml 的角色记录"],
+      "source": "docs/plans/P4-selector.md §7 的批准记录"
+    },
+    {
+      "id": "D-006",
+      "action": "self_approve",
+      "rationale": "课程 §11.3 No agent may self-approve —— 批准者必须是具名人类",
+      "enforced_by": ["docs/test-approvals.yaml 的 approved_by 校验（占位符即视为不可信）"],
+      "source": "scripts/check_test_approval.py"
+    }
+  ],
+
+  // ---------------------------------------------------------------------------
+  // 4. 强制机制（enforcement）
+  // ---------------------------------------------------------------------------
+  "enforcement": {
+    "hooks": [
+      {
+        "id": "H-001",
+        "event": "pre_commit",
+        "script": "scripts/check_safety_paths.py",
+        "purpose": "拦截 safety-critical 路径的无 ADR 变更",
+        "status": "installed_in_ci",
+        "installer": "scripts/install_hooks.py",
+        "local_pre_commit_installed": false,
+        "gap_debt": "TD-026",
+        "note": "本地 hook 的**安装器已就位**（含 --check / --uninstall，且拒绝覆盖他人 hook），但 agent 会话的沙箱不允许写 .git/hooks/ —— 须由人类在自己的环境执行一次安装。当前拦截仍只在 CI 阶段生效。"
+      },
+      {
+        "id": "H-002",
+        "event": "ci",
+        "script": "scripts/check_test_approval.py",
+        "purpose": "门禁 1：测试须在实现开始前获批",
+        "status": "installed"
+      },
+      {
+        "id": "H-003",
+        "event": "ci",
+        "script": "scripts/check_ai_use_log.py",
+        "purpose": "门禁 6：改代码或 prompt 未更新 AI-use 日志即阻塞",
+        "status": "installed"
+      },
+      {
+        "id": "H-004",
+        "event": "ci",
+        "script": "scripts/check_semantic_eval.py",
+        "purpose": "门禁 4：prompt/model 变更须 replay 固定评估集过阈值",
+        "status": "installed"
+      }
+    ],
+    "fitness_functions": {
+      "script": "scripts/fitness_functions.py",
+      "checks": [
+        "S1 一个架构元素恰好一个模块",
+        "S2 扩展永不删除 + 权威边界（selector ↮ compliance 双向禁止依赖）",
+        "S3 模块/函数 docstring 引用其实现的 ADR 与不变量",
+        "V1 每条 fit criterion ≥1 测试",
+        "V2 每条不变量 ≥1 个会失败的反例测试",
+        "V3 每个测试引用其验证的 REQ/INV",
+        "V4 跨轮次无回归（既有测试模块不得消失）"
+      ],
+      "status": "installed"
+    },
+    "branch_protection": {
+      "document": "docs/branch-protection.md",
+      "required_checks": 6,
+      "status": "documented_not_yet_enabled",
+      "note": "需仓库管理员在 GitHub 后台启用 —— agent 无法执行"
+    }
+  },
+
+  // ---------------------------------------------------------------------------
+  // 5. 强制能力的**真实边界**（诚实声明）
+  //
+  // 不写这一节，本文件就是虚假承诺。哪些规则真正可机械强制、
+  // 哪些只能靠纪律与审计，逐条说明。
+  // ---------------------------------------------------------------------------
+  "enforcement_reality": {
+    "mechanically_enforced": [
+      "P-001~P-004 + P-009 + P-013~P-016：safety-critical 路径的变更须带 ADR 引用（check_safety_paths.py，清单来自 ADR-002 D4 + ADR-004 D1）",
+      "P-008：测试模块不得删除（fitness V4）",
+      "D-001：网络库 import 被拒（check_dependencies.py）",
+      "D-003：既有测试不得消失（fitness V4）",
+      "D-006：占位符批准者不被采信（check_test_approval.py）"
+    ],
+    "not_mechanically_enforceable": [
+      "T1/T2 读工具的角色限制 —— 读取无副作用，CI 不可观测",
+      "D-002 环境变量读取 —— 需人工审查",
+      "D-004 架构工件改动 —— 仅人工审查可拦",
+      "D-005 计划获批前的工具调用 —— 流程纪律，非技术拦截",
+      "P-007 的『改动阈值逻辑』条件 —— 需人工判断何为阈值语义变更"
+    ],
+    "mitigations": [
+      "docs/ai-use-log.yaml 逐会话记录角色与产出（门禁 6 强制其存在）",
+      "执行计划清单（docs/plans/）使 BUILD 的产出可追溯到已批准的规格",
+      "CODEOWNERS + 分支保护提供人工评审这一最后防线"
+    ],
+    "residual_risk": "读工具的滥用（如 BUILD 偷看测试）在技术上无法拦截；本项目的应对是『使产出可追溯』而非『使违规不可能』。这是可接受的残余风险，但必须显式声明而非默认不存在。"
+  }
+}

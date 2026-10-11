@@ -1,0 +1,162 @@
+# CS5351 阻塞门禁（D7）— 课程 §6 六道门禁的实现
+#
+# 设计说明见 README「阻塞门禁设计」一节与 docs/branch-protection.md。
+#
+# 门禁 → 步骤映射：
+#   门禁 3 Schema            → Job「Schema gate」
+#   门禁 2 Static analysis   → Job「Static analysis gates」（ruff / mypy / 依赖 / 安全路径）
+#   门禁 5 Regression        → Job「Regression gate」
+#   门禁 6 AI-use log        → Job「AI-use log gate」
+#   门禁 1 Test approval     → Job「Test approval gate」
+#   门禁 4 Semantic eval     → Job「Semantic evaluation gate」（当前为占位，见该 step 说明）
+#   （附加）架构 fitness function → Job「Architecture fitness functions」（课程 Tier 1 要求）
+#
+# 门禁 4 与门禁 1 的受限状态在本文件内**显式声明**，不伪装为已完全满足。
+
+name: blocking-gates
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  PYTHONIOENCODING: utf-8
+  # 受限环境下无法在仓库内写缓存；显式指向 runner 临时目录
+  RUFF_CACHE_DIR: ${{ runner.temp }}/ruff-cache
+  MYPY_CACHE_DIR: ${{ runner.temp }}/mypy-cache
+
+jobs:
+  # =========================================================================
+  # 门禁 3：需求注册表必须通过其 JSON Schema
+  # =========================================================================
+  schema-gate:
+    name: "Gate 3 · Schema (requirements registry)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: pip install -e ".[dev]"
+      - name: Validate requirements registry against req-schema.json
+        run: python scripts/validate_requirements.py
+
+  # =========================================================================
+  # 门禁 2：lint / 类型检查 / 依赖检查；
+  #         触及 safety-relevant paths 的 PR 额外跑 contract / security /
+  #         API-surface / permission 检查（本项目以结构 fitness function +
+  #         安全路径检查实现后四项）
+  # =========================================================================
+  static-analysis:
+    name: "Gate 2 · Static analysis"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: pip install -e ".[dev]"
+      - name: Lint (ruff)
+        run: ruff check src test scripts
+      - name: Type check (mypy)
+        run: mypy
+      - name: Dependency check (declared vs used)
+        run: python scripts/check_dependencies.py
+      - name: Safety-relevant path check (permission + accompanying ADR)
+        run: python scripts/check_safety_paths.py --base origin/${{ github.base_ref || 'main' }}
+      - name: Structural / architecture fitness functions
+        run: python scripts/fitness_functions.py
+
+  # =========================================================================
+  # 门禁 5：每次变更跑全部历史测试套件，任何回归即阻塞
+  # =========================================================================
+  regression:
+    name: "Gate 5 · Regression (full offline suite)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: pip install -e ".[dev]"
+      - name: Offline test suite (no live API calls)
+        run: pytest test/offline -q
+      - name: Implementation ↔ requirements consistency audit
+        run: python scripts/audit_implementation.py
+
+  # =========================================================================
+  # 门禁 6：改代码或 prompt 却未更新 AI-use 日志 → 阻塞
+  # =========================================================================
+  ai-use-log-gate:
+    name: "Gate 6 · AI-use log"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: pip install -e ".[dev]"
+      - name: AI-use log updated in the same change set
+        run: python scripts/check_ai_use_log.py --base origin/${{ github.base_ref || 'main' }}
+
+  # =========================================================================
+  # 门禁 1：测试必须在实现开始前获批
+  # =========================================================================
+  test-approval-gate:
+    name: "Gate 1 · Test approval"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: pip install -e ".[dev]"
+      - name: Tests for this change were approved before implementation
+        run: python scripts/check_test_approval.py --base origin/${{ github.base_ref || 'main' }}
+
+  # =========================================================================
+  # 门禁 4：prompt / model 变更须先 replay 固定评估集并过质量阈值
+  #
+  # ⚠️ 受限状态（显式声明，不伪装）：
+  #   - 固定评估集 eval/eval_cases.json 尚未建立（依赖 OQ-005 定口径）
+  #   - 仓库当前**没有 prompt 文件**（prompts/ 为空），门禁触发条件尚不成立
+  #   因此本 job 在触发条件不成立时**明确输出「不适用」并通过**；
+  #   一旦检测到 prompt/model 变更而评估集缺失，则**阻断**（fail-closed）。
+  # =========================================================================
+  semantic-evaluation-gate:
+    name: "Gate 4 · Semantic evaluation"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: pip install -e ".[dev]"
+      - name: Replay fixed evaluation set on prompt/model change
+        run: python scripts/check_semantic_eval.py --base origin/${{ github.base_ref || 'main' }}
