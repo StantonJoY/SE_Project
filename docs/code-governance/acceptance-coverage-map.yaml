@@ -1,0 +1,194 @@
+# 验收覆盖映射（Acceptance Coverage Map）
+#
+# 用途：机器可读的 REQ/INV → 测试证据映射。由 scripts/fitness_functions.py 读取，
+#       用于实现结构性约束 V1（每条 fit criterion ≥ 1 测试）与 V2（每条不变量 ≥ 1 反例测试）。
+# 状态：草案待批 · 版本：V1（docs/architecture/ 轮次）· 日期：2026-10-06
+#
+# 诚实性原则：test_backed: true 表示**当前仓库确实存在**引用该 ID 的测试。
+#             尚未实现的需求标 false —— 不伪造测试、不把"计划要测"写成"已测"。
+#             未覆盖项同时登记于 docs/debt-register.md（TD-009）。
+
+schema_version: "1.0"
+
+# ---------------------------------------------------------------------------
+# 需求级覆盖（22 条基线需求）
+# ---------------------------------------------------------------------------
+requirements:
+
+  # ---- 已实现且有测试证据（test_backed: true）----
+  - id: "REQ-ADS-FR-001"
+    test_backed: true
+    evidence: ["test_ads.py::test_load_ok", "test_ads.py::test_get_found", "test_ads.py::test_get_missing_returns_none", "test_ads.py::test_load_duplicate_ad_id_rejected"]
+  - id: "REQ-ADS-FR-002"
+    test_backed: true
+    evidence: ["test_scene.py（8 项：正常/缺字段/非法枚举/非对象/多余字段/标签类型错/去重保序）"]
+  - id: "REQ-ADS-ARCH-001"
+    test_backed: true
+    evidence: ["test_ads.py::test_load_missing_required_field_rejected", "test_ads.py::test_load_invalid_device_value_rejected", "test_ads.py::test_load_one_bad_among_good_fails_whole_batch", "test_ads.py::test_load_invalid_json_rejected", "test_ads.py::test_load_top_level_not_list_rejected", "test_ads.py::test_load_missing_file_rejected"]
+  - id: "REQ-ADS-ARCH-002"
+    test_backed: true
+    evidence: ["test_compliance.py::test_check_output_reject_not_in_candidates", "test_compliance.py::test_run_compliance_reject_output_mismatch", "test_selector.py::test_parse_rejects_out_of_candidates", "test_selector.py::test_parse_rejects_nonempty_ad_id_absent_from_candidates", "test_selector.py::test_parse_rejects_empty_candidate_set"]
+    note: "P4 实现闭集在**解析期**的执行点；compliance 仍在展示前复检（双层，见 INV-ADS-008 的双层思路）"
+  - id: "REQ-ADS-ARCH-004"
+    test_backed: true
+    evidence: ["test_compliance.py（12 项确认纯函数行为一致）", "test_selector.py::test_parse_is_deterministic", "test_selector.py::test_mock_llm_deterministic", "test_context_assembly.py::test_assembly_is_deterministic", "test_context_assembly.py::test_count_tokens_is_pure_and_monotonic", "test_explanation.py::test_verify_explanation_is_deterministic"]
+    note: "正式 replay 证据待 eval/eval_runner 落地（TD-003）；当前由各模块的确定性测试支撑"
+  - id: "REQ-ADS-NFR-SAFETY-001"
+    test_backed: true
+    evidence: ["test_compliance.py::test_run_compliance_approve_normal_ad", "test_compliance.py::test_run_compliance_reject_financial_category"]
+  - id: "REQ-ADS-NFR-SAFETY-002"
+    test_backed: true
+    evidence: ["test_compliance.py::test_check_category_reject_financial", "test_compliance.py::test_check_category_reject_adult"]
+  - id: "REQ-ADS-NFR-SAFETY-003"
+    test_backed: true
+    evidence: ["test_ads.py::test_banned_words_hit", "test_ads.py::test_banned_words_miss", "test_ads.py::test_banned_words_check_all", "test_compliance.py::test_check_banned_words_reject", "test_banned_words.py（24 词全覆盖 + 对照样本不误拦）"]
+  - id: "REQ-ADS-NFR-SAFETY-004"
+    test_backed: true
+    evidence: ["test_ads.py::test_filter_night_excludes_not_night", "test_ads.py::test_filter_campus_excludes_adult", "test_ads.py::test_filter_device_excludes_unsupported", "test_compliance.py::test_check_scene_night_gaming", "test_compliance.py::test_check_scene_campus_adult", "test_compliance.py::test_check_scene_device_mismatch"]
+
+  # ---- 已设计未实现：测试待建（test_backed: false）----
+  - id: "REQ-ADS-FR-003"
+    test_backed: true
+    evidence: ["test_app_pipeline.py（**每条降级路径各一个反例**：scene_invalid / no_candidates / low_confidence / llm_output_invalid / llm_error / llm_timeout / injection_detected / compliance_rejected ×3 条规则 / audit_write_failure）", "test_app_pipeline.py::test_every_path_writes_exactly_one_audit_record", "test_app_pipeline.py::test_pipeline_never_raises_on_bad_input"]
+    note: "P5 已实现全部降级路径；每条路径均验证「结构化 no_ad + 恰好 1 条审计 + 不抛异常」。"
+  - id: "REQ-ADS-FR-004"
+    test_backed: true
+    evidence: ["test_render.py（两形态 schema、ad_id 模式反例、confidence 越界反例、空标题反例、**每个降级原因码都在 schema 中**、未登记原因码被拒、metadata 不外泄、序列化确定性）", "test_app_pipeline.py::test_all_results_pass_render_schema"]
+  - id: "REQ-ADS-ARCH-003"
+    test_backed: true
+    evidence: ["test_selector.py（9 项反例：非 JSON、顶层非对象、缺字段、多余字段、ad_id 空、reason 类型错、bool confidence、越界、非字符串 raw）"]
+  - id: "REQ-ADS-NFR-SAFETY-005"
+    test_backed: true
+    evidence: ["test_app_pipeline.py::test_degrade_low_confidence", "test_app_pipeline.py::test_confidence_exactly_at_threshold_is_accepted", "test_context_assembly.py::test_config_threshold_matches_confirmed_decision"]
+    note: "P5 已实现阈值**判定**：低于阈值 → no_ad（记录原始 confidence）；**恰在阈值处放行**（`<` 而非 `<=`，防止阈值语义漂移）；阈值 0.5 由测试锁定于 config.yaml（OQ-004 定案）。"
+  - id: "REQ-ADS-SEC-001"
+    test_backed: true
+    evidence: ["test_app_pipeline.py::test_degrade_injection_detected", "test_sanitize.py（中英文注入模式逐个命中 + 误报率控制：正常广告文案不得被拦）"]
+    note: "P5 已实现 pre-model 注入门（`app.sanitize`，10 条高精度模式）。**处置为检出即拒绝**（不改写后放行），理由见 sanitize.py 模块 docstring。剩余未覆盖：真实 LLM 的注入对抗（属 P8）。"
+  - id: "REQ-ADS-NFR-PERF-001"
+    test_backed: true
+    evidence: ["test_app_pipeline.py::test_degrade_llm_timeout（timeout gate + fallback）", "test_eval_runner.py::test_p95_and_sla_drift", "test_eval_runner.py::test_current_eval_set_passes（p95 由 replay 计算并判定 SLA）"]
+    note: "P7 补齐四元素的**全部**：timeout gate + fallback（P5）+ p95 监控 + SLA drift 判定（P7，窗口 = 评估集 replay，n≥20）。指标 `e2e_recommend_latency_p95` 由 replay 实际产出。"
+  - id: "REQ-ADS-NFR-COST-001"
+    test_backed: true
+    evidence: ["test_context_assembly.py（三档路由、85% 阈值、预算内、compaction 触发、**compaction 后重注入**、永不裁剪层、OVER_BUDGET 留痕、默认预算与需求登记一致）", "test_app_pipeline.py（装配使用 config.yaml 注入的预算；超预算 → no_ad `budget_exceeded`）"]
+    note: "P4 实现预算与重注入；P5 完成**配置注入**接线（此前用默认常量）。"
+  - id: "REQ-ADS-NFR-QA-001"
+    test_backed: true
+    evidence: ["test_eval_runner.py（加载 fail-closed 的 10 项反例、≥20 条硬门槛、basis/anchors 齐备、ID 唯一、label 封闭枚举、分母分离、replay 确定性、**当前评估集必须通过**）", "eval/eval_runner.py 一键 replay 输出通过率 + 违规数 + p95"]
+    note: "P7 已实现：评估集 **25 条**（11 MUST_PASS / 14 MUST_FAIL）。判定口径与分母分离见 ADR-003。**门禁 4 由此首次具备判据**。"
+  - id: "REQ-ADS-NFR-QA-002"
+    test_backed: true
+    evidence: ["test_mutation_check.py（变异表覆盖性、反向一致性、目标真实性、测试节点存在性、**判定逻辑本身** 4 项）", "scripts/mutation_check.py：对 **12 条**不变量各注入一条违规并确认其反例测试失败"]
+    note: "P7 已实现**变异验证**：12/12 条声明覆盖的不变量，其反例测试在实现被破坏时**确实失败**。这补上了此前「无法证明测试具备证伪能力」的缺口。"
+  - id: "REQ-ADS-GOV-001"
+    test_backed: true
+    evidence: ["test_audit.py（恰好 1 条、二次写入被拒、audit_id 唯一、时间戳、JSONL 逐行可解析、OSError → AuditWriteError、写入失败不标记为已写、**审计存储无读取接口**）", "test_app_pipeline.py::test_audit_write_failure_fails_whole_request", "test_app_pipeline.py::test_every_path_writes_exactly_one_audit_record"]
+    note: "P6 已实现。ADR-002 D2「审计写入失败 → 整体失败」由测试强制（原因码 `audit_write_failure`）。"
+  - id: "REQ-ADS-GOV-002"
+    test_backed: false
+    pending_test: "权限矩阵测试 + hook 拦截模拟"
+    blocked_by: "D3 交付物 .opencode/permissions.jsonc 待建（.opencode 规则文件尚未产出）"
+  - id: "REQ-ADS-AI-001"
+    test_backed: true
+    evidence: ["test_explanation.py::test_explanation_states_why_this_ad", "test_explanation.py::test_explanation_contrasts_with_other_candidates", "test_explanation.py::test_explanation_degradation_keeps_ad_id", "test_explanation.py::test_explanation_with_banned_word_is_stripped", "test_explanation.py::test_verify_explanation_signature_cannot_rewrite_decision", "test_explanation.py::test_generate_explanation_does_not_mutate_judgment"]
+    note: "P4 已实现解释路径的结构隔离与口径（OQ-009：为什么选这条广告）。「解释质量评分」（独立评估器）属 Tier 3，待评估集（TD-003）。"
+  - id: "REQ-ADS-AI-002"
+    test_backed: true
+    evidence: ["test_provenance.py（三要素齐备、model/prompt 版本反映实际配置、阈值来自 config 非硬编码、**降级路径同样带溯源**、缺失写 unknown 而非空串、可 JSON 序列化、不外泄到渲染输出）"]
+    note: "P7 已实现：审计记录新增 `provenance = {model_version, prompt_version, thresholds}`。设计要点：**缺失一律写 `unknown`，绝不写空字符串** —— 空串会把缺失伪装成有值，使 monitor `decisions_missing_version_provenance` 统计不到。剩余未覆盖：safety-critical 变更的**结构性拦截**（属 D3 的权限 + hook）。"
+
+# ---------------------------------------------------------------------------
+# 不变量级覆盖（16 条；negative_test_backed = 有"会失败"的反例测试）
+# ---------------------------------------------------------------------------
+invariants:
+
+  - id: "INV-ADS-015"
+    negative_test_backed: true
+    evidence: ["test_ads.py（缺字段/非法枚举/重复 ID/坏 JSON/顶层非数组/缺文件）"]
+  - id: "INV-ADS-001"
+    negative_test_backed: true
+    evidence: ["test_compliance.py::test_run_compliance_reject_financial_category", "test_compliance.py::test_run_compliance_reject_output_mismatch"]
+  - id: "INV-ADS-002"
+    negative_test_backed: true
+    evidence: ["test_compliance.py::test_check_output_reject_not_in_candidates", "test_selector.py::test_parse_rejects_out_of_candidates", "test_selector.py::test_parse_rejects_nonempty_ad_id_absent_from_candidates", "test_selector.py::test_parse_rejects_empty_candidate_set"]
+  - id: "INV-ADS-003"
+    negative_test_backed: true
+    evidence: ["test_selector.py（9 项反例：非 JSON/顶层非对象/缺字段/多余字段/空 ad_id/类型错/bool confidence/越界/非字符串 raw 全部抛 LLMOutputError）", "test_selector.py::test_mock_llm_without_candidates_yields_empty_ad_id"]
+  - id: "INV-ADS-004"
+    negative_test_backed: true
+    evidence: ["test_explanation.py::test_explanation_degradation_keeps_ad_id", "test_explanation.py::test_explanation_with_banned_word_is_stripped", "test_explanation.py::test_verify_explanation_signature_cannot_rewrite_decision", "test_explanation.py::test_generate_explanation_does_not_mutate_judgment"]
+  - id: "INV-ADS-014"
+    negative_test_backed: true
+    evidence: ["test_context_assembly.py::test_compaction_reinjects_standing_constraints", "test_context_assembly.py::test_assembled_tokens_within_budget_when_direct", "test_context_assembly.py::test_never_trimmed_layers_survive_heavy_compaction", "test_context_assembly.py::test_six_layers_all_present", "test_context_assembly.py::test_history_layer_explicitly_marked_not_applicable", "test_context_assembly.py::test_over_budget_is_recorded_for_upper_layer"]
+  - id: "INV-ADS-007"
+    negative_test_backed: true
+    evidence: ["test_compliance.py::test_check_banned_words_reject", "test_compliance.py::test_check_category_reject_financial", "test_compliance.py::test_check_category_reject_adult", "test_banned_words.py::test_every_banned_word_is_actually_blocked（24 词逐一反例）"]
+  - id: "INV-ADS-008"
+    negative_test_backed: true
+    evidence: ["test_compliance.py::test_check_scene_night_gaming", "test_compliance.py::test_check_scene_campus_adult", "test_compliance.py::test_check_scene_device_mismatch", "test_ads.py::test_filter_*"]
+
+  # ---- 反例测试待建（negative_test_backed: false）----
+  - id: "INV-ADS-009"
+    negative_test_backed: false
+    pending_test: "无 ADR 的 safety-critical 变更 → 必须被阻断（流程不变量）"
+    blocked_by: "D3 hook"
+  - id: "INV-ADS-010"
+    negative_test_backed: false
+    pending_test: "权限矩阵 + hook 事件拦截（流程不变量）"
+    blocked_by: "D3"
+  - id: "INV-ADS-011"
+    negative_test_backed: false
+    pending_test: "变异验证：注入违规后失败测试确实失败（流程不变量）"
+    blocked_by: "变异验证脚本待建"
+  - id: "INV-ADS-012"
+    negative_test_backed: true
+    evidence: ["test_audit.py::test_second_write_is_rejected", "test_audit.py::test_write_failure_does_not_mark_written", "test_audit.py::test_failing_store_raises_audit_write_error", "test_audit.py::test_audit_store_has_no_read_api", "test_app_pipeline.py::test_every_path_writes_exactly_one_audit_record", "test_app_pipeline.py::test_audit_write_failure_fails_whole_request"]
+    note: "P6 已实现。两条独立防线：① 结构上禁止二次写入；② 写入失败 → 整体失败（不产生无证据决策）。"
+  - id: "INV-ADS-013"
+    negative_test_backed: true
+    evidence: ["test_app_pipeline.py::test_degrade_llm_unavailable", "test_app_pipeline.py::test_degrade_llm_timeout", "test_app_pipeline.py::test_degrade_no_candidates", "test_app_pipeline.py::test_pipeline_never_raises_on_bad_input（None/42/字符串/空列表/错误类型/空对象）"]
+    note: "P5 已实现。管道对外的契约是「总是返回结构化结果」，不向调用方抛业务异常。"
+  - id: "INV-ADS-005"
+    negative_test_backed: true
+    evidence: ["test_app_pipeline.py::test_degrade_injection_detected", "test_sanitize.py（10 条中英文模式逐个命中 + 误报控制）"]
+    note: "P5 已实现 pre-model 注入门。剩余：真实 LLM 的注入对抗属 P8。"
+  - id: "INV-ADS-006"
+    negative_test_backed: true
+    evidence: ["test_app_pipeline.py::test_degrade_low_confidence", "test_app_pipeline.py::test_confidence_exactly_at_threshold_is_accepted", "test_selector.py::test_parse_rejects_confidence_out_of_range"]
+    note: "P5 已实现阈值判定。边界含**恰在阈值处放行**（`<` 而非 `<=`）。"
+  - id: "INV-ADS-016"
+    negative_test_backed: true
+    evidence: ["test_eval_runner.py::test_exit_code_reflects_threshold（0.9 < 0.95 必须判不通过；反向全达成不得误拦）", "test_eval_runner.py::test_violation_is_independent_of_pass_rate（阈值设为 0 时违规仍须阻断）", "test_eval_runner.py::test_current_eval_set_passes"]
+    note: "P7 已实现评估门。两条独立判据：通过率（质量，允许 5% 未达）与违规（正确性，零容忍）—— 二者混同会让 5% 容忍意外覆盖安全违规（ADR-003 D6）。"
+
+# ---------------------------------------------------------------------------
+# 汇总（由脚本核对，勿手工改）
+# ---------------------------------------------------------------------------
+summary:
+  requirements_total: 22
+  requirements_test_backed: 21
+  requirements_pending: 1
+  invariants_total: 16
+  invariants_negative_test_backed: 13
+  invariants_pending: 3
+  note: >-
+    2026-10-06 P7 落地后更新。计数**由脚本核对**，非手工估算。
+    需求覆盖 17 → 21：NFR-PERF-001（四元素补齐）、NFR-QA-001、NFR-QA-002、AI-002 转为 backed。
+    不变量覆盖 12 → 13：INV-ADS-016 转为 backed。
+    剩余未覆盖的 **1 条需求与 3 条不变量**全部登记去向：
+      · REQ-ADS-GOV-002 / INV-ADS-009 / INV-ADS-010 —— D3 交付物（.opencode 权限模型与 hook）待建
+      · INV-ADS-011 —— 变异验证已实现（12/12 检出），但其**流程侧**（CI 阻断接线）待 D3
+    **变异验证**：12/12 条声明覆盖的不变量，其反例测试在实现被破坏时确实失败。
+      · REQ-ADS-AI-002 —— 版本溯源字段未写入审计记录（属 P7/P8）
+  invariants_pending: 8
+  note: >-
+    2026-10-06 P4（selector）落地后更新。计数**由脚本核对**，非手工估算。
+    需求覆盖 9 → 12：ARCH-003、NFR-COST-001、AI-001 转为 backed；
+    ARCH-002、ARCH-004、NFR-SAFETY-003 证据增强。
+    不变量覆盖 5 → 8：INV-ADS-003（畸形输出 fail-closed）、
+    INV-ADS-004（解释路径隔离）、INV-ADS-014（预算与压缩后重注入）转为 backed。
+    未覆盖的 10 条需求与 8 条不变量**全部登记去向与阻塞原因**（pending_test / blocked_by），
+    主要阻塞在 P5（src/app/ 编排与降级）与 P6（src/audit/ 证据）。
+    其中 NFR-SAFETY-005 为 partial：confidence 取值域与阈值锁定已覆盖，
+    缺「低于阈值 → 降级」的判定（属 P5）。
