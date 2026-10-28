@@ -129,18 +129,26 @@ pytest test/offline -q
 ### 全部门禁（本地等价于 CI）
 
 ```bash
-ruff check src test scripts                              # 门禁 2 · lint
+ruff check src test scripts eval                         # 门禁 2 · lint
 mypy                                                     # 门禁 2 · 类型
 python scripts/check_dependencies.py                     # 门禁 2 · 依赖
+python scripts/check_repo_completeness.py                # 门禁 2 · 交付完整性（BUG-008）
 python scripts/check_safety_paths.py --base origin/main   # 门禁 2 · 安全路径 + ADR
 python scripts/fitness_functions.py                      # Tier 1 · 架构 fitness function
 python scripts/validate_requirements.py                  # 门禁 3 · Schema
 pytest test/offline -q                                   # 门禁 5 · 回归
 python scripts/audit_implementation.py                   # 实现 ↔ 需求一致性审计
+python scripts/mutation_check.py                         # 门禁 5b · 变异验证（13/13）
 python scripts/check_ai_use_log.py --base origin/main     # 门禁 6 · AI-use 日志
 python scripts/check_test_approval.py --base origin/main  # 门禁 1 · 测试批准
 python scripts/check_semantic_eval.py --base origin/main  # 门禁 4 · 语义评估
+python eval/eval_runner.py                                # 门禁 4 · 评估集 replay
 ```
+
+> **`check_repo_completeness.py` 为什么存在**（BUG-008）：`src/audit/` 曾因
+> `.gitignore` 里一条不带前导 `/` 的 `audit/` 模式**从未进入仓库**，
+> 而当时十项检查全部通过 —— 因为它们**都只读磁盘**。
+> 现在这一层被补上：**磁盘上有 ≠ 仓库里有**。
 
 ### live 测试（需真实 LLM API）
 

@@ -75,6 +75,8 @@ REQUIRED_TEST_MODULES = {
     "test_eval_runner.py",
     "test_mutation_check.py",
     "test_provenance.py",
+    # BUG-008（交付完整性）新增：把"源码必须被 git 跟踪"变成会失败的反例
+    "test_repo_completeness.py",
 }
 
 # S2：authority 边界——这些包不得被"展示路径"直接绕过 compliance 调用

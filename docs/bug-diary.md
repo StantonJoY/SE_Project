@@ -100,6 +100,22 @@
 
 ---
 
+## BUG-008 · `src/audit/` 因 `.gitignore` 的 `audit/` 模式**从未进入仓库**（7 个元素缺 1）
+
+| 字段 | 内容 |
+|---|---|
+| **症状** | 队友报告"audit 没有推送"。检查 `origin/main`：`src/` 下只有 6 个元素（ads / app / compliance / render / scene / selector），**`src/audit/` 整个目录不存在**。任何 clone 后 `import app.pipeline` 直接 `ModuleNotFoundError: No module named 'audit'`，5 个测试模块收集失败 —— **整个仓库跑不起来** |
+| **复现** | `git ls-files src/audit` → 空；`git check-ignore -v src/audit/store.py` → `.gitignore:14:audit/`；`git archive HEAD` 导出到干净目录后 `python -c "import app.pipeline"` → `ModuleNotFoundError` |
+| **分类** | **交付完整性缺陷（治理门禁盲区）**。代码本身没问题（本地 285 个测试全过），问题是**它从未被交付** |
+| **根因** | `.gitignore` 里有一条 `audit/`，本意是忽略仓库**根目录**的运行期审计日志目录。但 gitignore 的规则是：**不带前导 `/` 的模式匹配任意层级**。于是 `audit/` 同时命中了 `src/audit/`。该模式自项目初始就在（`4c80445` 之前的骨架提交），而 `src/audit/` 是 P6 才创建的 —— **新代码撞上了旧规则的隐藏匹配面** |
+| **为何十项检查全绿却没人发现** | **它们都只读磁盘，没有一个去问 git"这些要不要交付"**：`fitness_functions.py` 检查 `src/` 的目录结构（`src/audit/` 就在磁盘上，正常）；`audit_implementation.py` 读源码（能读到）；`pytest` 285 个全过（本地有文件）；`check_dependencies.py` 解析 import（能解析）。**"能被检查"与"能被交付"是两件事，此前没有任何检查覆盖后者** |
+| **修复** | ① `.gitignore`：`audit/` → `/audit/`、`logs/` → `/logs/`，并把 `build/` `dist/` `.venv/` `venv/` 一并根锚定（同类隐患）；② 补交 `src/audit/{__init__,store,metrics}.py`；③ 新增 `scripts/check_repo_completeness.py`（R1–R6）补上"交付完整性"这一层；④ 新增 `test/offline/test_repo_completeness.py`（14 个测试）把它变成**会失败的反例**；⑤ 顺带清掉误提交的 `.github/workflows/.probe` |
+| **验证** | 用 `git archive` 导出 HEAD 到干净目录：修复前 `import app.pipeline` 报错、5 模块收集失败；修复后 **299 个测试全过**、完整性检查 PASS |
+| **测试本身的坑** | 回归测试第一版用 `git check-ignore`，**永远不会失败** —— 因为 `git check-ignore` 默认**跳过已跟踪文件**（尊重索引）。必须加 `--no-index` 才在看"模式本身"。做了负向验证：把 `.gitignore` 改回 `audit/`，测试精确失败并指出 `.gitignore:21:audit/` |
+| **暴露的缺口** | **十项检查只覆盖"实现正确"，不覆盖"交付完整"。** 已补 `scripts/check_repo_completeness.py` 并**接入 CI**（`static-analysis` job，紧随依赖检查之后）；同时把 `scripts/mutation_check.py` 也接成了独立 job（`Gate 5b`，此前它虽已实现却从未在 CI 跑过）。这条缺陷也说明：**`gitignore` 的模式必须根锚定**——不带前导 `/` 的目录名是隐藏的地雷，新代码随时会撞上 |
+
+---
+
 ## 2. 同类审计发现（尚未修复，需决策或补数据）
 
 > 以下 4 项由 `scripts/audit_implementation.py` 系统发现，**不是代码逻辑错误**，而是

@@ -68,11 +68,15 @@ jobs:
       - name: Install
         run: pip install -e ".[dev]"
       - name: Lint (ruff)
-        run: ruff check src test scripts
+        run: ruff check src test scripts eval
       - name: Type check (mypy)
         run: mypy
       - name: Dependency check (declared vs used)
         run: python scripts/check_dependencies.py
+      - name: Delivery completeness (disk has it ≠ repo has it)
+        # BUG-008：`src/audit/` 曾因 `.gitignore` 的 `audit/` 模式从未入库，
+        # 而当时所有检查都只读磁盘、全部通过。本步骤补上"交付完整性"。
+        run: python scripts/check_repo_completeness.py
       - name: Safety-relevant path check (permission + accompanying ADR)
         run: python scripts/check_safety_paths.py --base origin/${{ github.base_ref || 'main' }}
       - name: Structural / architecture fitness functions
@@ -97,6 +101,30 @@ jobs:
         run: pytest test/offline -q
       - name: Implementation ↔ requirements consistency audit
         run: python scripts/audit_implementation.py
+
+  # =========================================================================
+  # 门禁 5（补充）：变异验证 —— 证明"反例测试"真的会失败
+  #
+  # INV-ADS-011 要求每条不变量有一个"在违规时确实会失败"的测试。
+  # `scripts/mutation_check.py` 对 13 条不变量各注入一条违规（内存中，不改源文件），
+  # 断言其测试确实失败。**若某条注入违规后测试仍全绿，则该反例不具备证伪能力。**
+  #
+  # 这是 P7 的产物：它第一次运行时抓到了 4 条"装饰性反例"（假通过）。
+  # =========================================================================
+  mutation-verification:
+    name: "Gate 5b · Mutation verification"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: pip install -e ".[dev]"
+      - name: Each declared invariant's counterexample test actually fails when broken
+        run: python scripts/mutation_check.py
 
   # =========================================================================
   # 门禁 6：改代码或 prompt 却未更新 AI-use 日志 → 阻塞
@@ -139,11 +167,16 @@ jobs:
   # =========================================================================
   # 门禁 4：prompt / model 变更须先 replay 固定评估集并过质量阈值
   #
-  # ⚠️ 受限状态（显式声明，不伪装）：
-  #   - 固定评估集 eval/eval_cases.json 尚未建立（依赖 OQ-005 定口径）
-  #   - 仓库当前**没有 prompt 文件**（prompts/ 为空），门禁触发条件尚不成立
-  #   因此本 job 在触发条件不成立时**明确输出「不适用」并通过**；
-  #   一旦检测到 prompt/model 变更而评估集缺失，则**阻断**（fail-closed）。
+  # 当前状态（P7 之后，**已不再是占位**）：
+  #   - 固定评估集 eval/eval_cases.json **已建立**（25 条：11 MUST_PASS / 14 MUST_FAIL）
+  #   - eval/eval_runner.py 可一键 replay，输出通过率 / 违规数 / p95
+  #   - config.yaml 的 eval 段是本门禁阈值的**单点来源**（pass_rate 0.95）
+  #   - 判定口径见 ADR-003（分母分离：MUST_FAIL 不计入通过率；违规零容忍）
+  #
+  # 仍需注意的限制（显式声明）：
+  #   - 仓库当前**仍无 prompt 文件**（prompts/ 为空，真实 LLM 接入属 P8），
+  #     故本门禁的"prompt 变更"触发条件在本仓库内尚不成立；
+  #   - 判定"MUST_PASS 达成率 < 阈值"会**阻断**（fail-closed）。
   # =========================================================================
   semantic-evaluation-gate:
     name: "Gate 4 · Semantic evaluation"
