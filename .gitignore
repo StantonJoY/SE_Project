@@ -2,17 +2,27 @@
 __pycache__/
 *.py[cod]
 *.egg-info/
-.venv/
-venv/
+/.venv/
+/venv/
 
 # Config / secrets
 .env
 config.local.yaml
 
 # Logs & data artifacts
+#
+# ⚠️ 这里的路径模式**必须带前导 `/`**（只锚定仓库根）。
+# 教训（2026-10-28，队友发现）：`audit/` 这条**不带**前导斜杠时，
+# gitignore 的规则是"匹配任意层级"，于是它把 `src/audit/`（证据子系统，
+# 7 个架构元素之一）一并忽略了 —— 那 3 个文件**从未进入仓库**，
+# 任何人 clone 后 `import audit` 立刻失败。见 BUG-008。
+# 现在改为根锚定，`src/audit/` 不再受影响。
 *.log
-audit/
-logs/
+/audit/
+/logs/
+
+# 运行期审计日志的默认落点（config.yaml 的 audit.log_path 为 logs/audit.jsonl）
+# 以及 eval 报告，均属本地产物；目录本身由其中的 README 保底。
 
 # OS
 .DS_Store
@@ -26,8 +36,8 @@ Thumbs.db
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
-build/
-dist/
+/build/
+/dist/
 
 # 评估集 replay 报告（本地产物；eval/reports/ 目录本身由该目录的 README 保底）
 eval/reports/replay-*.json
