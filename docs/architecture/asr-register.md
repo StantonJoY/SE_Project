@@ -271,3 +271,20 @@ VHIS 有明确的"被解释对象"（拒赔理由）。广告推荐系统的解�
 > **V2 轮次启动时必须做的事**：把上述 9 条预判转为正式 ASR-V2-* 条目（**加反引号并填入 `asr_id`**，
 > 否则 `scripts/validate_requirements.py` 的孤儿检查会认为它们未被引用），
 > 同时把 V1 的 `docs/architecture/` 层标为 **FROZEN / IMMUTABLE**（课程 note 行 106/1531）。
+
+
+## V2 增量（2026-10-31，有效本地基线）
+
+此前各节为 V1 历史快照。原课程 PDF 和本轮真实用户授权优先；V2 在同目录追加，V1 内容和 ID 保留。ADR-005 为方案及 AI proxy 技术评审，正式团队人工验收待完成。
+
+| ASR | 来源需求 | 结构后果 / 强制组件 | 不变量 |
+|---|---|---|---|
+| `ASR-V2-002` | `REQ-ADS-ARCH-005` | `bidding.ledger.Ledger.budgets`；ADR-005 事务/权限边界 | `INV-V2-002` |
+| `ASR-V2-003` | `REQ-ADS-ARCH-006` | `bidding.engine.choose_winner`；ADR-005 事务/权限边界 | `INV-V2-003` |
+| `ASR-V2-004` | `REQ-ADS-ARCH-007` | `bidding.ledger.Ledger.finalize`；ADR-005 事务/权限边界 | `INV-V2-004` |
+| `ASR-V2-007` | `REQ-ADS-NFR-SAFETY-007` | `selector.relevance.parse_relevance_output`；ADR-005 事务/权限边界 | `INV-V2-007` |
+| `ASR-V2-008` | `REQ-ADS-ARCH-010` | `bidding.ledger.Ledger.finalize`；ADR-005 事务/权限边界 | `INV-V2-008` |
+| `ASR-V2-009` | `REQ-ADS-ARCH-011` | `bidding.engine.choose_winner`；ADR-005 事务/权限边界 | `INV-V2-006` |
+| `ASR-V2-011` | `REQ-ADS-FR-006` | `app.cli_v2.load_v2_config`；ADR-005 事务/权限边界 | `INV-V2-008` |
+| `ASR-V2-012` | `REQ-ADS-ARCH-012` | `selector.relevance.parse_relevance_output`；ADR-005 事务/权限边界 | `INV-V2-009` |
+| `ASR-V2-017` | `REQ-ADS-GOV-003` | `scripts.check_semantic_eval.semantic_changes`；ADR-005 事务/权限边界 | `INV-V2-012` |

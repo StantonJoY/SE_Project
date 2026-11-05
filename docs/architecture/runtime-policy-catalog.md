@@ -327,3 +327,22 @@ Agent / 系统自动策略（RP-001~015）
 - 任一"解释影响决策"的样本（`RP-012`）
 - 审计写入失败任意一次（`RP-011`）
 - LLM 返回集外 `ad_id` 任意一次（`RP-005`）
+
+
+## V2 增量（2026-10-31，有效本地基线）
+
+此前各节为 V1 历史快照。原课程 PDF 和本轮真实用户授权优先；V2 在同目录追加，V1 内容和 ID 保留。ADR-005 为方案及 AI proxy 技术评审，正式团队人工验收待完成。
+
+| Policy | 触发 | 强制点 | 结果 |
+|---|---|---|---|
+| RP-V2-001 | 报价 schema/范围/ID 异常 | validate_bids | 整批加载失败，明确启动错误 |
+| RP-V2-002 | 模型异常、严格解析失败、注入或上下文超限 | recommend_v2 / parser | no_ad，模型前检查不调用 provider，零扣费 |
+| RP-V2-003 | 无正分且可负担 active 候选 | choose_winner | no_ad，不隐含次优重试分支 |
+| RP-V2-004 | FINAL AUTHORITY 合规拒绝胜者 | run_compliance，finalize 前 | no_ad，拒绝成交，零扣费 |
+| RP-V2-005 | 并发余额不足或 request_id 冲突 | Ledger 同事务复检 | 拒绝成交或明确冲突，不重复扣费 |
+| RP-V2-006 | after_debit / before_audit / before_commit 故障 | Ledger transaction | 全回滚；无法核实时 status_unknown |
+| RP-V2-007 | 已提交响应丢失 | lookup(request_id,fingerprint) | 返回保存响应，无模型二次调用/扣费 |
+| RP-V2-008 | 未知公式/价格/平局策略或缺少真实 HTTP 配置 | load_v2_config / client | 启动失败；不执行公式代码，不泄露凭证 |
+| RP-V2-009 | 固定评估缺失/失败，或无可信人类测试批准 | 六道既有门禁 | 阻断合并；AI proxy 审查不代替正式 human acceptance |
+
+HTTP 适配通过标准库 urllib 使用 chat-completions 协议；凭证来自 V2_LLM_API_KEY（配置记录名称，值不入库）。配置默认 fixed，CI/离线 demo 不联网。实时请求超时由 HTTP 客户端 timeout 实施；真实模型可用性、质量、费用尚无现场凭证验证。

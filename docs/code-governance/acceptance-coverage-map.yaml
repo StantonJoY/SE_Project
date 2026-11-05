@@ -67,7 +67,7 @@ requirements:
     note: "P5 已实现 pre-model 注入门（`app.sanitize`，10 条高精度模式）。**处置为检出即拒绝**（不改写后放行），理由见 sanitize.py 模块 docstring。剩余未覆盖：真实 LLM 的注入对抗（属 P8）。"
   - id: "REQ-ADS-NFR-PERF-001"
     test_backed: true
-    evidence: ["test_app_pipeline.py::test_degrade_llm_timeout（timeout gate + fallback）", "test_eval_runner.py::test_p95_and_sla_drift", "test_eval_runner.py::test_current_eval_set_passes（p95 由 replay 计算并判定 SLA）"]
+    evidence: ["test_app_pipeline.py::test_degrade_llm_timeout（timeout gate + fallback）", "test_eval_runner.py::test_p95_and_sla_drift", "test_eval_runner.py::test_current_eval_set_passes（p95 由 replay 计算并判定 SLA）", "test_v2_boundary_regressions.py::test_http_total_deadline_covers_slow_drip_body"]
     note: "P7 补齐四元素的**全部**：timeout gate + fallback（P5）+ p95 监控 + SLA drift 判定（P7，窗口 = 评估集 replay，n≥20）。指标 `e2e_recommend_latency_p95` 由 replay 实际产出。"
   - id: "REQ-ADS-NFR-COST-001"
     test_backed: true
@@ -79,11 +79,11 @@ requirements:
     note: "P7 已实现：评估集 **25 条**（11 MUST_PASS / 14 MUST_FAIL）。判定口径与分母分离见 ADR-003。**门禁 4 由此首次具备判据**。"
   - id: "REQ-ADS-NFR-QA-002"
     test_backed: true
-    evidence: ["test_mutation_check.py（变异表覆盖性、反向一致性、目标真实性、测试节点存在性、**判定逻辑本身** 4 项）", "scripts/mutation_check.py：对 **12 条**不变量各注入一条违规并确认其反例测试失败"]
+    evidence: ["test_mutation_check.py（变异表覆盖性、反向一致性、目标真实性、测试节点存在性、**判定逻辑本身** 4 项）", "scripts/mutation_check.py：对 **12 条**不变量各注入一条违规并确认其反例测试失败", "test_requirements_registry.py::test_registry_matches_schema", "test_repo_completeness.py::test_checker_passes_on_current_tree", "test_v2_mutation.py::test_all_thirteen_original_and_twelve_v2_semantic_mutations_are_retained", "test_v2_mutation.py::test_baseline_failure_prevents_injection_and_cannot_be_a_kill", "test_v2_governance.py::test_dependency_gate_rejects_undeclared_runtime_import", "test_v2_governance.py::test_consistency_audit_checks_actual_enforcement_targets"]
     note: "P7 已实现**变异验证**：12/12 条声明覆盖的不变量，其反例测试在实现被破坏时**确实失败**。这补上了此前「无法证明测试具备证伪能力」的缺口。"
   - id: "REQ-ADS-GOV-001"
     test_backed: true
-    evidence: ["test_audit.py（恰好 1 条、二次写入被拒、audit_id 唯一、时间戳、JSONL 逐行可解析、OSError → AuditWriteError、写入失败不标记为已写、**审计存储无读取接口**）", "test_app_pipeline.py::test_audit_write_failure_fails_whole_request", "test_app_pipeline.py::test_every_path_writes_exactly_one_audit_record"]
+    evidence: ["test_audit.py（恰好 1 条、二次写入被拒、audit_id 唯一、时间戳、JSONL 逐行可解析、OSError → AuditWriteError、写入失败不标记为已写、**审计存储无读取接口**）", "test_app_pipeline.py::test_audit_write_failure_fails_whole_request", "test_app_pipeline.py::test_every_path_writes_exactly_one_audit_record", "test_v2_boundary_regressions.py::test_invalid_unicode_advice_is_durably_rejected_with_raw_evidence"]
     note: "P6 已实现。ADR-002 D2「审计写入失败 → 整体失败」由测试强制（原因码 `audit_write_failure`）。"
   - id: "REQ-ADS-GOV-002"
     test_backed: false
@@ -101,11 +101,92 @@ requirements:
 # ---------------------------------------------------------------------------
 # 不变量级覆盖（16 条；negative_test_backed = 有"会失败"的反例测试）
 # ---------------------------------------------------------------------------
+  # V2: exact behavior tests; human acceptance is separate.
+  - id: "REQ-ADS-NFR-SAFETY-006"
+    test_backed: true
+    evidence: ["test_bidding_v2.py::test_reject_invalid_bid_values"]
+    acceptance: pending_human_acceptance
+  - id: "REQ-ADS-ARCH-005"
+    test_backed: true
+    evidence: ["test_bidding_v2.py::test_spend_replay_exact_exhaustion_and_overspend_rejection"]
+    acceptance: pending_human_acceptance
+  - id: "REQ-ADS-ARCH-006"
+    test_backed: true
+    evidence: ["test_bidding_v2.py::test_ineligible_high_bid_cannot_displace_affordable_candidate"]
+    acceptance: pending_human_acceptance
+  - id: "REQ-ADS-ARCH-007"
+    test_backed: true
+    evidence: ["test_bidding_v2.py::test_injected_transaction_failure_rolls_back_every_boundary", "test_v2_settlement_boundaries.py::test_invalid_auction_shape_rolls_back_even_after_debit", "test_v2_boundary_regressions.py::test_invalid_unicode_scene_is_durably_rejected_before_provider"]
+    acceptance: pending_human_acceptance
+  - id: "REQ-ADS-ARCH-008"
+    test_backed: true
+    evidence: ["test_bidding_v2.py::test_reject_invalid_budget_and_bound_types"]
+    acceptance: pending_human_acceptance
+  - id: "REQ-ADS-ARCH-009"
+    test_backed: true
+    evidence: ["test_bidding_v2.py::test_pure_deterministic_tie_break_does_not_depend_on_input_order"]
+    acceptance: pending_human_acceptance
+  - id: "REQ-ADS-NFR-SAFETY-007"
+    test_backed: true
+    evidence: ["test_relevance_v2.py::test_reject_noninteger_nonfinite_out_of_range_relevance"]
+    acceptance: pending_human_acceptance
+  - id: "REQ-ADS-ARCH-010"
+    test_backed: true
+    evidence: ["test_bidding_v2.py::test_ledger_refuses_invalid_or_non_bid_charges_atomically"]
+    acceptance: pending_human_acceptance
+  - id: "REQ-ADS-ARCH-011"
+    test_backed: true
+    evidence: ["test_bidding_v2.py::test_pure_deterministic_tie_break_does_not_depend_on_input_order"]
+    acceptance: pending_human_acceptance
+  - id: "REQ-ADS-FR-005"
+    test_backed: true
+    evidence: ["test_bidding_v2.py::test_winner_is_product_of_relevance_and_bid_at_pay_as_bid_price"]
+    acceptance: pending_human_acceptance
+  - id: "REQ-ADS-FR-006"
+    test_backed: true
+    evidence: ["test_v2_governance.py::test_formula_configuration_rejects_executable_or_unknown_policy"]
+    acceptance: pending_human_acceptance
+  - id: "REQ-ADS-ARCH-012"
+    test_backed: true
+    evidence: ["test_relevance_v2.py::test_ai_cannot_write_economic_fields_or_extra_keys", "test_v2_boundary_regressions.py::test_parser_rejects_raw_and_json_escaped_lone_surrogates"]
+    acceptance: pending_human_acceptance
+  - id: "REQ-ADS-FR-007"
+    test_backed: true
+    evidence: ["test_pipeline_v2.py::test_exhausted_budget_disappears_from_later_provider_candidates"]
+    acceptance: pending_human_acceptance
+  - id: "REQ-ADS-FR-008"
+    test_backed: true
+    evidence: ["test_pipeline_v2.py::test_success_uses_deterministic_auction_and_exact_transaction_snapshot", "test_v2_settlement_boundaries.py::test_caller_mutation_cannot_rewrite_durable_response_or_evidence"]
+    acceptance: pending_human_acceptance
+  - id: "REQ-ADS-NFR-QA-003"
+    test_backed: true
+    evidence: ["test_v2_governance.py::test_bidding_core_has_no_model_or_network_dependency"]
+    acceptance: pending_human_acceptance
+  - id: "REQ-ADS-SEC-002"
+    test_backed: true
+    evidence: ["test_bidding_v2.py::test_loading_rejects_duplicate_and_unknown_ad_ids"]
+    acceptance: pending_human_acceptance
+  - id: "REQ-ADS-GOV-003"
+    test_backed: true
+    evidence: ["test_v2_governance.py::test_semantic_gate_tracks_real_prompt_and_auction_paths"]
+    acceptance: pending_human_acceptance
+  - id: "REQ-ADS-NFR-QA-004"
+    test_backed: true
+    evidence: ["test_v2_governance.py::test_v2_fixed_evaluation_has_safety_and_budget_cases", "test_v2_eval.py::test_current_fixed_replay_passes", "test_v2_eval.py::test_wrong_negative_reason_blocks_even_with_zero_positive_threshold", "test_v2_governance.py::test_demo_reconciles_observed_spend_and_idempotency"]
+    acceptance: pending_human_acceptance
+  - id: "REQ-ADS-NFR-PERF-002"
+    test_backed: true
+    evidence: ["test_bidding_v2.py::test_hundred_candidate_offline_compute_median_below_fifty_ms"]
+    acceptance: pending_human_acceptance
+
 invariants:
 
   - id: "INV-ADS-015"
     negative_test_backed: true
     evidence: ["test_ads.py（缺字段/非法枚举/重复 ID/坏 JSON/顶层非数组/缺文件）"]
+    mutation_id: "MUT-AD-SCHEMA-OPEN"
+    mutation_test_nodes:
+      - "test/offline/test_ads.py::test_load_invalid_device_value_rejected"
   - id: "INV-ADS-001"
     negative_test_backed: true
     evidence: ["test_compliance.py::test_run_compliance_reject_financial_category", "test_compliance.py::test_run_compliance_reject_output_mismatch"]
@@ -165,30 +246,100 @@ invariants:
 # ---------------------------------------------------------------------------
 # 汇总（由脚本核对，勿手工改）
 # ---------------------------------------------------------------------------
+
+  # V2 invariant counterexamples
+  - id: "INV-V2-001"
+    negative_test_backed: true
+    evidence: ["test_bidding_v2.py::test_reject_invalid_bid_values", "test_bidding_v2.py::test_reject_out_of_range_status_and_extra_fields"]
+    mutation_id: "MUT-V2-BID-RANGE-OFF"
+    mutation_test_nodes:
+      - "test/offline/test_bidding_v2.py::test_reject_out_of_range_status_and_extra_fields"
+
+  - id: "INV-V2-002"
+    negative_test_backed: true
+    evidence: ["test_bidding_v2.py::test_engine_refuses_inconsistent_or_noninteger_budget_snapshots"]
+    mutation_id: "MUT-V2-BUDGET-REPAIR"
+    mutation_test_nodes:
+      - "test/offline/test_bidding_v2.py::test_engine_refuses_inconsistent_or_noninteger_budget_snapshots"
+
+  - id: "INV-V2-003"
+    negative_test_backed: true
+    evidence: ["test_bidding_v2.py::test_ineligible_high_bid_cannot_displace_affordable_candidate"]
+    mutation_id: "MUT-V2-AFFORDABILITY-OFF"
+    mutation_test_nodes:
+      - "test/offline/test_bidding_v2.py::test_ineligible_high_bid_cannot_displace_affordable_candidate"
+
+  - id: "INV-V2-004"
+    negative_test_backed: true
+    evidence: ["test_bidding_v2.py::test_injected_transaction_failure_rolls_back_every_boundary"]
+    mutation_id: "MUT-V2-COMMIT-ON-FAULT"
+    mutation_test_nodes:
+      - "test/offline/test_bidding_v2.py::test_injected_transaction_failure_rolls_back_every_boundary"
+
+  - id: "INV-V2-005"
+    negative_test_backed: true
+    evidence: ["test_bidding_v2.py::test_reject_invalid_budget_and_bound_types"]
+    mutation_id: "MUT-V2-COERCE-MONEY"
+    mutation_test_nodes:
+      - "test/offline/test_bidding_v2.py::test_reject_invalid_budget_and_bound_types"
+
+  - id: "INV-V2-006"
+    negative_test_backed: true
+    evidence: ["test_bidding_v2.py::test_pure_deterministic_tie_break_does_not_depend_on_input_order"]
+    mutation_id: "MUT-V2-REVERSE-TIE"
+    mutation_test_nodes:
+      - "test/offline/test_bidding_v2.py::test_pure_deterministic_tie_break_does_not_depend_on_input_order"
+
+  - id: "INV-V2-007"
+    negative_test_backed: true
+    evidence: ["test_relevance_v2.py::test_reject_noninteger_nonfinite_out_of_range_relevance"]
+    mutation_id: "MUT-V2-COERCE-RELEVANCE"
+    mutation_test_nodes:
+      - "test/offline/test_relevance_v2.py::test_reject_noninteger_nonfinite_out_of_range_relevance"
+
+  - id: "INV-V2-008"
+    negative_test_backed: true
+    evidence: ["test_bidding_v2.py::test_ledger_refuses_invalid_or_non_bid_charges_atomically"]
+    mutation_id: "MUT-V2-FORGED-PRICE"
+    mutation_test_nodes:
+      - "test/offline/test_bidding_v2.py::test_ledger_refuses_invalid_or_non_bid_charges_atomically[6]"
+      - "test/offline/test_bidding_v2.py::test_ledger_refuses_invalid_or_non_bid_charges_atomically[8]"
+
+  - id: "INV-V2-009"
+    negative_test_backed: true
+    evidence: ["test_relevance_v2.py::test_ai_cannot_write_economic_fields_or_extra_keys"]
+    mutation_id: "MUT-V2-STRIP-ECONOMIC-EXTRAS"
+    mutation_test_nodes:
+      - "test/offline/test_relevance_v2.py::test_ai_cannot_write_economic_fields_or_extra_keys"
+
+  - id: "INV-V2-010"
+    negative_test_backed: true
+    evidence: ["test_bidding_v2.py::test_request_id_fingerprint_conflict_cannot_charge_again"]
+    mutation_id: "MUT-V2-IGNORE-FINGERPRINT"
+    mutation_test_nodes:
+      - "test/offline/test_bidding_v2.py::test_request_id_fingerprint_conflict_cannot_charge_again"
+
+  - id: "INV-V2-011"
+    negative_test_backed: true
+    evidence: ["test_pipeline_v2.py::test_success_uses_deterministic_auction_and_exact_transaction_snapshot", "test_bidding_v2.py::test_injected_transaction_failure_rolls_back_every_boundary"]
+    mutation_id: "MUT-V2-DELETE-AUDIT"
+    mutation_test_nodes:
+      - "test/offline/test_pipeline_v2.py::test_success_uses_deterministic_auction_and_exact_transaction_snapshot"
+
+  - id: "INV-V2-012"
+    negative_test_backed: true
+    evidence: ["test_v2_governance.py::test_semantic_gate_tracks_real_prompt_and_auction_paths"]
+
+    mutation_id: "MUT-V2-NO-SEMANTIC-TRIGGER"
+    mutation_test_nodes:
+      - "test/offline/test_v2_governance.py::test_semantic_gate_tracks_real_prompt_and_auction_paths"
+
 summary:
-  requirements_total: 22
-  requirements_test_backed: 21
+  requirements_total: 41
+  requirements_test_backed: 40
   requirements_pending: 1
-  invariants_total: 16
-  invariants_negative_test_backed: 13
+  invariants_total: 28
+  invariants_negative_test_backed: 25
   invariants_pending: 3
-  note: >-
-    2026-10-06 P7 落地后更新。计数**由脚本核对**，非手工估算。
-    需求覆盖 17 → 21：NFR-PERF-001（四元素补齐）、NFR-QA-001、NFR-QA-002、AI-002 转为 backed。
-    不变量覆盖 12 → 13：INV-ADS-016 转为 backed。
-    剩余未覆盖的 **1 条需求与 3 条不变量**全部登记去向：
-      · REQ-ADS-GOV-002 / INV-ADS-009 / INV-ADS-010 —— D3 交付物（.opencode 权限模型与 hook）待建
-      · INV-ADS-011 —— 变异验证已实现（12/12 检出），但其**流程侧**（CI 阻断接线）待 D3
-    **变异验证**：12/12 条声明覆盖的不变量，其反例测试在实现被破坏时确实失败。
-      · REQ-ADS-AI-002 —— 版本溯源字段未写入审计记录（属 P7/P8）
-  invariants_pending: 8
-  note: >-
-    2026-10-06 P4（selector）落地后更新。计数**由脚本核对**，非手工估算。
-    需求覆盖 9 → 12：ARCH-003、NFR-COST-001、AI-001 转为 backed；
-    ARCH-002、ARCH-004、NFR-SAFETY-003 证据增强。
-    不变量覆盖 5 → 8：INV-ADS-003（畸形输出 fail-closed）、
-    INV-ADS-004（解释路径隔离）、INV-ADS-014（预算与压缩后重注入）转为 backed。
-    未覆盖的 10 条需求与 8 条不变量**全部登记去向与阻塞原因**（pending_test / blocked_by），
-    主要阻塞在 P5（src/app/ 编排与降级）与 P6（src/audit/ 证据）。
-    其中 NFR-SAFETY-005 为 partial：confidence 取值域与阈值锁定已覆盖，
-    缺「低于阈值 → 降级」的判定（属 P5）。
+  formal_v2_acceptance: pending_human_acceptance
+  note: "V1 historical pending entries retained. Concrete evidence existence is checked by fitness; behavioral success by pytest/replay. Historical duplicate summary preserved in coverage-v1-summary-snapshot.md."

@@ -38,7 +38,7 @@ LOG_PATH = ROOT / "docs" / "ai-use-log.yaml"
 
 # 触发门禁的文件类别：代码与 prompt（课程原文 "changes code or prompts"）
 CODE_OR_PROMPT_RE = re.compile(
-    r"^(src/.*\.py|scripts/.*\.py|test/.*\.py|prompts/.*|.*\.prompt\.md|.*\.prompt\.ya?ml)$"
+    r"^(src/.*\.py|scripts/.*\.py|eval/.*\.py|test/.*\.py|prompts/.*|.*\.prompt\.md|.*\.prompt\.ya?ml)$"
 )
 LOG_REL = "docs/ai-use-log.yaml"
 
@@ -66,15 +66,13 @@ def resolve_base(explicit: str | None) -> str | None:
 
 
 def changed_files(base: str | None, explicit: list[str] | None) -> list[str]:
-    if explicit:
+    """Include committed, unstaged, staged and individually named untracked files."""
+    if explicit is not None:
         return sorted(set(explicit))
-    if base:
-        out = git("diff", "--name-only", f"{base}...HEAD")
-        if out.strip():
-            return sorted({f for f in out.splitlines() if f.strip()})
-    files = [line[3:].strip() for line in git("status", "--porcelain").splitlines() if line.strip()]
-    files += [f for f in git("diff", "--name-only", "HEAD~1", "HEAD").splitlines() if f.strip()]
-    return sorted({f for f in files if f})
+    files = git("diff", "--name-only", f"{base}...HEAD").splitlines() if base else []
+    files += git("diff", "--name-only", "HEAD").splitlines()
+    files += git("ls-files", "--others", "--exclude-standard").splitlines()
+    return sorted({f for f in files if f.strip()})
 
 
 def check_structure() -> list[str]:

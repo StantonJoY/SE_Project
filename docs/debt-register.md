@@ -486,5 +486,21 @@
 |---|---|---|---|
 | 1 | 12 条债务的分类与优先级 | 维持 | ⏳ 待批 |
 | 2 | `TD-007`（隐私）需在 `audit` 落地前定案 | 同意，优先级应提升 | ⏳ **需团队决策** |
-| 3 | `TD-012` 需人工删除两个残留文件 | 提交前处理 | ⏳ 待办 |
+| 3 | `TD-012` 两个探查残留文件 | 提交前核对 | 当前检出无残留 |
 | 4 | `TD-011`（角色分离）以何种方式满足 | 正式 CI 建立时定 | ⏳ 待批 |
+
+
+## V2 增量债务（2026-10-31，旧统计是 V1 快照）
+
+| ID | 状态 | 事实 / 去向 |
+|---|---|---|
+| TD-V2-001 | open | 正式 human acceptance 未完成；真实 kickoff 授权 + AI proxy 评审另记，不回填前置测试批准 |
+| TD-V2-002 | open | 2026-11-05 GitHub 公开接口显示 `main` 未保护。管理员配置和 V2 远端 CI 仍待完成 |
+| TD-V2-003 | partial | CityU 真实成交与医疗品类否决已验证。可重复执行的 live 测试、质量、成本和 p95 仍待完成 |
+| TD-V2-004 | open until delivery verification | 最初全量验证中三项 Git 跟踪检查因新增文件未登记而失败。交付状态以随后对待上传快照运行的检查为准 |
+| TD-V2-005 | corrected locally | 预算快照 extra-field KeyError、dict/integer relevance 契约差异由对应 BUILD 修正并由独立测试验证 |
+| TD-V2-006 | corrected locally | MUST_FAIL mismatch 阻断、Python prompt 语义触发和代码-only 测试批准旁路已补机制及反例 |
+
+用户在 2026-10-31 说明额度重置后，本轮实现恢复。中断和重定向摘要见 [AI 使用记录](ai-use-log.yaml)，原始记录在本地归档。正式批准状态见 [V2 审批状态](v2-approval-status.yaml)。
+
+2026-11-05 复核 `TD-026`。本机已安装现有 `pre-commit`，暂存预演中已由 Git 执行并通过 ADR 与 AI 使用日志检查。[实测记录](review-memo.md#cityu-真实调用与本地钩子复核2026-11-05)

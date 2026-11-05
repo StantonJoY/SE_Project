@@ -231,7 +231,8 @@ def main() -> int:
                 bad("E", f"{r['id']} enforcement {target!r} 不是可解析的 模块.符号")
                 continue
             pkg, _, rest = target.partition(".")
-            cand = src_root / pkg / f"{rest.split('.')[0]}.py"
+            target_root = ROOT if pkg in {"scripts", "eval"} else src_root
+            cand = target_root / pkg / f"{rest.split('.')[0]}.py"
             if not cand.exists():
                 bad("E", f"{r['id']} enforcement {target!r} → {cand.relative_to(ROOT)} 不存在")
                 continue

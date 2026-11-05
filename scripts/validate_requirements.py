@@ -129,11 +129,18 @@ def check_consistency(registry: dict) -> list[str]:
 
     # --- 基线版本一致；候选必须声明 deferred_to_round ---
     baseline_version = registry.get("project", {}).get("baseline_version")
+    baseline_versions = registry.get("project", {}).get("baseline_versions", [baseline_version])
+    targets = set(registry.get("project", {}).get("target_versions", []))
+    if baseline_version not in baseline_versions or not set(baseline_versions) <= targets:
+        errors.append("[consistency] baseline_versions must contain baseline_version and use declared target_versions")
+    present_versions = {r.get("version") for r in baseline}
+    if set(baseline_versions) != present_versions:
+        errors.append("[consistency] baseline_versions must exactly match effective baseline requirement versions")
     for r in baseline:
-        if r.get("version") != baseline_version:
+        if r.get("version") not in baseline_versions:
             errors.append(
                 f"[consistency] {r.get('id')}: 基线需求 version={r.get('version')!r} "
-                f"须等于 project.baseline_version={baseline_version!r}"
+                f"须属于 project.baseline_versions={baseline_versions!r}"
             )
         if r.get("priority") == "must" and r.get("status") == "deferred":
             errors.append(f"[consistency] {r.get('id')}: 基线需求不得为 deferred 状态")

@@ -90,6 +90,7 @@ def local_packages() -> set[str]:
     for extra in ("scripts", "eval"):
         d = ROOT / extra
         if d.is_dir():
+            names.add(extra)  # First-party script/namespace package, including eval imports.
             names |= {p.stem for p in d.glob("*.py") if not p.name.startswith("_")}
     return names
 

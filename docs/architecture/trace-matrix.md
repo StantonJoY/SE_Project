@@ -208,3 +208,32 @@ ADR-001（AI is advisory）
 | 2 | Status 判定（8 tested / 1 partial / 13 design）是否接受 | 维持；`partial` 用于覆盖面未建 | ⏳ 待批 |
 | 3 | Runtime Monitor 指标名与阈值（尤其 `compliance_escape_count == 0`） | 维持 | ⏳ 待批 |
 | 4 | §5 的 5 条技术债是否认可 | 维持 | ⏳ 待批 |
+
+
+## V2 增量（2026-10-31，有效本地基线）
+
+此前各节为 V1 历史快照。原课程 PDF 和本轮真实用户授权优先；V2 在同目录追加，V1 内容和 ID 保留。ADR-005 为方案及 AI proxy 技术评审，正式团队人工验收待完成。
+
+| REQ ID | 状态 | 架构后果与强制组件 | 验证证据 | 运行时观测 |
+|---|---|---|---|---|
+| `REQ-ADS-NFR-SAFETY-006` | implemented；本地测试，正式验收 pending | `bidding.models.validate_bids` / `INV-V2-001` | `test_bidding_v2.py::test_reject_invalid_bid_values` | SQLite 权威快照：`request_id`、候选/分数/预算/成交价/结果；离线重算差额=0 |
+| `REQ-ADS-ARCH-005` | implemented；本地测试，正式验收 pending | `bidding.ledger.Ledger.budgets` / `INV-V2-002` | `test_bidding_v2.py::test_spend_replay_exact_exhaustion_and_overspend_rejection` | SQLite 权威快照：`request_id`、候选/分数/预算/成交价/结果；离线重算差额=0 |
+| `REQ-ADS-ARCH-006` | implemented；本地测试，正式验收 pending | `bidding.engine.choose_winner` / `INV-V2-003` | `test_bidding_v2.py::test_ineligible_high_bid_cannot_displace_affordable_candidate` | SQLite 权威快照：`request_id`、候选/分数/预算/成交价/结果；离线重算差额=0 |
+| `REQ-ADS-ARCH-007` | implemented；本地测试，正式验收 pending | `bidding.ledger.Ledger.finalize` / `INV-V2-004` | `test_bidding_v2.py::test_injected_transaction_failure_rolls_back_every_boundary` | SQLite 权威快照：`request_id`、候选/分数/预算/成交价/结果；离线重算差额=0 |
+| `REQ-ADS-ARCH-008` | implemented；本地测试，正式验收 pending | `bidding.models.validate_bids` / `INV-V2-005` | `test_bidding_v2.py::test_reject_invalid_budget_and_bound_types` | SQLite 权威快照：`request_id`、候选/分数/预算/成交价/结果；离线重算差额=0 |
+| `REQ-ADS-ARCH-009` | implemented；本地测试，正式验收 pending | `bidding.engine.choose_winner` / `INV-V2-006` | `test_bidding_v2.py::test_pure_deterministic_tie_break_does_not_depend_on_input_order` | SQLite 权威快照：`request_id`、候选/分数/预算/成交价/结果；离线重算差额=0 |
+| `REQ-ADS-NFR-SAFETY-007` | implemented；本地测试，正式验收 pending | `selector.relevance.parse_relevance_output` / `INV-V2-007` | `test_relevance_v2.py::test_reject_noninteger_nonfinite_out_of_range_relevance` | SQLite 权威快照：`request_id`、候选/分数/预算/成交价/结果；离线重算差额=0 |
+| `REQ-ADS-ARCH-010` | implemented；本地测试，正式验收 pending | `bidding.ledger.Ledger.finalize` / `INV-V2-008` | `test_bidding_v2.py::test_ledger_refuses_invalid_or_non_bid_charges_atomically` | SQLite 权威快照：`request_id`、候选/分数/预算/成交价/结果；离线重算差额=0 |
+| `REQ-ADS-ARCH-011` | implemented；本地测试，正式验收 pending | `bidding.engine.choose_winner` / `INV-V2-006` | `test_bidding_v2.py::test_pure_deterministic_tie_break_does_not_depend_on_input_order` | SQLite 权威快照：`request_id`、候选/分数/预算/成交价/结果；离线重算差额=0 |
+| `REQ-ADS-FR-005` | implemented；本地测试，正式验收 pending | `bidding.engine.choose_winner` / `INV-V2-006` | `test_bidding_v2.py::test_winner_is_product_of_relevance_and_bid_at_pay_as_bid_price` | SQLite 权威快照：`request_id`、候选/分数/预算/成交价/结果；离线重算差额=0 |
+| `REQ-ADS-FR-006` | implemented；本地测试，正式验收 pending | `app.cli_v2.load_v2_config` / `INV-V2-008` | `test_v2_governance.py::test_formula_configuration_rejects_executable_or_unknown_policy` | SQLite 权威快照：`request_id`、候选/分数/预算/成交价/结果；离线重算差额=0 |
+| `REQ-ADS-ARCH-012` | implemented；本地测试，正式验收 pending | `selector.relevance.parse_relevance_output` / `INV-V2-009` | `test_relevance_v2.py::test_ai_cannot_write_economic_fields_or_extra_keys` | SQLite 权威快照：`request_id`、候选/分数/预算/成交价/结果；离线重算差额=0 |
+| `REQ-ADS-FR-007` | implemented；本地测试，正式验收 pending | `bidding.ledger.Ledger.finalize` / `INV-V2-003` | `test_pipeline_v2.py::test_exhausted_budget_disappears_from_later_provider_candidates` | SQLite 权威快照：`request_id`、候选/分数/预算/成交价/结果；离线重算差额=0 |
+| `REQ-ADS-FR-008` | implemented；本地测试，正式验收 pending | `bidding.ledger.Ledger.finalize` / `INV-V2-011` | `test_pipeline_v2.py::test_success_uses_deterministic_auction_and_exact_transaction_snapshot` | SQLite 权威快照：`request_id`、候选/分数/预算/成交价/结果；离线重算差额=0 |
+| `REQ-ADS-NFR-QA-003` | implemented；本地测试，正式验收 pending | `bidding.engine.choose_winner` / `INV-V2-006` | `test_v2_governance.py::test_bidding_core_has_no_model_or_network_dependency` | SQLite 权威快照：`request_id`、候选/分数/预算/成交价/结果；离线重算差额=0 |
+| `REQ-ADS-SEC-002` | implemented；本地测试，正式验收 pending | `bidding.models.validate_bids` / `INV-V2-001` | `test_bidding_v2.py::test_loading_rejects_duplicate_and_unknown_ad_ids` | SQLite 权威快照：`request_id`、候选/分数/预算/成交价/结果；离线重算差额=0 |
+| `REQ-ADS-GOV-003` | implemented；本地测试，正式验收 pending | `scripts.check_semantic_eval.semantic_changes` / `INV-V2-012` | `test_v2_governance.py::test_semantic_gate_tracks_real_prompt_and_auction_paths` | SQLite 权威快照：`request_id`、候选/分数/预算/成交价/结果；离线重算差额=0 |
+| `REQ-ADS-NFR-QA-004` | implemented；本地测试，正式验收 pending | `eval.v2_runner.main` / `INV-V2-012` | `test_v2_governance.py::test_v2_fixed_evaluation_has_safety_and_budget_cases` | SQLite 权威快照：`request_id`、候选/分数/预算/成交价/结果；离线重算差额=0 |
+| `REQ-ADS-NFR-PERF-002` | implemented；本地测试，正式验收 pending | `bidding.engine.choose_winner` / `INV-V2-006` | `test_bidding_v2.py::test_hundred_candidate_offline_compute_median_below_fifty_ms` | SQLite 权威快照：`request_id`、候选/分数/预算/成交价/结果；离线重算差额=0 |
+
+观测口径：上述 SQLite 字段是实际持久化证据，不冒称 Prometheus 指标。重复/冲突/零余额及事务失败由固定 replay 与反例核对。线上告警基础设施尚未部署。

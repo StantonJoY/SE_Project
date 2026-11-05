@@ -353,3 +353,104 @@
 | 4 | `INV-ADS-004` 的"解释"口径 | ✅ **已确认**：「为什么选这条广告」（`OQ-009` 于 2026-10-06 关闭，见 `asr-register.md` §3.2） | ✅ 已关闭 |
 
 > 本文件所有判断均已显式标注，未静默决定。
+
+
+## V2 增量（2026-10-31，有效本地基线）
+
+此前各节为 V1 历史快照。原课程 PDF 和本轮真实用户授权优先；V2 在同目录追加，V1 内容和 ID 保留。ADR-005 为方案及 AI proxy 技术评审，正式团队人工验收待完成。
+
+### `INV-V2-001`
+
+- 不变量：报价必须为整数且在边界内；拒绝 bool、重复/未知 ID 和额外字段。
+- 来源：`REQ-ADS-NFR-SAFETY-006`, `REQ-ADS-SEC-002`；ADR-005。
+- 强制：`bidding.models.validate_bids`。
+- 反例证据：`test_bidding_v2.py::test_reject_invalid_bid_values`。
+- 失败动作：整批拒绝加载；不进入竞价。
+
+### `INV-V2-002`
+
+- 不变量：预算满足 0 <= spent <= total，remaining=total-spent。
+- 来源：`REQ-ADS-ARCH-005`；ADR-005。
+- 强制：`bidding.ledger.Ledger.budgets`。
+- 反例证据：`test_bidding_v2.py::test_engine_refuses_inconsistent_or_noninteger_budget_snapshots`。
+- 失败动作：拒绝不一致快照或事务，停止新成交。
+
+### `INV-V2-003`
+
+- 不变量：只有 active 且 remaining>=price 的正相关候选可以成交；零余额退出候选。
+- 来源：`REQ-ADS-ARCH-006`, `REQ-ADS-FR-007`；ADR-005。
+- 强制：`bidding.engine.choose_winner`。
+- 反例证据：`test_bidding_v2.py::test_ineligible_high_bid_cannot_displace_affordable_candidate`。
+- 失败动作：不合格候选排除；无可用候选时 no_ad。
+
+### `INV-V2-004`
+
+- 不变量：扣费、请求响应和权威审计在同一 SQLite 事务提交；任一写入失败全回滚。
+- 来源：`REQ-ADS-ARCH-007`；ADR-005。
+- 强制：`bidding.ledger.Ledger.finalize`。
+- 反例证据：`test_bidding_v2.py::test_injected_transaction_failure_rolls_back_every_boundary`。
+- 失败动作：事务回滚；状态无法核实时 status_unknown，同 ID 恢复。
+
+### `INV-V2-005`
+
+- 不变量：全部金额为整数分，排除 bool 与浮点。
+- 来源：`REQ-ADS-ARCH-008`；ADR-005。
+- 强制：`bidding.models.validate_bids`。
+- 反例证据：`test_bidding_v2.py::test_reject_invalid_budget_and_bound_types`。
+- 失败动作：类型错误拒绝加载或事务，不写预算。
+
+### `INV-V2-006`
+
+- 不变量：score=relevance*bid；同分 ad_id 升序；计算纯函数且不受输入排序影响。
+- 来源：`REQ-ADS-ARCH-009`, `REQ-ADS-ARCH-011`, `REQ-ADS-FR-005`, `REQ-ADS-NFR-QA-003`, `REQ-ADS-NFR-PERF-002`；ADR-005。
+- 强制：`bidding.engine.choose_winner`。
+- 反例证据：`test_bidding_v2.py::test_pure_deterministic_tie_break_does_not_depend_on_input_order`。
+- 失败动作：非法评分拒绝本轮；无合法正分候选时 no_ad。
+
+### `INV-V2-007`
+
+- 不变量：相关性为 0..100 整数，每候选恰好一条；缺失、重复、集外、额外键、NaN/Inf 拒绝。
+- 来源：`REQ-ADS-NFR-SAFETY-007`；ADR-005。
+- 强制：`selector.relevance.parse_relevance_output`。
+- 反例证据：`test_relevance_v2.py::test_reject_noninteger_nonfinite_out_of_range_relevance`。
+- 失败动作：模型输出无效时 no_ad，零扣费。
+
+### `INV-V2-008`
+
+- 不变量：唯一成交价 pay_as_bid；配置只接受命名 relevance_times_bid 策略，不执行公式字符串。
+- 来源：`REQ-ADS-ARCH-010`, `REQ-ADS-FR-006`；ADR-005。
+- 强制：`bidding.ledger.Ledger.finalize`。
+- 反例证据：`test_bidding_v2.py::test_ledger_refuses_invalid_or_non_bid_charges_atomically`。
+- 失败动作：未知配置启动失败；非出价计费拒绝并回滚。
+
+### `INV-V2-009`
+
+- 不变量：LLM 仅获场景及非经济候选摘要；不得写 winner、price、spent、bid 或 budget。
+- 来源：`REQ-ADS-ARCH-012`；ADR-005。
+- 强制：`selector.relevance.parse_relevance_output`。
+- 反例证据：`test_relevance_v2.py::test_ai_cannot_write_economic_fields_or_extra_keys`。
+- 失败动作：经济字段或越权输出拒绝；合规必须在扣费前批准。
+
+### `INV-V2-010`
+
+- 不变量：同 request_id、同输入返回已保存响应；变更输入拒绝；并发与重启不得重复扣费。
+- 来源：`REQ-ADS-ARCH-007`；ADR-005。
+- 强制：`bidding.ledger.Ledger.lookup`。
+- 反例证据：`test_bidding_v2.py::test_request_id_fingerprint_conflict_cannot_charge_again`。
+- 失败动作：冲突明确拒绝，事务唯一键复检；响应未知只用相同 ID 恢复。
+
+### `INV-V2-011`
+
+- 不变量：每逻辑请求只有一个权威事务审计快照，含候选、报价、预算、分数、价格、版本和结果。
+- 来源：`REQ-ADS-FR-008`；ADR-005。
+- 强制：`bidding.ledger.Ledger.finalize`。
+- 反例证据：`test_pipeline_v2.py::test_success_uses_deterministic_auction_and_exact_transaction_snapshot`。
+- 失败动作：无证据不得提交成交；数据库整体失效不能承诺持久审计。
+
+### `INV-V2-012`
+
+- 不变量：实际 Python prompt、竞价代码、报价和配置语义变化触发 V1+V2 固定 replay；任一安全预期失败阻断。
+- 来源：`REQ-ADS-GOV-003`, `REQ-ADS-NFR-QA-004`；ADR-005。
+- 强制：`scripts.check_semantic_eval.semantic_changes`。
+- 反例证据：`test_v2_governance.py::test_semantic_gate_tracks_real_prompt_and_auction_paths`。
+- 失败动作：评估资产缺失或任一阈值/安全反例失败阻断；代理不得自我批准。

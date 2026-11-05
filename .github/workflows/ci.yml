@@ -8,7 +8,7 @@
 #   门禁 5 Regression        → Job「Regression gate」
 #   门禁 6 AI-use log        → Job「AI-use log gate」
 #   门禁 1 Test approval     → Job「Test approval gate」
-#   门禁 4 Semantic eval     → Job「Semantic evaluation gate」（当前为占位，见该 step 说明）
+#   门禁 4 Semantic eval     → Job「Semantic evaluation gate」（Python prompts + V2 policies trigger both replays）
 #   （附加）架构 fitness function → Job「Architecture fitness functions」（课程 Tier 1 要求）
 #
 # 门禁 4 与门禁 1 的受限状态在本文件内**显式声明**，不伪装为已完全满足。
@@ -98,7 +98,7 @@ jobs:
       - name: Install
         run: pip install -e ".[dev]"
       - name: Offline test suite (no live API calls)
-        run: pytest test/offline -q
+        run: pytest test/offline -q --cov=src/bidding --cov-report=term-missing --cov-fail-under=90
       - name: Implementation ↔ requirements consistency audit
         run: python scripts/audit_implementation.py
 
@@ -106,7 +106,7 @@ jobs:
   # 门禁 5（补充）：变异验证 —— 证明"反例测试"真的会失败
   #
   # INV-ADS-011 要求每条不变量有一个"在违规时确实会失败"的测试。
-  # `scripts/mutation_check.py` 对 13 条不变量各注入一条违规（内存中，不改源文件），
+  # `scripts/mutation_check.py` 对 25 条已声明覆盖的不变量注入违规（内存中，不改源文件），
   # 断言其测试确实失败。**若某条注入违规后测试仍全绿，则该反例不具备证伪能力。**
   #
   # 这是 P7 的产物：它第一次运行时抓到了 4 条"装饰性反例"（假通过）。
@@ -167,16 +167,10 @@ jobs:
   # =========================================================================
   # 门禁 4：prompt / model 变更须先 replay 固定评估集并过质量阈值
   #
-  # 当前状态（P7 之后，**已不再是占位**）：
-  #   - 固定评估集 eval/eval_cases.json **已建立**（25 条：11 MUST_PASS / 14 MUST_FAIL）
-  #   - eval/eval_runner.py 可一键 replay，输出通过率 / 违规数 / p95
-  #   - config.yaml 的 eval 段是本门禁阈值的**单点来源**（pass_rate 0.95）
-  #   - 判定口径见 ADR-003（分母分离：MUST_FAIL 不计入通过率；违规零容忍）
-  #
-  # 仍需注意的限制（显式声明）：
-  #   - 仓库当前**仍无 prompt 文件**（prompts/ 为空，真实 LLM 接入属 P8），
-  #     故本门禁的"prompt 变更"触发条件在本仓库内尚不成立；
-  #   - 判定"MUST_PASS 达成率 < 阈值"会**阻断**（fail-closed）。
+  # V2: actual Python prompt and auction policy/code/bid/config changes trigger BOTH
+  # eval/eval_runner.py and eval/v2_runner.py. Missing assets or failed safety
+  # expectations block; fixed providers keep CI offline.
+  # Local success does not imply remote branch protection or human test approval.
   # =========================================================================
   semantic-evaluation-gate:
     name: "Gate 4 · Semantic evaluation"
@@ -191,5 +185,5 @@ jobs:
           python-version: "3.11"
       - name: Install
         run: pip install -e ".[dev]"
-      - name: Replay fixed evaluation set on prompt/model change
+      - name: Replay V1 and V2 fixed evaluations on actual prompt/model/auction changes
         run: python scripts/check_semantic_eval.py --base origin/${{ github.base_ref || 'main' }}

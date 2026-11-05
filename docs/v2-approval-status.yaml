@@ -1,0 +1,22 @@
+schema_version: "1.0"
+status: pending_human_acceptance
+work_authorization:
+  actor_kind: human
+  actor: user_in_current_conversation
+  authorized_at: "2026-10-30T12:10:56.447Z"
+  evidence: docs/plans/V2-execution.md
+  scope: local_v2_execution_and_delegated_agent_supervision
+technical_review:
+  actor_kind: ai_proxy
+  evidence: docs/review-memo.md
+  scope: plan_test_design_and_revision_review
+formal_test_approval:
+  status: pending_human_acceptance
+  approved_by: null
+  approved_at: null
+  note: No new named human approval exists; historical TA-0001..0004 remain unchanged. Postimplementation acceptance cannot be backdated into preimplementation approval.
+merge_readiness:
+  branch_protection: main_unprotected_as_of_2026_11_05
+  ci_execution: not_verified_remotely
+  live_model_validation: cityu_smoke_passed_live_suite_pending
+  local_pre_commit: installed_and_rehearsed
