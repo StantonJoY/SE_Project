@@ -1,0 +1,13 @@
+{
+  "kind": "ad",
+  "ad": {
+    "ad_id": "ad_001",
+    "title": "深夜咖啡外卖",
+    "copy": "加班夜，一杯热美式送到家",
+    "category": "food_delivery"
+  },
+  "explanation": "选择 ad_001（品类 food_delivery）的理由：场景与「ad_001」的目标标签匹配，且该候选在候选集中排序最前。置信度 0.85。在同一场景下，候选集中还有 ad_004(education)、ad_005(retail)、ad_007(financial_guarantee)、ad_008(subscription)、ad_009(medical) 等 9 条，但它们的品类或目标标签与本场景的匹配度更低。",
+  "explanation_degraded": false,
+  "confidence": 0.85,
+  "audit_id": "aud-f56d9cfe577c"
+}

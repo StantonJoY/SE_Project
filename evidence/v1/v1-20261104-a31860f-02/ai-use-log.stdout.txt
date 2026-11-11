@@ -1,0 +1,13 @@
+结构检查通过：17 条 entry
+变更集含 4 个代码/prompt 文件（触发门禁 6）：
+  scripts/check_repo_completeness.py
+  scripts/fitness_functions.py
+  src/audit/store.py
+  test/offline/test_repo_completeness.py
+
+FAIL — 变更集改动了代码或 prompt，但未更新 docs/ai-use-log.yaml。
+  依据：课程 §6 门禁 6 —— a pull request that changes code or prompts
+        without updating the AI-use log is blocked。
+  处置：在 docs/ai-use-log.yaml 追加一条 entry，记录本次变更的
+        agent / tool / role / task / artifacts / outcome / 人工批准。
+  若本次变更不含 AI 参与（纯人工），仍须追加 entry 并说明 agent 为 human。

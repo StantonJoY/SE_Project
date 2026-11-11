@@ -1,0 +1,38 @@
+﻿diff --git a/scripts/check_repo_completeness.py b/scripts/check_repo_completeness.py
+index 9d75075..08ebac1 100644
+--- a/scripts/check_repo_completeness.py
++++ b/scripts/check_repo_completeness.py
+@@ -104,10 +104,7 @@ def is_local_artifact(rel: str) -> bool:
+     for pattern in LOCAL_ARTIFACT_GLOBS:
+         if Path(rel).match(pattern):
+             return True
+-    for marker in BUILD_DIR_MARKERS:
+-        if marker in rel:
+-            return True
+-    return False
++    return any(marker in rel for marker in BUILD_DIR_MARKERS)
+ 
+ 
+ def on_disk_sources() -> dict[str, list[str]]:
+@@ -183,7 +180,7 @@ def main(argv: list[str] | None = None) -> int:
+     # ---- R1/R3锛氱鐩樹笂搴斾氦浠樼殑婧愮爜蹇呴』琚窡韪?----
+     sources = on_disk_sources()
+     total = 0
+-    for root_name, files in sources.items():
++    for files in sources.values():
+         untracked = [f for f in files if f not in tracked]
+         total += len(files)
+         for f in untracked:
+diff --git a/src/audit/store.py b/src/audit/store.py
+index 8535657..2f31a2a 100644
+--- a/src/audit/store.py
++++ b/src/audit/store.py
+@@ -41,7 +41,7 @@ class AuditRecordBuilder:
+     """
+ 
+     audit_id: str
+-    store: "AuditStore"
++    store: AuditStore
+     fields: dict[str, Any] = field(default_factory=dict)
+     _written: bool = field(default=False, init=False, repr=False)
+ 

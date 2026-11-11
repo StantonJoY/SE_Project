@@ -1,0 +1,8 @@
+评估集 eval/eval_cases.json: **存在**
+  可随时一键 replay：python eval/eval_runner.py
+prompt 变更: 无
+model 变更: 否
+
+PASS — 不适用：本次变更不含 prompt 或 model 变更，门禁触发条件未成立
+  （注：评估集已就位且可一键 replay；ADR-003 未要求每次提交都 replay ——
+   若要改为提交即 replay，属策略变更，须重开 ADR-003）

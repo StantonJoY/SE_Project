@@ -1,0 +1,12 @@
+结构检查通过：4 条批准记录，生效起点 2026-10-06
+变更集含 1 个测试文件（触发门禁 1）：
+  test/offline/test_repo_completeness.py
+变更集中实现代码最早提交时间: 2026-10-28T22:31:50+08:00
+
+FAIL — 以下测试未在实现开始前获批，共 1 项：
+  - test/offline/test_repo_completeness.py（无任何批准记录）
+
+  依据：课程 §6 门禁 1 —— tests must be approved BEFORE implementation began。
+  处置：在 docs/test-approvals.yaml 追加一条 status: approved 的记录，
+        填写 req_ids / test_files / 具名 approved_by / approved_at（ISO 8601 含时区），
+        并确保 approved_at 早于对应实现的提交时间。
