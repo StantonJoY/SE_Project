@@ -104,10 +104,7 @@ def is_local_artifact(rel: str) -> bool:
     for pattern in LOCAL_ARTIFACT_GLOBS:
         if Path(rel).match(pattern):
             return True
-    for marker in BUILD_DIR_MARKERS:
-        if marker in rel:
-            return True
-    return False
+    return any(marker in rel for marker in BUILD_DIR_MARKERS)
 
 
 def on_disk_sources() -> dict[str, list[str]]:
@@ -183,7 +180,7 @@ def main(argv: list[str] | None = None) -> int:
     # ---- R1/R3：磁盘上应交付的源码必须被跟踪 ----
     sources = on_disk_sources()
     total = 0
-    for root_name, files in sources.items():
+    for files in sources.values():
         untracked = [f for f in files if f not in tracked]
         total += len(files)
         for f in untracked:

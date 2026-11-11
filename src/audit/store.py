@@ -41,7 +41,7 @@ class AuditRecordBuilder:
     """
 
     audit_id: str
-    store: "AuditStore"
+    store: AuditStore
     fields: dict[str, Any] = field(default_factory=dict)
     _written: bool = field(default=False, init=False, repr=False)
 
