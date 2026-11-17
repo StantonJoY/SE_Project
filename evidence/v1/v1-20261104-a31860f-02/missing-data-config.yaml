@@ -1,0 +1,23 @@
+﻿llm:
+  provider: mock
+  timeout_sec: 30
+  model: ""
+
+selector:
+  confidence_threshold: 0.5
+  max_retries: 1
+  context_budget_tokens: 2000
+
+data:
+  ads_path: "E:/cityu/SE/project/SE_Project-test/evidence/v1/v1-20261104-a31860f-02/does-not-exist-ads.json"
+  banned_words_path: "data/banned_words.json"
+  scene_rules_path: "data/scene_rules.json"
+
+audit:
+  log_path: "logs/audit.jsonl"
+
+eval:
+  cases_path: "eval/eval_cases.json"
+  reports_dir: "eval/reports"
+  pass_rate_threshold: 0.95
+  latency_p95_threshold_sec: 5.0

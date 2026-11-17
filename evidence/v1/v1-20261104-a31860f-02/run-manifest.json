@@ -1,0 +1,40 @@
+{
+    "run_id":  "v1-20261104-a31860f-02",
+    "mode":  "mock",
+    "scope":  "V1 deterministic offline/mock validation",
+    "status":  "PASS_WITH_LIMITATIONS",
+    "course_submission_readiness":  "CHANGES_REQUIRED",
+    "completed_at":  "2026-11-05T00:38:55.5174311+08:00",
+    "repository":  "git@github.com:StantonJoY/SE_Project.git",
+    "branch":  "test/v1-candidate-a31860f",
+    "git_commit":  "a31860fc3fb7c0710cf2d7ed157d3ebab2dafe77",
+    "source_root":  "E:\\cityu\\SE\\project\\SE_Project-test\\src",
+    "python_version":  "Python 3.11.17",
+    "python_prefix":  "D:\\miniconda3\\envs\\DEProject",
+    "static_checks":  "PASS",
+    "repo_completeness":  "PASS",
+    "tests":  {
+                  "collected":  299,
+                  "passed":  299,
+                  "failed":  0,
+                  "result":  "PASS",
+                  "junit":  "offline.junit.xml"
+              },
+    "evaluation":  {
+                       "must_pass":  "11/11",
+                       "must_fail":  "14/14",
+                       "violations":  0,
+                       "p95_seconds_mock":  0.0034,
+                       "result":  "PASS",
+                       "report":  "eval-replay.json"
+                   },
+    "known_limitations":  [
+                              "Real LLM client and live tests are out of scope.",
+                              "Gate 1 test approval is not satisfied for test_repo_completeness.py.",
+                              "Gate 6 AI-use log is not satisfied for the current change set.",
+                              "INV-ADS-016 mutation verification contains a false positive.",
+                              "src/audit is not covered by the protected-path list.",
+                              "D5 transcripts and D6 Report.md are missing.",
+                              "The V1 baseline commit has not been confirmed by the team."
+                          ]
+}

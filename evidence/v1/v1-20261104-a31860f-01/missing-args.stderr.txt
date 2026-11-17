@@ -1,0 +1,1 @@
+需要 --scene，或同时给出 --time-slot 与 --device

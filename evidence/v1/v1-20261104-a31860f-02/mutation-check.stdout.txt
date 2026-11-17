@@ -1,0 +1,50 @@
+==============================================================================
+变异验证：每条声明为已覆盖的不变量，其反例测试是否真会失败？
+==============================================================================
+覆盖表声明 negative_test_backed: 13 条
+变异表覆盖:                     13 条
+
+  ✓ 被检出  INV-ADS-001    MUT-CATEGORY-PASS
+            变异: 把合规的品类黑名单检查变异为**恒通过**（放开 medical/financial/adult）
+            测试: FAILED test/offline/test_compliance.py::test_check_category_reject_financial
+  ✓ 被检出  INV-ADS-002    MUT-OUTPUT-PASS
+            变异: 把合规的候选集存在性检查变异为**恒通过**（放开集外 ad_id）
+            测试: FAILED test/offline/test_compliance.py::test_check_output_reject_not_in_candidates
+  ✓ 被检出  INV-ADS-003    MUT-PARSE-BYPASS
+            变异: 把严格 JSON 解析变异为**绕过校验**（畸形输出也当作合法）
+            测试: FAILED test/offline/test_app_pipeline.py::test_degrade_llm_output_invalid_after_retry
+  ✓ 被检出  INV-ADS-004    MUT-EXPLANATION-PASS
+            变异: 把解释校验变异为**恒通过**（违禁解释不再被剥离）
+            测试: FAILED test/offline/test_app_pipeline.py::test_explanation_banned_word_is_stripped_in_pipeline
+  ✓ 被检出  INV-ADS-005    MUT-INJECTION-CLEAN
+            变异: 把 pre-model 注入门变异为**恒判干净**（注入可抵达 LLM）
+            测试: FAILED test/offline/test_app_pipeline.py::test_poisoned_material_is_rejected_by_pipeline
+  ✓ 被检出  INV-ADS-006    MUT-CONFIDENCE-HIGH
+            变异: 把解析出的 confidence 变异为**恒为 1.0**（低置信度永远过阈值）
+            测试: FAILED test/offline/test_app_pipeline.py::test_degrade_low_confidence - TypeE...
+  ✓ 被检出  INV-ADS-007    MUT-BANNED-PASS
+            变异: 把违禁词检查变异为**恒通过**（违禁文案可展示）
+            测试: FAILED test/offline/test_banned_words.py::test_every_banned_word_is_actually_blocked
+  ✓ 被检出  INV-ADS-008    MUT-SCENE-PASS
+            变异: 把规则级场景检查变异为**恒通过**（夜间 gaming / 校园 adult 可展示）
+            测试: FAILED test/offline/test_compliance.py::test_check_scene_night_gaming - TypeE...
+  ✓ 被检出  INV-ADS-012    MUT-AUDIT-GUARD-OFF
+            变异: 去掉「恰好 1 条」的守卫（允许同一请求写多条审计）
+            测试: FAILED test/offline/test_audit.py::test_second_write_is_rejected - Failed: DI...
+  ✓ 被检出  INV-ADS-013    MUT-RAISE-INSTEAD-OF-DEGRADE
+            变异: 把「总是返回结构化结果」变异为**抛异常**（失败不再降级）
+            测试: FAILED test/offline/test_app_pipeline.py::test_pipeline_never_raises_on_bad_input
+  ✓ 被检出  INV-ADS-014    MUT-NO-REINJECT
+            变异: 去掉 compaction 后的**约束重注入**（压缩即可让约束消失）
+            测试: FAILED test/offline/test_context_assembly.py::test_compaction_reinjects_standing_constraints
+  ✓ 被检出  INV-ADS-016    MUT-GATE-ALWAYS-PASS
+            变异: 把评估门的判定变异为**恒通过**（阈值失败不再阻断）
+            测试: INTERNALERROR> ModuleNotFoundError: No module named 'eval_runner'
+  ✓ 被检出  INV-ADS-015    MUT-DETERMINISM-BREAK
+            变异: 破坏确定性：让解析结果带**随机 confidence**
+            测试: FAILED test/offline/test_selector.py::test_parse_is_deterministic - assert False
+
+==============================================================================
+PASS — 13 条变异全部被检出：
+       每条声明覆盖的不变量，其反例测试在实现被破坏时**确实失败**。
+==============================================================================

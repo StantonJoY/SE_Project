@@ -1,0 +1,7 @@
+{
+  "kind": "no_ad",
+  "reason_code": "scene_invalid",
+  "detail": "场景输入不合法（REQ-003）: 'midnight' is not one of ['morning', 'afternoon', 'evening', 'night']",
+  "audit_id": "aud-07a0af688cb7",
+  "attempts": 0
+}

@@ -1,0 +1,5 @@
+PASS — requirements.yaml 通过 Schema、一致性与架构输入校验
+  基线需求 22 条（ASR 18，不变式 9，非功能 5）
+  候选需求 19 条（归属后续轮次，未并入基线）
+  来源 6 个，待决项 10 个
+  基线状态分布: implemented=8, specified=14
