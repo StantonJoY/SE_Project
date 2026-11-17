@@ -33,7 +33,7 @@
 
 ---
 
-## 1. 需求条目（15 条）
+## 1. 需求条目（17 条）
 
 > 类型/优先级取值受 `req-schema.json` 约束：`functional | invariant | quality | performance | cost | governance | security`；`must | should | could | wont`。
 
@@ -75,6 +75,26 @@
 
 ---
 
+### 1.5 V2 接入：广告费由游戏定价派生（演示级口径）
+
+> **口径来源**：团队决定「广告费 = 游戏定价的 5%」，属**演示简化**，不声称商业合理性。
+> 唯一目的是把 V2 的竞价/结算链路接进真实语料，让"价格"成为可解释、可复算的确定性输入。
+
+| 草案标签 | 正式 ID | 类型 | 需求 | fit criterion |
+|---|---|---|---|---|
+| REQ-V3-SE-16 | `REQ-ADS-FR-012` | functional | **广告费派生规则**：`bid_cents = max(1, round(price_cents × 5%))`。免费游戏（`price_final = 0`）取 1 分，**不得被排除在竞价之外**。预算 `budget_cents = bid_cents × 20`（配置项 `corpus.budget_impressions`，默认 20 次曝光）。 | 30 条样本表驱动：`ad_413150`（$14.99）→ 75 分；`ad_730`（免费）→ 1 分；每条 `budget_cents == bid_cents × 20`；`bid_cents ≥ 1` 恒成立（`Bid` 契约） |
+| REQ-V3-SE-17 | `REQ-ADS-ARCH-016` | invariant | **派生规则唯一来源**：5% 系数与取整方式**只出现在 `src/corpus/pricing.py` 一处**；出价与预算**不得**硬编码在数据文件、脚本或 pipeline 里。V2 既有账本不变量（`0 ≤ spent ≤ total`、`remaining = total − spent`、`charge == bid_cents`）全部照旧成立。 | 常量只在一个模块（fitness 静态检查：`0.05` 与 `20` 只在该文件出现）；`bidding` 模块零改动；20 次连续成交后 `remaining == 0 / status == exhausted`（免费游戏同样成立）；第 21 次返回 `budget_race` 或 `no_ad`，**不得透支** |
+
+> **为什么预算取"20 次曝光"而不是"等于定价"**：定价可能为 0（3 条免费游戏），
+> 且 5% 取整会有漂移（$14.99 → 75 分 × 20 = 1500 > 1499）。
+> 用 `budget = bid × 20` 可以保证**每一条**样本都恰好 20 次耗尽，测试可精确断言。
+
+> **已用真实 `Ledger` 验证**（内存库，2026-11-17）：
+> `ad_413150`（75 分 × 20 = 1500）／`ad_730`（1 分 × 20 = 20）／`ad_1086940`（300 分 × 20 = 6000）
+> 均在 20 次成交后 `remaining = 0`、`status = exhausted`，**第 21 次被 `InsufficientBudget` 拒绝**。
+
+---
+
 ## 2. 不变量与反例（给 mutation_check 的抓手）
 
 | 不变量 | 反例（必须能失败） |
@@ -86,6 +106,8 @@
 | 年龄兜底（NFR-SAFETY-009） | 把上限硬编码为 18 → R6S 在 campus 放行 → 反例必须红 |
 | 不加载长文本（FR-009） | 在 `CorpusRepository` 里加载 `description_clean` → 结构断言必须红 |
 | 注入门前置（SEC-003） | 语料样本含注入模式但直接进 prompt → 测试必须红 |
+| 广告费派生唯一来源（ARCH-016） | 把 5% 改成硬编码 120 或 `price/20` 散落在别处 → 静态检查必须红 |
+| 预算不可透支（ARCH-016） | 把 `budget_cents` 改成 `price_cents` → 免费游戏 20 次耗尽测试必须红 |
 
 ---
 
@@ -93,12 +115,14 @@
 
 | 文件 | 动作 | 是否受保护 |
 |---|---|---|
-| `src/corpus/`（新包，4 个文件） | 新增 | 否 |
+| `src/corpus/`（新包，5 个文件：models / repository / projection / select / **pricing**） | 新增 | 否 |
+| `src/app/pipeline_v2.py` | 调用 `run_compliance(..., facts=...)`，把语料事实传进合规 | **是（ADR-005 清单，须 ADR-006 覆盖）** |
+| `scripts/build_bids_v3.py` + `data/bids-corpus.json` | 由语料派生 bid sidecar（产物入库、可复算） | **是（data/，须 ADR-006）** |
 | `src/compliance/pipeline.py` | `run_compliance` 加可选 `facts` 参数；`check_scene` 读它 | **是（须 ADR-006）** |
 | `data/scene-content-rules.yaml` | 新增三档禁项表 | **是（ADR-005 同族，须 ADR-006 覆盖）** |
 | `config.yaml` | 新增 `corpus` 段（路径、K、场景标签映射） | 否 |
-| `docs/req/requirements.yaml` | 追加 15 条 + 改 `scope.out` 的 RAG 条 + `evolution_rounds` 加 V3 | **是（须 ADR-006）** |
-| `docs/architecture/invariants.md` | 追加 6 条 V3 不变量 | **仅只读（须人工批准）** |
+| `docs/req/requirements.yaml` | 追加 17 条 + 改 `scope.out` 的 RAG 条 + `evolution_rounds` 加 V3 | **是（须 ADR-006）** |
+| `docs/architecture/invariants.md` | 追加 7 条 V3 不变量 | **仅只读（须人工批准）** |
 | `docs/architecture/trace-matrix.md` | 追加 V3 行 + monitor | 否 |
 | `docs/code-governance/acceptance-coverage-map.yaml` | 追加 V3 覆盖去向 | **是（须 ADR-006）** |
 | `scripts/fitness_functions.py` | `ELEMENT_BY_PACKAGE` 加 `corpus` | **是（须 ADR-006）** |
@@ -117,6 +141,8 @@
 | 2 | K 默认值 | **30** | 实测 1152 token / 2000（58%）；K=60 超预算 |
 | 3 | 注入门是否新增模式 | **先用既有门**，不新增；加一条语料反例测试 | 现有 10 条模式已覆盖；新增模式需重标定评估口径 |
 | 4 | 负例语义 | **先复用 `no_ad`**，`no_match` 进 deferred | 避免同时改渲染 schema |
+| 5 | 广告费口径（V2 接入） | **`bid = max(1, round(price × 5%))`；`budget = bid × 20`**；免费游戏出价 1 分 | 团队决定，演示级；见 §1.5 |
+| 6 | 5% 系数的唯一来源 | 只允许出现在 `src/corpus/pricing.py`；数据文件与 pipeline 不得硬编码 | 改一次口径只改一处，账本才对得平 |
 
 ---
 
@@ -128,4 +154,5 @@
 | top-3 列表输出 | 需改 render 判别联合，风险高于收益 |
 | 独立 `no_match` reason code | 与 `no_ad` 语义暂可合并 |
 | `review_count` 末位 tie-break | 二值字段，区分度低 |
-| SQLite FTS5 / `price_final` 接 V2 / token 反推 K / 消融实验 | 全部 V4 及以后 |
+| SQLite FTS5 / token 反推 K / 消融实验 | 全部 V4 及以后 |
+| 真实广告计价（曝光确认、CPM/CPC、结算对账） | 本轮 5% 口径是**演示简化**，不是商业模型 |

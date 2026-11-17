@@ -22,6 +22,7 @@ requirements_registry:                  # PR-0 录入后的正式 ID
   - REQ-ADS-SEC-003
   - REQ-ADS-NFR-QA-005 / 006 / 007
   - REQ-ADS-GOV-004 / 005
+  - REQ-ADS-FR-012（广告费 = 定价 × 5%）/ REQ-ADS-ARCH-016（派生规则唯一来源）
 invariants:
   - "INV-ADS-001（compliance 不可绕过）—— 必须保持"
   - "INV-V3-001 语料不进 Ad 契约（新增）"
@@ -73,6 +74,28 @@ elements:
     returns: "list[str]"
     note: "纯函数：命中数降序 + item_id 升序，取前 K"
 
+  - file: "src/corpus/pricing.py"
+    functions:
+      - name: "bid_cents_from_price"
+        params: {price_cents: "int"}
+        returns: "int"
+        note: "max(1, round(price_cents * 0.05))；5% 系数**只允许**出现在此文件"
+      - name: "budget_cents_for"
+        params: {bid_cents: "int", impressions: "int = 20"}
+        returns: "int"
+        note: "bid_cents * impressions；保证整数、>= bid_cents"
+
+  - file: "scripts/build_bids_v3.py"
+    function: "build_bids"
+    params: {corpus: "CorpusRepository", out_path: "Path"}
+    returns: "None"
+    note: "调用 pricing 生成 data/bids-corpus.json；幂等，重跑结果逐字节一致"
+
+  - file: "src/app/pipeline_v2.py"            # V2 编排层，受 ADR-005 保护
+    changes:
+      - "run_compliance(..., facts=corpus_facts)  —— 把语料内容事实传进合规"
+    note: "竞价/账本逻辑零改动；仍要求 compliance 在结算之前"
+
   - file: "src/compliance/pipeline.py"        # 唯一被修改的冻结层
     changes:
       - "run_compliance(..., facts: Mapping[str, CorpusFacts] | None = None)"
@@ -90,7 +113,9 @@ elements:
 target_files_pr1: ["src/corpus/*.py", "config.yaml", "test/offline/test_corpus*.py"]
 target_files_pr2: ["src/compliance/pipeline.py", "data/scene-content-rules.yaml",
                    "test/offline/test_v3_compliance*.py"]
-target_files_pr3: ["scripts/fitness_functions.py", "docs/architecture/*.md",
+target_files_pr3: ["src/corpus/pricing.py", "scripts/build_bids_v3.py", "data/bids-corpus.json",
+                   "src/app/pipeline_v2.py", "test/offline/test_v3_pricing*.py"]
+target_files_pr4: ["scripts/fitness_functions.py", "docs/architecture/*.md",
                    "docs/req/requirements.yaml", "eval/*", "docs/ai-use-log.yaml"]
 target_files_pr0: ["docs/req/requirements.yaml", "docs/architecture/adr-006-*.md",
                    "docs/architecture/invariants.md", "docs/code-governance/acceptance-coverage-map.yaml"]
@@ -101,7 +126,7 @@ frozen_paths_not_touched: ["src/ads/", "src/scene/", "src/selector/", "src/biddi
 ```
 
 **触及的受保护路径**（`check_safety_paths.py --show-paths`）：
-`src/compliance/`、`data/`、`eval/`、`scripts/fitness_functions.py`、`docs/req/requirements.yaml`、
+`src/compliance/`、`data/`、`eval/`、`src/app/pipeline_v2.py`、`scripts/fitness_functions.py`、`docs/req/requirements.yaml`、
 `docs/code-governance/acceptance-coverage-map.yaml` → **全部由 PR-0 的 `ADR-006` 覆盖**。
 
 ---
@@ -127,6 +152,12 @@ cases:
   - {name: "test_r6s_age_gate_campus_vs_competitive", criterion: "REQ-V3-SE-08", type: negative}
   - {name: "test_three_tier_scene_matrix", criterion: "REQ-V3-SE-09", type: negative}
   - {name: "test_corpus_text_injection_blocked", criterion: "REQ-V3-SE-10", type: negative}
+  # V2 接入（定价 → 出价 → 结算）
+  - {name: "test_bid_is_five_percent_of_price", criterion: "REQ-V3-SE-16", type: "unit"}
+  - {name: "test_free_game_bids_one_cent", criterion: "REQ-V3-SE-16", type: negative}
+  - {name: "test_budget_equals_twenty_impressions", criterion: "REQ-V3-SE-16", type: "unit"}
+  - {name: "test_twenty_impressions_exhaust_budget", criterion: "REQ-V3-SE-17", type: deterministic_replay}
+  - {name: "test_five_percent_constant_single_source", criterion: "REQ-V3-SE-17", type: negative}
   # 回归与治理
   - {name: "test_full_suite_zero_regression", criterion: "REQ-V3-SE-11", type: deterministic_replay}
   - {name: "test_v3_eval_partition", criterion: "REQ-V3-SE-12", type: deterministic_replay}
@@ -172,11 +203,20 @@ cases:
 
 > **PR-2 的验收**：三档矩阵 100% 符合预期；`mutation_check` 新增不变量全部可检出。
 
-### PR-3 · 评估与收尾
+### PR-3 · V2 接入（定价 → 出价 → 结算）
 
-16. `eval/eval_cases.json` 加 V3 分区（12–15 条，含 ≥3 条无匹配负例）；`eval_runner.py` 支持分区统计。
-17. 同步 `trace-matrix` / `ai-use-log` / `acceptance-coverage-map`。
-18. 全量检查：需求 schema、fitness、依赖、完整性、安全路径、评估 replay、变异验证。
+16. `src/corpus/pricing.py`：`bid_cents_from_price` / `budget_cents_for`，5% 与 20 次只在此处。
+17. `scripts/build_bids_v3.py`：生成 `data/bids-corpus.json`（幂等、可复算）；`config-v3.yaml` 指向它。
+18. `src/app/pipeline_v2.py`：调用 `run_compliance(..., facts=...)`；竞价与账本逻辑零改动。
+19. 测试：30 条表驱动（含 `ad_413150` → 75 分、`ad_730` → 1 分）；连续 20 次成交后 `remaining == 0 / exhausted`；第 21 次 `budget_race` 且不透支。
+
+> **PR-3 的验收**：V2 端到端在语料上跑通；20 次耗尽对每一条样本成立；`bidding/` 目录零改动（用 git diff 证明）。
+
+### PR-4 · 评估与收尾
+
+20. `eval/eval_cases.json` 加 V3 分区（12–15 条，含 ≥3 条无匹配负例）；`eval_runner.py` 支持分区统计。
+21. 同步 `trace-matrix` / `ai-use-log` / `acceptance-coverage-map`。
+22. 全量检查：需求 schema、fitness、依赖、完整性、安全路径、评估 replay、变异验证。
 
 ---
 
@@ -185,6 +225,9 @@ cases:
 - **回退**：PR-1 只新增文件，删除 `src/corpus/` 即回到 V2 状态；PR-2 的合规改动保留 `facts=None` 的旧行为，回退只需不传参。
 - **未知**：全量 25,899 条语料尚未交付，本计划只用 30 条样本 + 仓库内子集（建议 300 条）；若语料形态变化，`parser_ver` 升版需重跑 PR-1 的验收。
 - **风险**：`data/scene-content-rules.yaml` 一旦入库即为 safety-critical，任何调参都要 ADR + 回归。
+- **风险（V2 接入）**：`Ledger.seed()` 会拒绝**已存在账本**中不同的报价契约 —— 改了 5% 口径或语料集合后，
+  旧的 `logs/bidding-v2.sqlite3` 必须换路径或删除，否则报 `persistent seed contract cannot be changed`。
+  demo 用 `logs/bidding-v3.sqlite3` 隔离。
 
 ---
 
