@@ -4,7 +4,8 @@
 
 | 文件 | 会话 | 大小 | 说明 |
 |---|---|---|---|
-| `2026-11-17-session.v4.jsonl.zstd` | `session-7cc4a18d-21fb-4881-a8a8-9fc484f2ecca` | ~1.1 MB | DSH session v4 记录，**多帧 zstd** 压缩的 JSONL |
+| `2026-10-06-session.v4.jsonl.zstd` | `session-a8810df4-2c17-4226-b48e-1a453890c191` | ~5.9 MB | V1 从零构建（2026-10-06 → 11-02，39 轮 / 1149 次工具调用 / 16 次审批） |
+| `2026-11-17-session.v4.jsonl.zstd` | `session-7cc4a18d-21fb-4881-a8a8-9fc484f2ecca` | ~1.1 MB | V2 整合与 CI 修复（12 轮 / 189 次工具调用） |
 
 ## 格式
 

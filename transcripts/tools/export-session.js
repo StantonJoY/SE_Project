@@ -55,11 +55,13 @@ const oneLine = (s, n) => {
 const INJECTED = /^Current runtime context|^<system-reminder>|^Additional instructions from:|^Time sampled/;
 
 function main(argv) {
-  const [input, output] = argv;
+  const compact = argv.includes('--compact');
+  const [input, output] = argv.filter((a) => !a.startsWith('--'));
   if (!input || !output) {
-    console.error('用法: node export-session.js <session.v4.jsonl.zstd> <output.md>');
+    console.error('用法: node export-session.js <session.v4.jsonl.zstd> <output.md> [--compact]');
     return 2;
   }
+  const maxAssistant = compact ? 600 : MAX_ASSISTANT;
   const recs = decodeFrames(fs.readFileSync(input))
     .split('\n')
     .filter(Boolean)
@@ -169,10 +171,21 @@ function main(argv) {
     for (const a of t.assistant) {
       out.push(`**助手（step ${a.step}）：**`);
       out.push('');
-      out.push(a.text.length > MAX_ASSISTANT ? a.text.slice(0, MAX_ASSISTANT) + '\n\n*（正文过长，已截断）*' : a.text);
+      out.push(a.text.length > maxAssistant ? a.text.slice(0, maxAssistant) + '\n\n*（正文过长，已截断）*' : a.text);
       out.push('');
     }
-    if (t.calls.length) {
+    if (t.calls.length && compact) {
+      // 精简模式：只按工具名聚合，适合上千次调用的长会话；细节在 raw/ 里可查
+      const byName = new Map();
+      let errors = 0;
+      for (const c of t.calls) {
+        byName.set(c.name, (byName.get(c.name) || 0) + 1);
+        if (results.get(c.callId)?.isError) errors++;
+      }
+      const detail = [...byName.entries()].sort((a, b) => b[1] - a[1]).map(([n, k]) => `\`${n}\`×${k}`).join('、');
+      out.push(`**工具调用（${t.calls.length} 次${errors ? `，失败 ${errors} 次` : ''}）：** ${detail}`);
+      out.push('');
+    } else if (t.calls.length) {
       out.push(`**工具调用（${t.calls.length} 次）：**`);
       out.push('');
       out.push('| # | 工具 | 参数摘要 | 结果 |');

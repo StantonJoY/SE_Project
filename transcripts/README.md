@@ -7,7 +7,11 @@ agent 实际承担了什么、什么时候被调用、人类如何审核/纠正/
 
 | # | 会话 | 日期 | 主题 | 可读版 | 原始记录 |
 |---|---|---|---|---|---|
-| 1 | `session-7cc4a18d` | 2026-11-17 | V1→V2 整合、CI 失效根因定位与修复、PR 合并、门禁体检 | [`2026-11-17-main-v2-integration.md`](2026-11-17-main-v2-integration.md) | `raw/2026-11-17-session.v4.jsonl.zstd` |
+| 1 | `session-a8810df4` | 2026-10-06 → 11-02 | **V1 从零构建**：需求 → 架构 → 治理工件 → 7 个架构元素 → 评估集；39 轮 / 1149 次工具调用 / 16 次审批 | [`2026-10-06-v1-build-and-governance.md`](2026-10-06-v1-build-and-governance.md)（精简模式） | `raw/2026-10-06-session.v4.jsonl.zstd` |
+| 2 | `session-7cc4a18d` | 2026-11-17 | V1→V2 整合、CI 失效根因定位与修复、PR 合并、D5 补齐 | [`2026-11-17-main-v2-integration.md`](2026-11-17-main-v2-integration.md) | `raw/2026-11-17-session.v4.jsonl.zstd` |
+
+> 长会话（工具调用上千次）用 `--compact` 导出：助手正文截到 600 字符、工具调用按名称聚合，
+> 单条细节回 `raw/` 里查。短会话用完整模式，保留逐条工具参数与结果。
 
 > 后续会话请按同一格式补充：可读版放本目录，原始 `session.v4.jsonl.zstd` 放 `raw/`，并在此表登记。
 
