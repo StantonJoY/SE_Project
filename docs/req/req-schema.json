@@ -29,6 +29,11 @@
         "course": {"type": "string", "minLength": 1},
         "repository": {"type": "string", "minLength": 1},
         "baseline_version": {"type": "string", "pattern": "^V[0-9]+$"},
+        "baseline_versions": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^V[0-9]+$"},
+          "description": "Explicit versions retained in the effective baseline; legacy registries default to baseline_version."
+        },
         "target_versions": {
           "type": "array",
           "minItems": 1,
@@ -40,7 +45,7 @@
 
     "evolution_rounds": {
       "type": "array",
-      "description": "ADD rounds and the docs directory each governs. Course rule (note line 1531/1562): every round is append-only and directories are never merged.",
+      "description": "Evolution history remains identifiable; V2 appends sections inside the original course deliverable directories.",
       "minItems": 1,
       "items": {
         "type": "object",
@@ -115,7 +120,7 @@
 
     "baseline_requirements": {
       "type": "array",
-      "description": "Requirements of the current build target. Must all share project.baseline_version.",
+      "description": "Requirements of the current build target. Must belong to explicit project.baseline_versions (legacy default: project.baseline_version only).",
       "minItems": 1,
       "items": {"$ref": "#/$defs/requirement"}
     },

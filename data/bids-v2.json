@@ -1,0 +1,4 @@
+[
+  {"ad_id": "ad_001", "bid_cents": 120, "budget_cents": 240, "bid_floor": 1, "bid_ceiling": 1000000, "status": "active"},
+  {"ad_id": "ad_002", "bid_cents": 200, "budget_cents": 600, "bid_floor": 1, "bid_ceiling": 1000000, "status": "active"}
+]

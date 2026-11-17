@@ -178,3 +178,12 @@
 | 3 | §5 "测试不得使用 tmp_path"作为项目约束 | 接受（沙箱兼容） | ⏳ 待批 |
 | 4 | §7 角色分离当前未满足（同一 AI 兼任）→ `TD-011` | 接受为已知债务 | ⏳ 待批 |
 | 5 | §0 Tier 3 未建立 | 接受；评估集落地后补齐 | ⏳ 待批 |
+
+
+## V2 增量与课程依据（2026-10-31）
+
+此前 V1 段为历史快照。有效目录与角色规则见 AGENTS.md 当前 V2 段。原课程 PDF 优先于附加 docs2/整包冻结/禁止监督读取测试的习惯；独立 TEST 不改实现、BUILD 不改断言的职责仍保留。
+
+新增 bidding models/engine/ledger、relevance、pipeline_v2、cli_v2、schema_v2 已登记。SQLite 原子预算/请求结果/权威审计及幂等由 INV-V2-001..012 强制。V2 证据必须是实际函数 test_file.py::test_function，fitness 验证 enforcement AST 和非空断言/raises；存在测试不等于运行通过，pytest 与 replay 另行验证。原 V1 pending 覆盖不冒称 100%。
+
+六道原门禁继续存在。代码变更也须匹配 requirement-specific approved tests；proxy_review 不能充当 human。实际 Python prompt、bidding、pipeline、bids、config 触发两套 replay；安全预期错误无论质量比例如何都阻断。CI 的 bidding 语句覆盖 >=90%，计算性能沿用 100 候选中位数 <50ms。

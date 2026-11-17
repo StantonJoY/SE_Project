@@ -1,0 +1,28 @@
+# ADR-005 / REQ-ADS-ARCH-010, REQ-ADS-FR-006: named policy; no executable formula.
+model:
+  provider: fixed
+  version: fixed-v2
+  name: ""
+  endpoint: ""
+  api_key_env: V2_LLM_API_KEY
+  timeout_sec: 30
+  fixed_scores:
+    ad_001: 90
+    ad_002: 50
+prompt:
+  context_budget_tokens: 2000
+paths:
+  ads: data/ads.json
+  bids: data/bids-v2.json
+  banned_words: data/banned_words.json
+  scene_rules: data/scene_rules.json
+  ledger: logs/bidding-v2.sqlite3
+policy:
+  version: pay-as-bid-v1
+  score_formula: relevance_times_bid
+  pricing: pay_as_bid
+  tie_break: ad_id_ascending
+replay:
+  pass_rate_threshold: 0.95
+  compliance_escape_limit: 0
+  latency_p95_threshold_sec: 5.0

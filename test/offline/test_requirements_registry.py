@@ -52,12 +52,17 @@ def test_registry_passes_validation(registry: dict, schema: dict) -> None:
     assert vr.check_architecture_inputs(registry) == []
 
 
-def test_baseline_is_v1_and_candidates_are_deferred(registry: dict) -> None:
+def test_effective_baseline_versions_and_candidates_are_deferred(registry: dict) -> None:
+    """V2 规格迁移：有效基线保留 V1 并纳入 V2；此迁移不是实现前人工批准。"""
+    declared = set(registry["project"]["baseline_versions"])
+    assert declared == {"V1", "V2"}
+    assert {r["version"] for r in registry["baseline_requirements"]} == declared
+    assert registry["project"]["baseline_version"] == "V2"
     for r in registry["baseline_requirements"]:
-        assert r["version"] == "V1"
+        assert r["version"] in declared
         assert "deferred_to_round" not in r
     for r in registry["candidate_requirements"]:
-        assert r["deferred_to_round"] == "V2"
+        assert r["deferred_to_round"] == r["version"]
 
 
 def test_ids_use_semantic_prefixes(registry: dict) -> None:
@@ -134,10 +139,18 @@ def test_baseline_asr_without_asr_id_rejected(registry: dict, schema: dict) -> N
 
 
 def test_deferred_asr_may_omit_asr_id(registry: dict, schema: dict) -> None:
+    """V2 候选已全部生效；构造候选验证原有豁免，且去掉豁免必须拒绝。"""
     bad = copy.deepcopy(registry)
-    cand = next(r for r in bad["candidate_requirements"] if r["asr"])
+    cand = next(r for r in bad["baseline_requirements"] if r["asr"] and not r.get("asr_ids"))
+    bad["baseline_requirements"].remove(cand)
+    bad["candidate_requirements"].append(cand)
+    cand["deferred_to_round"] = cand["version"]
+    cand["status"] = "deferred"
+    del cand["asr_id"]
     assert "asr_id" not in cand
     assert _schema_errors(bad, schema) == []
+    del cand["deferred_to_round"]
+    assert _schema_errors(bad, schema)
 
 
 def test_missing_evolution_rounds_rejected(registry: dict, schema: dict) -> None:
@@ -227,8 +240,16 @@ def test_status_verified_without_automated_check_rejected(registry: dict) -> Non
 
 
 def test_baseline_version_mismatch_rejected(registry: dict) -> None:
+    """V2 是已声明的合法基线版本；未声明版本仍必须拒绝。"""
     bad = copy.deepcopy(registry)
-    bad["baseline_requirements"][0]["version"] = "V2"
+    bad["baseline_requirements"][0]["version"] = "V3"
+    assert any("baseline_version" in e for e in _consistency_errors(bad))
+
+
+def test_effective_baseline_version_cannot_be_omitted(registry: dict) -> None:
+    """保留 V1 条目时，版本声明不得只列 V2。"""
+    bad = copy.deepcopy(registry)
+    bad["project"]["baseline_versions"] = ["V2"]
     assert any("baseline_version" in e for e in _consistency_errors(bad))
 
 

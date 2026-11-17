@@ -184,3 +184,19 @@
 | 3 | **§5.1 保留期**：选 A（有限可配置）还是 B（声称 7 年） | **建议 A**；选 B 需先建防篡改机制 | ⏳ **需团队决策** |
 | 4 | **§5.2 隐私**：`user_tags` 是否按 PII 代理处理（哈希/最小化） | **建议按 PII 处理** | ⏳ **需团队决策** |
 | 5 | §3 两类状态都不做 | 维持（各有理由与重开条件） | ⏳ 待批 |
+
+
+## V2 增量（2026-10-31，有效本地基线）
+
+此前各节为 V1 历史快照。原课程 PDF 和本轮真实用户授权优先；V2 在同目录追加，V1 内容和 ID 保留。ADR-005 为方案及 AI proxy 技术评审，正式团队人工验收待完成。
+
+| 状态 | 所有者 / 存活期 | 写入与读取规则 | 保留 / 隐私 |
+|---|---|---|---|
+| budgets | Ledger / SQLite，跨请求及进程重启 | seed 仅初始化；重复 seed 不重置 spend；仅 finalize 事务扣费 | 本地演示数据库由用户维护；无自动 TTL/充值 |
+| request results + fingerprint | Ledger，跨请求及重启 | 同 ID 查询完整已提交响应；输入冲突拒绝；事务内再次检查唯一性 | 与账本一起保留，删除前须核对账务 |
+| authoritative audit | 同库独立表，和预算/结果同事务 | runtime 不读取历史审计；audit_records 仅离线验证/导出 | 场景标签、模型原始响应可能敏感；凭证不写入；本地访问控制 |
+| scene / model context | 单请求内存 | system standing constraints + user scene/四字段候选摘要；不传 bid/budget | 无对话历史/跨线程用户画像 |
+
+V1 六层上下文与 85% compaction 规则保留。V2 的两 API roles 不是声称六层均适用：system 保存约束，user 仅装配本轮数据。UTF-8 字节上界为保守估计而非真实 tokenizer；默认 2000 限额，超限在模型调用前 no_ad，拒绝静默裁剪 standing constraints。此选择以 fail-closed 换取低预算时的可用性；真实 token/成本质量仍需 live 验证。
+
+提交成功但响应丢失可按原 request_id 恢复；无法核实数据库状态则 status_unknown。数据库完全不可用时，不能同时保证响应与持久审计，异常必须显式报告。冻结 JSON 快照只用于离线复现实验，不是预算权威源。

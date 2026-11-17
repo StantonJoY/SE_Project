@@ -1,0 +1,7 @@
+  · 运行时依赖 ['jsonschema', 'tomli']
+  · dev 依赖 ['jsonschema', 'mypy', 'pytest', 'ruff', 'tomli', 'yaml']
+  · src/ 第三方 import ['jsonschema', 'yaml']
+  · aux 第三方 import ['pytest', 'tomli']
+  · 本地包（src/ 顶层）['ads', 'app', 'audit', 'audit_implementation', 'check_ai_use_log', 'check_dependencies', 'check_repo_completeness', 'check_safety_paths', 'check_semantic_eval', 'check_test_approval', 'compliance', 'demo_p1', 'demo_p4_selector', 'eval_runner', 'fitness_functions', 'install_hooks', 'mutation_check', 'render', 'scene', 'selector', 'validate_requirements']
+
+PASS — 依赖声明与代码实际使用一致（无隐藏依赖、无臃肿声明）

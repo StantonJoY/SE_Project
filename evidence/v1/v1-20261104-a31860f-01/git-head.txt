@@ -1,0 +1,23 @@
+﻿commit a31860fc3fb7c0710cf2d7ed157d3ebab2dafe77
+Author:     StantonJoY <1377060711@qq.com>
+AuthorDate: 2026-10-28T22:37:12+08:00
+Commit:     StantonJoY <1377060711@qq.com>
+CommitDate: 2026-10-28T22:37:12+08:00
+
+    test(repo): BUG-008 鐨勫洖褰掓祴璇?+ 鎶婁袱涓鏌ュ櫒鎺ュ叆 CI
+    
+    鍓嶄竴涓彁浜よˉ浜や簡 src/audit/锛屼絾鍙慨浜嗐€岃繖涓€娆°€嶃€?    鏈彁浜ゆ妸瀹冨彉鎴愩€屼笉浼氬啀鍙戠敓銆嶏紝骞惰ˉ涓?BUG-008 鏆撮湶鐨勬祦绋嬬己鍙ｃ€?    
+    1. 鏂板 test/offline/test_repo_completeness.py锛?4 涓祴璇曪級
+       鏈€鏍稿績鐨勪竴鏉★細test_no_src_package_is_gitignored
+         瀵规瘡涓?src/<pkg>/*.py 鎵ц git check-ignore --no-index -v锛?         鏂█**娌℃湁浠讳綍 src 鍖呰 gitignore 妯″紡鍛戒腑**銆?       杩欐潯鐩存帴瀵瑰簲 BUG-008 鐨勬牴鍥狅紱鍋氳繃璐熷悜楠岃瘉 鈥斺€?         鎶?.gitignore 鏀瑰洖 `audit/`锛岃娴嬭瘯绮剧‘澶辫触骞舵寚鍑?`.gitignore:21:audit/`銆?    
+       鈿狅笍 娴嬭瘯寮€鍙戜腑鐨勫潙锛氱涓€鐗堢敤鐨勬槸涓嶅甫 --no-index 鐨?git check-ignore锛?       缁撴灉**姘歌繙涓嶄細澶辫触** 鈥斺€?鍥犱负 git check-ignore 榛樿璺宠繃宸茶窡韪枃浠?       锛堝皧閲嶇储寮曪級銆傚凡鍏ュ簱鐨?src/audit/store.py 鍥犳琚姤鍛婁负銆屾湭蹇界暐銆嶃€?       鍔?--no-index 鎵嶆槸鐪熸鍦ㄦ祴銆屾ā寮忔湰韬€嶃€佸嵆銆屽皢鏉ユ柊澧炵殑鍚岀被鏂囦欢浼氫笉浼氳鍚炪€嶃€?    
+    2. CI 鎺ュ叆锛堟鍓嶄袱涓鏌ュ櫒鍧囨湭鍦?CI 璺戣繃锛?       - static-analysis job: 鏂板 Delivery completeness 姝ラ
+       - 鏂板 job銆孏ate 5b 路 Mutation verification銆嶈窇 scripts/mutation_check.py
+       - ruff 鑼冨洿琛ヤ笂 eval/
+       - 淇闂ㄧ 4 鐨勬敞閲婏細璇勪及闆?P7 鍚庡凡寤虹珛锛?5 鏉★級锛屼笉鍐嶆槸鍗犱綅
+    
+    3. 鏂囨。
+       - docs/bug-diary.md 鏂板 BUG-008锛堢棁鐘?澶嶇幇/鍒嗙被/鏍瑰洜/涓轰綍鍗侀」妫€鏌ュ叏缁垮嵈婕?淇/楠岃瘉/娴嬭瘯鏈韩鐨勫潙锛?       - README 鐨勫懡浠ゆ竻鍗曡ˉ涓?check_repo_completeness.py / mutation_check.py / eval_runner.py
+       - fitness 鐨?REQUIRED_TEST_MODULES 绾冲叆 test_repo_completeness.py锛堜娇鍏跺彈 V4 淇濇姢锛?    
+    楠岃瘉锛?99 涓祴璇曞叏杩囷紱fitness / schema / 瀹屾暣鎬?/ 瀹¤(0 鍙戠幇路48 閫氳繃) 鍏ㄧ豢銆?    
+    Refs: BUG-008, INV-ADS-011, INV-ADS-012, REQ-ADS-GOV-001

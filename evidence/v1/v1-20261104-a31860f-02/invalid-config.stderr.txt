@@ -1,0 +1,3 @@
+配置错误：
+配置校验失败（fail loudly，不静默取默认值）：
+  - llm.provider='invalid_provider' 非法（应为 mock | openai_compatible）

@@ -254,3 +254,16 @@ SE_Project/
 | 4 | ADR-002 D1（`no_ad` 为终态）与 D2（审计失败即整体失败） | ⏳ 待批 |
 
 > 本蓝图状态为**草案**。按课程行 3830，**计划获批前不得产出实现代码**。
+
+
+## V2 增量（2026-10-31，有效本地基线）
+
+此前各节为 V1 历史快照。原课程 PDF 和本轮真实用户授权优先；V2 在同目录追加，V1 内容和 ID 保留。ADR-005 为方案及 AI proxy 技术评审，正式团队人工验收待完成。
+
+新增元素⑧ bidding：models.Bid/validate_bids（报价契约），engine.AuctionChoice/choose_winner（纯数学），ledger.Ledger（SQLite 预算、幂等结果及权威审计）。这些是同一竞价元素的单一职责子模块。
+
+新增支撑模块：selector/relevance.py 提供 RelevanceClient、FixedRelevanceClient、HTTPRelevanceClient、严格 parse_relevance_output；app/pipeline_v2.py 的 recommend_v2 编排；app/cli_v2.py 提供独立 CLI；render/schema_v2.py 校验 ad/no_ad/status_unknown。data/bids-v2.json 为独立 sidecar，V1 ads.json 不改。config-v2.yaml 选择已验证的命名公式、价格与平局策略。
+
+数据流：sanitize/scene → 非经济候选上下文 → relevance advisory → strict parser → deterministic choose_winner → V1 run_compliance FINAL AUTHORITY → Ledger.finalize 原子提交 → render。所有拒绝路径不自动改选另一个胜者。解释仅影响说明文本。
+
+接口与失败语义见 docs/plans/V2-execution.md、ADR-005、INV-V2-001 至 INV-V2-012。所有既有 V1 回归仍为强制；本地授权与正式人类测试审批分开记录。

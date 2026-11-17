@@ -139,6 +139,7 @@ class ReplayReport:
         return (
             self.pass_rate >= self.pass_rate_threshold
             and not self.violations
+            and all(o.matched for o in self.must_fail)
             and not self.sla_drift_alert
         )
 
