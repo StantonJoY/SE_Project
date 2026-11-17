@@ -289,3 +289,143 @@ entries:
       残留：新立 TD-028（清单「忘放标记」是静默失败，须加机械断言）。
       TD-026 只完成一半：安装器就位，但 agent 会话的沙箱不允许写 .git/hooks/，
       须由人类执行 `python scripts/install_hooks.py`。
+
+  - id: "AIU-0018"
+    date: "2026-10-31"
+    agent: "Codex V2 governance BUILD agent"
+    tool: "native collaboration + Python/PowerShell"
+    role: "build"
+    task: "激活 V2 同目录需求与架构；修正实际语义触发、代码变更测试批准和结构证据检查"
+    artifacts: ["docs/req/requirements.yaml", "docs/architecture/", "scripts/", "test/offline/test_v2_governance.py", ".github/workflows/ci.yml", "AGENTS.md", "Prompt.md"]
+    outcome: "pending"
+    evidence: "docs/review-memo.md"
+    authorization: "真实用户 kickoff 2026-10-30T12:10:56.447Z，见 docs/plans/V2-execution.md"
+    review_kind: "ai_proxy"
+    notes: >-
+      本轮真实授权覆盖 V2 实现与代行 agent 监督。正式人工前置测试批准仍缺。
+      2026-10-31 用户说明额度已重置后继续构建，先前中断和重定向保存在本地会话归档。
+      核心与集成由其他实际 agent 负责，保留原有测试的验证意图。
+      集成发现预算快照额外字段导致 KeyError 契约缺陷，以及 relevance parser 返回 dict 而 engine
+      需要 integer score 的契约差异，交由对应 BUILD 修复。治理另发现 V1 MUST_FAIL mismatch
+      未参与最终阻断、代码-only 变更逃过测试批准、Python prompt 未触发 replay，并补反例验证。
+      评审备忘录分别记录前置批准、Git 交付、远程分支保护与真实生成的验证状态。
+
+  - id: "AIU-0019"
+    date: "2026-10-31"
+    agent: "Codex V2 core BUILD"
+    tool: "native collaboration"
+    role: "build"
+    task: "严格报价、确定性竞价、SQLite原子预算/结果/审计与幂等提交"
+    artifacts: ["src/bidding/"]
+    outcome: "pending"
+    evidence: "test/offline/test_bidding_v2.py"
+    review_kind: "ai_proxy"
+    notes: "真实quota中断后同线程继续；按独立测试修正公开预算形状。正式人工验收待完成。"
+
+  - id: "AIU-0020"
+    date: "2026-10-31"
+    agent: "Codex V2 integration BUILD"
+    tool: "native collaboration"
+    role: "build"
+    task: "相关性建议、V2合规编排、CLI配置、输出schema和七场景演示；修复Unicode和HTTP总deadline"
+    artifacts: ["src/app/pipeline_v2.py", "src/app/cli_v2.py", "src/selector/relevance.py", "src/render/schema_v2.py", "src/bidding/ledger.py", "src/audit/store.py", "config-v2.yaml", "data/bids-v2.json", "scripts/demo_v2.py", "test/offline/test_v2_boundary_regressions.py"]
+    outcome: "pending"
+    evidence: "test/offline/test_v2_boundary_regressions.py"
+    review_kind: "ai_proxy"
+    notes: "BUILD修复来自独立VERIFY的实际反例；ledger仅授权ASCII JSON转义，audit仅UP037注释格式。默认fixed离线，外部真实模型未测。"
+
+  - id: "AIU-0021"
+    date: "2026-10-31"
+    agent: "Codex independent TEST and boundary VERIFY"
+    tool: "native collaboration + pytest/coverage"
+    role: "test"
+    task: "规格驱动164项功能测试；后补59项公开结算边界测试，保留90%门槛"
+    artifacts: ["test/offline/test_bidding_v2.py", "test/offline/test_pipeline_v2.py", "test/offline/test_relevance_v2.py", "test/offline/test_v2_settlement_boundaries.py"]
+    outcome: "pending"
+    evidence: "test/offline/test_v2_settlement_boundaries.py"
+    review_kind: "ai_proxy"
+    notes: "独立TEST在初始BUILD时未读产品实现；补充边界验证为真实postimplementation阶段，不冒称人工前置批准。267项组合测试测得bidding覆盖95.59%。"
+
+  - id: "AIU-0022"
+    date: "2026-10-31"
+    agent: "Codex V2 eval BUILD"
+    tool: "native collaboration"
+    role: "build"
+    task: "18条固定V2回放、独立预算/审计对账和24条评估器自测"
+    artifacts: ["eval/v2_cases.json", "eval/v2_runner.py", "test/offline/test_v2_eval.py"]
+    outcome: "pending"
+    evidence: "test/offline/test_v2_eval.py"
+    review_kind: "ai_proxy"
+    notes: "4正向、14预期拒绝，严格匹配且独立安全违规为0；错误预期会退出1；不含真实模型性能声明。"
+
+  - id: "AIU-0023"
+    date: "2026-10-31"
+    agent: "Codex independent VERIFY"
+    tool: "native collaboration + real SQLite + loopback HTTP"
+    role: "review"
+    task: "拒绝两项边界缺陷并复核；将3条过时V1注册表快照断言迁移到当前声明版本策略"
+    artifacts: ["test/offline/test_requirements_registry.py"]
+    outcome: "pending"
+    evidence: "docs/review-memo.md"
+    review_kind: "ai_proxy"
+    notes: "原负向意图保留并新增未声明版本拒绝。实际本地HTTP慢滴流/延迟headers约0.156s拒绝，配置0.15s；302目标未收到请求。代理技术复核不替代正式人工验收。"
+
+  - id: "AIU-0024"
+    date: "2026-10-31"
+    agent: "Codex supervisor on behalf of requesting user"
+    tool: "native collaboration + orchestration helpers"
+    role: "review"
+    task: "按真实用户授权执行计划，记录重定向、拒绝、代理批准、额度中断及可导出的工具记录"
+    artifacts: ["docs/plans/V2-execution.md", "docs/architecture/adr-005-v2-atomic-auction.md"]
+    outcome: "pending"
+    evidence: "docs/review-memo.md"
+    review_kind: "ai_proxy"
+    notes: "开发时使用 Codex CLI 和 Codex 原生 agent。可导出的原始记录与解释性注释分别在本地归档，部分协作正文仍缺可读原文。正式人工批准状态见 docs/v2-approval-status.yaml。"
+
+  - id: "AIU-0025"
+    date: "2026-10-31"
+    agent: "Codex resumed independent VERIFY and delivery review"
+    tool: "native collaboration"
+    role: "verify"
+    task: "用户再次要求继续后，复核25条变异的真实失败证据、会话可见导出边界及最终本地打包"
+    artifacts: ["scripts/mutation_check.py", "test/offline/test_v2_mutation.py"]
+    outcome: "pending"
+    evidence: "docs/review-memo.md"
+    review_kind: "ai_proxy"
+    notes: "旧reviewer真实quota中断保留；新复核另起真实agent，不补造旧线程结论。纠正INV-ADS-015素材schema映射及注入对象契约；变异先跑无变异基线，再只接受可信call断言。发现部分协作正文为密文，read_thread未恢复明文，D5完整可读会话要求不能宣称满足。正式人工验收仍待完成。"
+
+  - id: "AIU-0026"
+    date: "2026-10-31"
+    agent: "Codex supervisor environment verification"
+    tool: "OpenCode environment check + read-only provider model list"
+    role: "verify"
+    task: "复查 OpenCode 安装和模型接口可达性，纠正仅检查 Windows 命令路径所得的结论"
+    artifacts: ["docs/review-memo.md", "docs/v2-approval-status.yaml"]
+    outcome: "pending"
+    evidence: "docs/review-memo.md"
+    review_kind: "ai_proxy"
+    notes: "复查确认已安装 OpenCode，CityU /models 返回 HTTP 200，模型列表包含 CS5351/DeepSeek-V4-Flash。V2 外部生成尚未执行。此前实际开发工具为 Codex。环境核查原件保存在本地。"
+
+  - id: "AIU-0027"
+    date: "2026-11-05"
+    agent: "Codex V2 handover verification"
+    tool: "V2 CLI + CityU HTTP provider + local Git hook"
+    role: "verify"
+    task: "通过现有 V2 CLI 运行真实生成，核对成交、重放、合规拒绝与本地提交检查"
+    artifacts: ["README.md", "docs/review-memo.md", "docs/v2-approval-status.yaml"]
+    outcome: "pending"
+    evidence: "docs/review-memo.md"
+    review_kind: "ai_proxy"
+    notes: "两次 CityU 生成均通过场景验收。正常成交写入一条审计，重复请求返回相同结果，医疗品类被确定性拒绝且余额不变。本地钩子已安装并通过暂存预演。工程实现的前置人工批准状态未变。"
+
+  - id: "AIU-0028"
+    date: "2026-11-17"
+    agent: "Codex CI repair and review agents"
+    tool: "Codex native collaboration"
+    role: "build"
+    task: "修复 GitHub Actions 无法解析顶层 env 中 runner.temp 的错误"
+    artifacts: [".github/workflows/ci.yml"]
+    outcome: "accepted"
+    evidence: "https://github.com/StantonJoY/SE_Project/actions/runs/41941541305"
+    authorization: "用户在当前会话中明确要求修复 CI 配置并上传新版 V2。"
+    notes: "Ruff 和 mypy 的缓存变量分别移到对应步骤的 env。独立复核确认除变量所在作用域外，触发条件、任务和检查命令一致。"

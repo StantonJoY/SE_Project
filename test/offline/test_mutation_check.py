@@ -3,6 +3,7 @@
 Verifies: REQ-ADS-NFR-QA-002（每条不变量 ≥1 个会在违规时失败的测试）、
           INV-ADS-011（测试须具备证伪能力；缺口必须有去向）。
 批准：docs/test-approvals.yaml 的 TA-0004（pre_registered，指向 docs/plans/P7-eval.md）。
+V2 登记命名空间迁移是在实现后的独立 TEST 代理技术审查中完成，不能沿用该历史批准冒充 V2 前置人工批准。
 运行：仓库根目录下 pytest test/offline/test_mutation_check.py
 
 **本模块的定位**：变异脚本本身也是一个实现，它同样会错。
@@ -61,7 +62,8 @@ def test_no_mutation_for_undeclared_invariant() -> None:
     import re
 
     text = (ROOT / "docs" / "architecture" / "invariants.md").read_text(encoding="utf-8")
-    known = set(re.findall(r"INV-ADS-\d{3}", text))
+    # V2 规格迁移：只接受同一登记册中真实编号，不以任意前缀替代登记证据。
+    known = set(re.findall(r"`(INV-(?:ADS|V2)-\d{3})`", text))
     for m in mc.MUTATIONS:
         assert m.invariant in known, f"{m.mutation_id} 引用了不存在的不变量 {m.invariant}"
 
@@ -131,8 +133,13 @@ def test_pytest_usage_error_is_not_detection() -> None:
 
 
 def test_genuine_failure_is_detection() -> None:
-    """INV-ADS-011：注入成功 + 测试失败 ⇒ 才算「被检出」。"""
-    detected, note = mc._classify(1, "[mutation] 已注入 MUT-X\n1 failed")
+    """INV-ADS-011：同一变异注入成功 + 调用阶段行为断言失败 ⇒ 才算「被检出」。"""
+    import json
+
+    evidence = {"mutation": "MUT-X", "nodeid": "test/offline/test_guard.py::test_guard",
+                "phase": "call", "exception": "AssertionError", "message": "guard violated"}
+    output = "[mutation] 已注入 MUT-X → fixture:guard\n[mutation-failure] " + json.dumps(evidence) + "\n1 failed"
+    detected, note = mc._classify(1, output)
     assert detected is True
     assert note == ""
 
@@ -145,9 +152,18 @@ def test_genuine_pass_is_not_detection() -> None:
 
 def test_declared_invariants_reads_coverage_map() -> None:
     """REQ-ADS-NFR-QA-002：`negative_test_backed` 的判定来源必须是覆盖表（单一来源）。"""
+    import re
+
+    import yaml
+
+    # 实现后的 V2 规格迁移，不冒充实现前人工批准：核对实际覆盖表，保留单一来源约束。
+    coverage = yaml.safe_load(mc.COVERAGE_MAP.read_text(encoding="utf-8"))
+    expected = [entry["id"] for entry in coverage["invariants"] if entry.get("negative_test_backed")]
     declared = mc._declared_invariants()
     assert declared, "覆盖表应至少声明一条 negative_test_backed"
-    assert all(i.startswith("INV-ADS-") for i in declared)
+    assert len(declared) == len(set(declared)), "不变量声明不得重复"
+    assert set(declared) == set(expected), "不变量声明必须精确来自覆盖表"
+    assert all(re.fullmatch(r"INV-(?:ADS|V2)-\d{3}", invariant) for invariant in declared)
 
 
 def test_list_mode_lists_all_mutations(capsys) -> None:

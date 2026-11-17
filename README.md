@@ -1,5 +1,29 @@
 # SE Project — 场景化广告推荐引擎（Ad Recommendation Engine）
 
+## V2 本地演示与当前状态（2026-10-31）
+
+V2 在 V1 上增加确定性单赢家竞价和 SQLite 持久预算；原 19 条 V2 需求已在同一注册表激活。LLM 只给相关性，`relevance*bid`、ID 平局、pay-as-bid 价格和花费由代码决定。合规拒绝发生在扣费之前；预算、幂等结果和权威审计同事务提交。报价由 `data/bids-v2.json` sidecar 提供。
+
+```powershell
+python -m pip install -e ".[dev]"
+python scripts/demo_v2.py
+python -m app.cli_v2 --request-id demo-001 --time-slot night --device mobile --tag campus
+python eval/eval_runner.py --no-write
+python eval/v2_runner.py --no-write
+pytest test/offline -q --cov=src/bidding --cov-report=term-missing --cov-fail-under=90
+```
+
+CLI 默认 `fixed`，账本默认 `logs/bidding-v2.sqlite3`；同 ID 同输入重复请求返回保存响应，不重扣费。修改输入须使用新的 request_id；发生 status_unknown 时用原 ID 原输入恢复，不能假定零收费。重新运行演示应依其脚本说明使用独立数据库，禁止靠重新 seed 重置历史花费。
+
+HTTP 路径使用标准库 urllib 和 chat-completions 协议。在本地通过环境变量提供密钥，默认名称为 `V2_LLM_API_KEY`，也可用 `--api-key-env` 指定。显式选择 `--provider http --model <model> --base-url <API-root>`（或 `--endpoint <complete-url>`）。CityU 的 `CS5351/DeepSeek-V4-Flash` 已通过正常成交、请求重放和医疗品类拒绝的真实调用验证。可重复执行的 live 测试套件、质量评估、p95 和成本测量仍待完成。V2 按 UTF-8 字节数保守估算上下文用量，超过 2000 上限即拒绝。[真实调用记录](docs/review-memo.md#cityu-真实调用与本地钩子复核2026-11-05)
+
+V2 的实现、干预和验证摘要见 [AI 使用记录](docs/ai-use-log.yaml) 和 [评审备忘录](docs/review-memo.md)。原始 agent 会话、工具输出和干预注释在本地归档，课程如需原始证据，由团队另行提交。部分协作正文仍无法导出为可读文本。正式人工前置测试批准、最终验收和远程 CI/分支保护仍待处理，详见 [V2 审批状态](docs/v2-approval-status.yaml)。
+
+`PyYAML` 为运行时依赖（配置实际使用）；`pytest-cov` 为开发依赖，由 CI 命令行测 bidding >=90% 覆盖率。后面的课程状态表为 V1 历史快照，其计数和“尚无 prompt/联网”说明不代表当前 V2 状态。
+
+## V1 文档历史快照
+
+
 CS5351 Agentic Software Engineering Project · 2026-2027
 
 在人类监督下，用 AI coding agent 构建一个**场景化广告推荐引擎**：

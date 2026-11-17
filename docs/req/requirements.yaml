@@ -9,13 +9,14 @@
 # 校验：python scripts/validate_requirements.py
 
 schema_version: "2.0"
-registry_revision: "2026-10-06.1"
+registry_revision: "2026-10-31.1"
 
 project:
   name: "场景化广告推荐引擎 / Scenario-based Ad Recommendation Engine"
   course: "CS5351 Agentic Software Engineering Project"
   repository: "https://github.com/StantonJoY/SE_Project"
-  baseline_version: "V1"
+  baseline_version: "V2"
+  baseline_versions: ["V1", "V2"]
   target_versions: ["V1", "V2"]
 
 # ---------------------------------------------------------------------------
@@ -28,10 +29,10 @@ evolution_rounds:
     status: "active"
     note: "B1 基线：架构工件在当前轮次目录下，AI 可改。"
   - round: "V2"
-    governs: "docs2/architecture/"
-    docs_dir: "docs2/architecture/"
-    status: "not_started"
-    note: "竞价轮次。V2 启动时 V1 层冻结（IMMUTABLE）；新条目只追加到 docs2/。"
+    governs: "docs/architecture/"
+    docs_dir: "docs/architecture/"
+    status: "active"
+    note: "V2 增量：原目录维护，V1 历史条目保留，全部历史测试继续回归；正式人工验收待完成。"
 
 scope:
   in:
@@ -39,7 +40,7 @@ scope:
     - "LLM 在规则预筛后的候选集内做闭集选择，输出结构化 JSON（ad_id/reason/confidence）。"
     - "确定性合规过滤作为安全边界，拦截违禁词、敏感品类、场景冲突与非法输出。"
     - "全流程审计日志（JSONL），可重放每次决策。"
-    - "V2（docs2/ 轮次）：报价竞价框架，LLM 降级为相关性建议，成交/花费/胜负由确定性数学代码决定。"
+    - "V2（原目录增量）：报价竞价框架，LLM 降级为相关性建议，成交/花费/胜负由确定性数学代码决定。"
   out:
     - item: "RAG / 向量检索召回"
       deferred_to: "V3"
@@ -77,8 +78,8 @@ sources:
   - key: "req_v2_draft"
     path: "docs/req/requirements-v2-bidding-draft.md"
     kind: "requirement_draft"
-    authority: "candidate"
-    note: "V2 竞价候选需求，归属 docs2/ 轮次。"
+    authority: "normative"
+    note: "V2 已并入有效基线；原候选草案保留为来源与历史。"
   - key: "design_v1"
     path: "docs/design/technical-design-v1.md"
     kind: "design_draft"
@@ -464,7 +465,7 @@ baseline_requirements:
     fit_criterion: "CI 全部通过，且每个不变量的失败测试在注入违规时确实失败（变异验证）。"
     verification: ["unit_test", "negative_test", "ci_gate"]
     enforced_by: "test/offline + 覆盖面校验 + CI 门"
-    enforcement: ["test.offline", "docs/code-governance/verification-constraints.md"]
+    enforcement: ["test.offline", "docs/code-governance/verification-constraints.md", "scripts.audit_implementation.main", "scripts.check_dependencies.main", "scripts.check_repo_completeness.main", "scripts.mutation_check.main"]
     asr: true
     asr_id: "ASR-ADS-16"
     invariants: ["INV-ADS-011"]
@@ -490,7 +491,7 @@ baseline_requirements:
     fit_criterion: "每次请求恰好 1 条日志，字段完整（场景、候选集规模、LLM 原始输出、过滤结果、最终输出、模型与 prompt 版本）。"
     verification: ["unit_test", "deterministic_replay"]
     enforced_by: "audit（JSONL 追加写）"
-    enforcement: ["audit"]
+    enforcement: ["audit", "audit.store.AuditRecordBuilder.write"]
     asr: true
     asr_id: "ASR-ADS-10"
     invariants: ["INV-ADS-012"]
@@ -574,8 +575,8 @@ baseline_requirements:
 # 与 V1 基线同时列出以便追溯；ID 已重编为语义化格式，旧编号见 legacy_id 与 legacy_id_map。
 # 候选需求的 asr_id 留待 docs2/ 轮次建立；本文件只记录 A1 预判结果（见 asr-register.md §9）。
 # ===========================================================================
-candidate_requirements:
 
+  # V2 effective baseline: promoted from the 19 published candidate IDs; V1 above preserved.
   - id: "REQ-ADS-NFR-SAFETY-006"
     version: "V2"
     type: "invariant"
@@ -583,14 +584,15 @@ candidate_requirements:
     priority: "must"
     fit_criterion: "全量素材满足 bid ∈ [bid_floor, bid_ceiling]，通过率 100%；非法值在加载期被拒绝并报错。"
     verification: ["schema_validation", "negative_test", "unit_test"]
-    enforced_by: "ads.schema（加载期范围双重校验）"
+    enforced_by: "bidding.models.validate_bids"
+    enforcement: ["bidding.models.validate_bids"]
+    invariants: ["INV-V2-001"]
     asr: false
     legacy_id: "REQ-021"
-    deferred_to_round: "V2"
     fallback: "加载期整体拒绝该素材批次（与 REQ-ADS-ARCH-001 同策略），不将非法报价带入任何决策。"
     source_refs:
       - {source: "req_v2_draft", locator: "§2, REQ-021"}
-    status: "deferred"
+    status: "implemented"
 
   - id: "REQ-ADS-ARCH-005"
     version: "V2"
@@ -599,14 +601,16 @@ candidate_requirements:
     priority: "must"
     fit_criterion: "任意时刻该等式精确成立（整数运算），违例数 = 0；重放核对一致。"
     verification: ["property_test", "unit_test", "deterministic_replay"]
-    enforced_by: "bidding.budget"
+    enforced_by: "bidding.ledger.Ledger.budgets"
+    enforcement: ["bidding.ledger.Ledger.budgets"]
+    invariants: ["INV-V2-002"]
     asr: true
+    asr_id: "ASR-V2-002"
     legacy_id: "REQ-022"
-    deferred_to_round: "V2"
     fallback: "冻结该广告（转 exhausted）并写审计告警，阻断后续展示直至人工核对台账。"
     source_refs:
       - {source: "req_v2_draft", locator: "§4, REQ-022"}
-    status: "deferred"
+    status: "implemented"
     notes: "litmus 命中 State + QA + Evidence = 3 维 → ASR 预判（引入跨轮持久状态）。"
 
   - id: "REQ-ADS-ARCH-006"
@@ -616,30 +620,34 @@ candidate_requirements:
     priority: "must"
     fit_criterion: "被展示广告满足 budget_remaining > 0（或 ≥ 最低可成交额），违规数 = 0。"
     verification: ["unit_test", "negative_test"]
-    enforced_by: "bidding.engine（候选过滤）"
+    enforced_by: "bidding.engine.choose_winner"
+    enforcement: ["bidding.engine.choose_winner"]
+    invariants: ["INV-V2-003"]
     asr: true
+    asr_id: "ASR-V2-003"
     legacy_id: "REQ-023"
-    deferred_to_round: "V2"
     fallback: "该广告退出候选集并转 exhausted；本轮若无其他候选则降级 no_ad。"
     source_refs:
       - {source: "req_v2_draft", locator: "REQ-023"}
-    status: "deferred"
+    status: "implemented"
 
   - id: "REQ-ADS-ARCH-007"
     version: "V2"
     type: "invariant"
-    statement: "花费入账精确：每次展示后 spent 增量恰好等于成交价。"
+    statement: "花费入账精确：每次本地模拟成交提交后 spent 增量恰好等于成交价；不代表真实曝光。"
     priority: "must"
     fit_criterion: "每轮 spent 增量 = 成交价；全量 Σspent = Σ成交价（重放核对一致），差额 = 0。"
     verification: ["property_test", "deterministic_replay", "unit_test"]
-    enforced_by: "bidding.budget"
+    enforced_by: "bidding.ledger.Ledger.finalize"
+    enforcement: ["bidding.ledger.Ledger.finalize"]
+    invariants: ["INV-V2-004", "INV-V2-010"]
     asr: true
+    asr_id: "ASR-V2-004"
     legacy_id: "REQ-024"
-    deferred_to_round: "V2"
     fallback: "停止竞价模块计费并回滚到上一份已核对台账快照，同时人工介入。"
     source_refs:
       - {source: "req_v2_draft", locator: "§4, REQ-024"}
-    status: "deferred"
+    status: "implemented"
 
   - id: "REQ-ADS-ARCH-008"
     version: "V2"
@@ -648,14 +656,15 @@ candidate_requirements:
     priority: "must"
     fit_criterion: "全量金额字段为整数类型，累计过程零精度丢失（属性测试）。"
     verification: ["property_test", "static_analysis"]
-    enforced_by: "bidding.budget"
+    enforced_by: "bidding.models.validate_bids"
+    enforcement: ["bidding.models.validate_bids"]
+    invariants: ["INV-V2-005"]
     asr: false
     legacy_id: "REQ-025"
-    deferred_to_round: "V2"
     fallback: "类型校验拦截非整数金额输入并拒绝该素材/请求；已产生的浮点台账作废重算。"
     source_refs:
       - {source: "req_v2_draft", locator: "§2, REQ-025"}
-    status: "deferred"
+    status: "implemented"
 
   - id: "REQ-ADS-ARCH-009"
     version: "V2"
@@ -664,14 +673,15 @@ candidate_requirements:
     priority: "must"
     fit_criterion: "相同输入重复计算得分逐位一致；评估集 replay 零差异。"
     verification: ["property_test", "deterministic_replay"]
-    enforced_by: "bidding.scoring"
+    enforced_by: "bidding.engine.choose_winner"
+    enforcement: ["bidding.engine.choose_winner"]
+    invariants: ["INV-V2-006"]
     asr: false
     legacy_id: "REQ-026"
-    deferred_to_round: "V2"
     fallback: "两次计算结果不一致即判定分数不可信，本轮降级 no_ad 并记录差异样本。"
     source_refs:
       - {source: "req_v2_draft", locator: "REQ-026"}
-    status: "deferred"
+    status: "implemented"
 
   - id: "REQ-ADS-NFR-SAFETY-007"
     version: "V2"
@@ -680,14 +690,16 @@ candidate_requirements:
     priority: "must"
     fit_criterion: "注入异常数值样本 100% 被拒绝并走降级。"
     verification: ["negative_test", "property_test"]
-    enforced_by: "bidding.engine（数值校验 gate）"
+    enforced_by: "selector.relevance.parse_relevance_output"
+    enforcement: ["selector.relevance.parse_relevance_output"]
+    invariants: ["INV-V2-007"]
     asr: true
+    asr_id: "ASR-V2-007"
     legacy_id: "REQ-027"
-    deferred_to_round: "V2"
     fallback: "拒绝该广告与请求，降级 no_ad 并记录异常样本用于回归。"
     source_refs:
       - {source: "req_v2_draft", locator: "§4, REQ-027"}
-    status: "deferred"
+    status: "implemented"
 
   - id: "REQ-ADS-ARCH-010"
     version: "V2"
@@ -696,15 +708,17 @@ candidate_requirements:
     priority: "must"
     fit_criterion: "成交价按唯一指定规则计算，实现唯一、文档明确；不存在第二条计价路径。"
     verification: ["unit_test", "deterministic_replay"]
-    enforced_by: "bidding.engine（单一计价路径）"
+    enforced_by: "bidding.ledger.Ledger.finalize"
+    enforcement: ["bidding.ledger.Ledger.finalize"]
+    invariants: ["INV-V2-008"]
     asr: true
+    asr_id: "ASR-V2-008"
     legacy_id: "REQ-028"
-    deferred_to_round: "V2"
     fallback: "规则未定义或出现多路径时拒绝成交并降级 no_ad，同时按安全关键路径要求人工批准。"
     source_refs:
       - {source: "req_v2_draft", locator: "REQ-028, §5"}
-    status: "deferred"
-    notes: "规则选择本身是待决项，见 OQ-006。"
+    status: "implemented"
+    notes: "本地方案 pay_as_bid 见 ADR-005；正式人工验收待完成。"
 
   - id: "REQ-ADS-ARCH-011"
     version: "V2"
@@ -713,29 +727,32 @@ candidate_requirements:
     priority: "must"
     fit_criterion: "分数相同时按固定规则（如 ad_id 升序）胜出，重复运行胜者完全一致。"
     verification: ["unit_test", "property_test", "deterministic_replay"]
-    enforced_by: "bidding.engine（tie-break）"
+    enforced_by: "bidding.engine.choose_winner"
+    enforcement: ["bidding.engine.choose_winner"]
+    invariants: ["INV-V2-006"]
     asr: true
+    asr_id: "ASR-V2-009"
     legacy_id: "REQ-029"
-    deferred_to_round: "V2"
     fallback: "tie-break 未命中或结果不稳定时拒绝本轮成交并降级 no_ad。"
     source_refs:
       - {source: "req_v2_draft", locator: "REQ-029"}
-    status: "deferred"
+    status: "implemented"
 
   - id: "REQ-ADS-FR-005"
     version: "V2"
     type: "functional"
     statement: "竞价引擎在候选集内按最终分数选出胜者。"
     priority: "must"
-    fit_criterion: "胜者 = 分数最高且预算充足者；分数公式为单一来源且可配置。"
+    fit_criterion: "胜者 = 分数最高且预算充足者；分数公式为由 config-v2.yaml 选择已验证的命名策略；不执行公式字符串。"
     verification: ["unit_test", "deterministic_replay"]
-    enforced_by: "bidding.engine"
+    enforced_by: "bidding.engine.choose_winner"
+    enforcement: ["bidding.engine.choose_winner"]
+    invariants: ["INV-V2-006"]
     asr: false
     legacy_id: "REQ-030"
-    deferred_to_round: "V2"
     source_refs:
       - {source: "req_v2_draft", locator: "REQ-030"}
-    status: "deferred"
+    status: "implemented"
 
   - id: "REQ-ADS-FR-006"
     version: "V2"
@@ -744,15 +761,17 @@ candidate_requirements:
     priority: "must"
     fit_criterion: "final_score 公式在 config 中单点定义；变更触发评估 replay。"
     verification: ["unit_test", "evaluation_replay", "ci_gate"]
-    enforced_by: "bidding.scoring + config.yaml"
+    enforced_by: "app.cli_v2.load_v2_config"
+    enforcement: ["app.cli_v2.load_v2_config"]
+    invariants: ["INV-V2-008"]
     asr: true
+    asr_id: "ASR-V2-011"
     legacy_id: "REQ-031"
-    deferred_to_round: "V2"
     source_refs:
       - {source: "req_v2_draft", locator: "REQ-031"}
       - {source: "sa_lecture", locator: "§5.7 Configuration Governance"}
-    status: "deferred"
-    notes: "公式形态为待决项，见 OQ-007。单一来源 + 变更触发 replay 使其成为 ASR 预判。"
+    status: "implemented"
+    notes: "本地方案 relevance_times_bid 见 ADR-005；正式人工验收待完成。单一来源 + 变更触发 replay 使其成为 ASR 预判。"
 
   - id: "REQ-ADS-ARCH-012"
     version: "V2"
@@ -761,14 +780,16 @@ candidate_requirements:
     priority: "must"
     fit_criterion: "LLM 输出 schema 不含成交价/花费字段（schema 层强制）；上述字段仅由竞价引擎产生。"
     verification: ["schema_validation", "negative_test"]
-    enforced_by: "selector.parser.parse_llm_output（schema 层权限边界）"
+    enforced_by: "selector.relevance.parse_relevance_output"
+    enforcement: ["selector.relevance.parse_relevance_output", "selector.relevance.HTTPRelevanceClient", "app.pipeline_v2.recommend_v2", "app.cli_v2.main"]
+    invariants: ["INV-V2-009"]
     asr: true
+    asr_id: "ASR-V2-012"
     legacy_id: "REQ-032"
-    deferred_to_round: "V2"
     fallback: "输出 schema 校验拒绝含成交/花费字段的 LLM 输出，降级 no_ad 并记录违规样本。"
     source_refs:
       - {source: "req_v2_draft", locator: "REQ-032, §4"}
-    status: "deferred"
+    status: "implemented"
     notes: "权限边界：LLM 对成交/花费无写权限，在 schema 层而非约定层强制。V2 把 V1 的 ARCH-001 推进到极致。"
 
   - id: "REQ-ADS-FR-007"
@@ -778,13 +799,14 @@ candidate_requirements:
     priority: "must"
     fit_criterion: "展示后 remaining = 0 的广告在下一轮不再进入候选集。"
     verification: ["unit_test", "deterministic_replay"]
-    enforced_by: "bidding.budget + 候选集构建"
+    enforced_by: "bidding.ledger.Ledger.finalize"
+    enforcement: ["bidding.ledger.Ledger.finalize"]
+    invariants: ["INV-V2-003"]
     asr: false
     legacy_id: "REQ-033"
-    deferred_to_round: "V2"
     source_refs:
       - {source: "req_v2_draft", locator: "REQ-033"}
-    status: "deferred"
+    status: "implemented"
 
   - id: "REQ-ADS-FR-008"
     version: "V2"
@@ -793,13 +815,14 @@ candidate_requirements:
     priority: "must"
     fit_criterion: "每次决策日志含 bid / budget / spend / final_score / 成交价，可完整重放决策过程。"
     verification: ["unit_test", "deterministic_replay"]
-    enforced_by: "audit（竞价快照）"
+    enforced_by: "bidding.ledger.Ledger.finalize"
+    enforcement: ["bidding.ledger.Ledger.finalize", "app.pipeline_v2.recommend_v2", "render.schema_v2.validate_v2_result"]
+    invariants: ["INV-V2-011"]
     asr: false
     legacy_id: "REQ-034"
-    deferred_to_round: "V2"
     source_refs:
       - {source: "req_v2_draft", locator: "REQ-034"}
-    status: "deferred"
+    status: "implemented"
 
   - id: "REQ-ADS-NFR-QA-003"
     version: "V2"
@@ -808,10 +831,11 @@ candidate_requirements:
     priority: "must"
     fit_criterion: "竞价引擎为纯逻辑模块（无 LLM 依赖），test/offline 全覆盖。"
     verification: ["unit_test", "static_analysis"]
-    enforced_by: "test.offline（结构约束）"
+    enforced_by: "bidding.engine.choose_winner"
+    enforcement: ["bidding.engine.choose_winner"]
+    invariants: ["INV-V2-006"]
     asr: false
     legacy_id: "REQ-035"
-    deferred_to_round: "V2"
     metric:
       name: "bidding_offline_line_coverage"
       unit: "%"
@@ -820,7 +844,7 @@ candidate_requirements:
       window: "test/offline 对 src/bidding 的语句覆盖率"
     source_refs:
       - {source: "req_v2_draft", locator: "REQ-035"}
-    status: "deferred"
+    status: "implemented"
 
   - id: "REQ-ADS-SEC-002"
     version: "V2"
@@ -829,13 +853,14 @@ candidate_requirements:
     priority: "should"
     fit_criterion: "素材加载期 schema + 范围双重校验；异常报价样本 100% 被拒绝。"
     verification: ["schema_validation", "negative_test"]
-    enforced_by: "ads.repository.AdRepository.load"
+    enforced_by: "bidding.models.validate_bids"
+    enforcement: ["bidding.models.validate_bids"]
+    invariants: ["INV-V2-001"]
     asr: false
     legacy_id: "REQ-036"
-    deferred_to_round: "V2"
     source_refs:
       - {source: "req_v2_draft", locator: "REQ-036"}
-    status: "deferred"
+    status: "implemented"
 
   - id: "REQ-ADS-GOV-003"
     version: "V2"
@@ -844,14 +869,16 @@ candidate_requirements:
     priority: "must"
     fit_criterion: "语义评估门禁覆盖竞价变更；AI-use 日志同步；安全关键路径变更附带 ADR 与人工批准记录。"
     verification: ["ci_gate", "evaluation_replay"]
-    enforced_by: "permission model + pre-commit hook + CI 门"
+    enforced_by: "scripts.check_semantic_eval.semantic_changes"
+    enforcement: ["scripts.check_semantic_eval.semantic_changes", "scripts.check_test_approval.required_test_requirements", "scripts.check_safety_paths.read_adr_paths", "scripts.check_ai_use_log.check_structure", "scripts.fitness_functions.check_v2_contracts", "scripts.validate_requirements.check_consistency"]
+    invariants: ["INV-V2-012"]
     asr: true
+    asr_id: "ASR-V2-017"
     legacy_id: "REQ-037"
-    deferred_to_round: "V2"
     source_refs:
       - {source: "req_v2_draft", locator: "REQ-037"}
       - {source: "course_spec", locator: "D7 gate 4, gate 6; branch protection"}
-    status: "deferred"
+    status: "implemented"
 
   - id: "REQ-ADS-NFR-QA-004"
     version: "V2"
@@ -860,19 +887,20 @@ candidate_requirements:
     priority: "should"
     fit_criterion: "新增用例覆盖预算耗尽、出价越界、平局、数值异常、花费重放，合计 ≥ 10 条。"
     verification: ["evaluation_replay"]
-    enforced_by: "eval（竞价分区）"
+    enforced_by: "eval.v2_runner.main"
+    enforcement: ["eval.v2_runner.main", "scripts.demo_v2.run_demo"]
+    invariants: ["INV-V2-012"]
     asr: false
     legacy_id: "REQ-038"
-    deferred_to_round: "V2"
     metric:
       name: "bidding_eval_case_count"
       unit: "条"
       threshold: 10
       direction: "at_least"
-      window: "eval/eval_cases.json 竞价分区"
+      window: "eval/v2_cases.json 固定竞价评估"
     source_refs:
       - {source: "req_v2_draft", locator: "REQ-038"}
-    status: "deferred"
+    status: "implemented"
 
   - id: "REQ-ADS-NFR-PERF-002"
     version: "V2"
@@ -881,10 +909,11 @@ candidate_requirements:
     priority: "should"
     fit_criterion: "100 条候选内单次竞价计算耗时 < 50ms（离线基准）。"
     verification: ["metric_measurement", "unit_test"]
-    enforced_by: "bidding.engine"
+    enforced_by: "bidding.engine.choose_winner"
+    enforcement: ["bidding.engine.choose_winner"]
+    invariants: ["INV-V2-006"]
     asr: false
     legacy_id: "REQ-039"
-    deferred_to_round: "V2"
     metric:
       name: "bidding_compute_latency"
       unit: "ms"
@@ -893,11 +922,14 @@ candidate_requirements:
       window: "100 条候选离线基准，取多次运行中位数"
     source_refs:
       - {source: "req_v2_draft", locator: "REQ-039"}
-    status: "deferred"
+    status: "implemented"
 
 # ---------------------------------------------------------------------------
 # 旧编号映射（D1 v1 → v2）。旧编号已废弃，仅用于追溯历史讨论与文档。
 # ---------------------------------------------------------------------------
+
+candidate_requirements: []
+
 legacy_id_map:
   "REQ-001": "REQ-ADS-FR-001"
   "REQ-002": "REQ-ADS-ARCH-001"
@@ -998,7 +1030,7 @@ open_questions:
     blocks: ["REQ-ADS-FR-006"]
     due_gate: "V2 需求批准前"
   - id: "OQ-008"
-    question: "V2 竞价需求是否正式并入基线（从 candidate_requirements 迁至 baseline_requirements，并启用 docs2/）。"
+    question: "V2 已按用户授权并入本地有效基线；团队正式人工验收何时完成。"
     owner: "team"
     blocks: ["REQ-ADS-ARCH-005", "REQ-ADS-FR-005", "REQ-ADS-FR-006", "REQ-ADS-FR-008"]
     due_gate: "V1 收尾后、V2 开工前"
@@ -1013,3 +1045,7 @@ open_questions:
       （`_FakePath` + monkeypatch `builtins.open`），test_banned_words.py 同法。
       离线套件现为 86 passed / 0 error，不再依赖宿主临时目录可写性。
       该约束已写入 verification-constraints.md §5；见 BUG-001。
+
+# V2 policy clarification (2026-10-31): historical OQ-005 wording remains above.
+# MUST_FAIL is excluded from the quality denominator, but ANY mismatched MUST_FAIL blocks.
+# OQ-006/007 local design: pay_as_bid / relevance_times_bid; formal human acceptance remains pending.

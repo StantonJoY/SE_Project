@@ -1,5 +1,7 @@
 # 分支保护配置（Branch Protection）— D7 交付物
 
+> V2 状态（2026-11-05）。六道门禁已配置，Python prompt、竞价与配置变更触发 V1 和 V2 回放。GitHub 公开接口显示 `main` 未受保护，未返回适用的分支规则。管理员仍需配置远端保护和真实评审者。V2 正式前置测试批准待处理。后文 V1 状态为历史配置说明。
+
 > 课程 §6 原文：
 > **"Branch protection: Branch protection must require passing CI, and changes to
 > safety-critical paths must require human review with an accompanying architecture decision."**

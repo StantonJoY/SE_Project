@@ -85,7 +85,7 @@ def _parse_path_table(lines: list[str], start: int) -> dict[str, bool]:
             continue  # 表头分隔行
         last = cells[-1]
         for path in PATH_RE.findall(cells[0]):
-            if "/" not in path and not path.endswith((".json", ".py", ".md")):
+            if "/" not in path and not path.endswith((".json", ".py", ".md", ".yaml", ".yml", ".toml", ".jsonc")):
                 continue  # 非路径条目（如机制名）
             paths[path] = "ADR" in last
     return paths
@@ -135,18 +135,11 @@ def resolve_base(explicit: str | None) -> str | None:
 
 
 def changed_files(base: str | None) -> list[str]:
-    if base:
-        out = git("diff", "--name-only", f"{base}...HEAD")
-    else:
-        out = ""
-    if not out.strip():
-        # 退化：未提交变更 + 最近一次提交
-        out = git("status", "--porcelain")
-        files = [line[3:].strip() for line in out.splitlines() if line.strip()]
-        out = git("diff", "--name-only", "HEAD~1", "HEAD")
-        files += out.splitlines()
-        return sorted({f for f in files if f})
-    return sorted({f for f in out.splitlines() if f.strip()})
+    """Include local changes as well as the committed comparison."""
+    files = git("diff", "--name-only", f"{base}...HEAD").splitlines() if base else []
+    files += git("diff", "--name-only", "HEAD").splitlines()
+    files += git("ls-files", "--others", "--exclude-standard").splitlines()
+    return sorted({f for f in files if f.strip()})
 
 
 def touches(path: str, changed: list[str]) -> list[str]:

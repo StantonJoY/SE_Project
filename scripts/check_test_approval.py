@@ -14,7 +14,7 @@
   ① **结构层**：`docs/test-approvals.yaml` 存在、可解析；每条记录含必需字段；
      `req_ids` 必须真实存在于 `docs/req/requirements.yaml`；`test_files` 必须真实存在；
      `approved_by` 不得为占位符；`approved_at` 须为 ISO 8601 含时区。
-  ② **时序层**：变更集中**新增或修改的测试文件**，必须能匹配到一条 `status: approved`
+  ② **时序层**：测试变更及实现路径映射的需求测试，必须能匹配到可信人类 `status: approved`
      的记录，且该记录的 `approved_at` **早于**变更集中实现代码的最早提交时间。
      这一层直接实现课程原文的 "approved **before** implementation began"。
 
@@ -60,15 +60,13 @@ def resolve_base(explicit: str | None) -> str | None:
 
 
 def changed_files(base: str | None, explicit: list[str] | None) -> list[str]:
-    if explicit:
+    """Include committed, unstaged, staged and individually named untracked files."""
+    if explicit is not None:
         return sorted(set(explicit))
-    if base:
-        out = git("diff", "--name-only", f"{base}...HEAD")
-        if out.strip():
-            return sorted({f for f in out.splitlines() if f.strip()})
-    files = [ln[3:].strip() for ln in git("status", "--porcelain").splitlines() if ln.strip()]
-    files += [f for f in git("diff", "--name-only", "HEAD~1", "HEAD").splitlines() if f.strip()]
-    return sorted({f for f in files if f})
+    files = git("diff", "--name-only", f"{base}...HEAD").splitlines() if base else []
+    files += git("diff", "--name-only", "HEAD").splitlines()
+    files += git("ls-files", "--others", "--exclude-standard").splitlines()
+    return sorted({f for f in files if f.strip()})
 
 
 def registry_req_ids() -> set[str]:
@@ -82,7 +80,8 @@ def registry_req_ids() -> set[str]:
 
 def parse_iso(value: str) -> datetime | None:
     try:
-        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+        dt = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        return dt if dt.tzinfo is not None else None
     except (ValueError, AttributeError):
         return None
 
@@ -145,20 +144,69 @@ def check_structure(valid_reqs: set[str]) -> tuple[list[str], list[dict], str | 
 
 def is_effective(a: dict) -> bool:
     """是否为**可信**的批准记录：状态为 approved 且批准者不是占位符。"""
-    return a.get("status") == "approved" and not PLACEHOLDER_RE.search(str(a.get("approved_by", "")))
+    legacy_human = a.get("id") in {"TA-0001", "TA-0002", "TA-0003", "TA-0004"}
+    kind = a.get("actor_kind", "human" if legacy_human else "unspecified")
+    who = str(a.get("approved_by", ""))
+    return (a.get("status") == "approved" and kind == "human" and bool(who.strip())
+            and not PLACEHOLDER_RE.search(who) and not re.search(r"agent|proxy|AI|模型|代理", who, re.I))
 
 
-def implementation_time(changed: list[str], test_files: list[str]) -> datetime | None:
-    """变更集中非测试代码的最早提交时间 —— 即"实现开始"的时间下界。"""
-    impl = [f for f in changed if f not in test_files]
-    if not impl:
+def required_test_requirements(changed: list[str]) -> tuple[dict[str, set[str]], list[str]]:
+    """Resolve changed implementation paths to requirement-specific evidence tests.
+
+    A code-only change still requires approved tests. Unknown implementation
+    paths block rather than silently escaping the gate.
+    """
+    registry = yaml.safe_load(REGISTRY.read_text(encoding="utf-8"))
+    coverage = yaml.safe_load((ROOT / "docs/code-governance/acceptance-coverage-map.yaml").read_text(encoding="utf-8"))
+    evidence = {r["id"]: r.get("evidence", []) for r in coverage.get("requirements", [])}
+    needs: dict[str, set[str]] = {f: set() for f in changed if TEST_FILE_RE.match(f)}
+    errors: list[str] = []
+    reqs = (registry.get("baseline_requirements") or []) + (registry.get("candidate_requirements") or [])
+    for path in [f for f in changed if f.startswith(("src/", "scripts/", "eval/")) and f.endswith(".py")]:
+        matched = []
+        module = path.removeprefix("src/").removesuffix(".py").replace("/", ".")
+        package = module.removesuffix(".__init__")
+        for r in reqs:
+            targets = r.get("enforcement") or []
+            if any(t == module or t.startswith(module + ".") or
+                   (module.endswith(".__init__") and t.startswith(package + ".")) for t in targets):
+                matched.append(r)
+        if not matched:
+            errors.append(f"{path}: no requirement-to-test mapping; approval cannot be established")
+        for r in matched:
+            files = {m for item in evidence.get(r["id"], []) for m in re.findall(r"test_[A-Za-z0-9_]+\.py", item)}
+            if not files:
+                errors.append(f"{path}: {r['id']} has no concrete evidence test")
+            for filename in files:
+                needs.setdefault("test/offline/" + filename, set()).add(r["id"])
+    for filename in needs:
+        if filename in changed:
+            for rid, items in evidence.items():
+                if any(Path(filename).name in item for item in items):
+                    needs[filename].add(rid)
+            if not needs[filename]:
+                errors.append(f"{filename}: changed test has no requirement-specific coverage mapping")
+    return needs, errors
+
+
+def implementation_time(changed: list[str], test_files: list[str], base: str | None = None) -> datetime | None:
+    """Earliest implementation commit in this change range, never file creation time.
+
+    Local edits have no verifiable start timestamp. Their presence must not be
+    converted into proof of preimplementation human approval.
+    """
+    impl = [f for f in changed if f not in test_files and f.endswith(".py")]
+    local = set(git("diff", "--name-only", "HEAD").splitlines())
+    local.update(git("ls-files", "--others", "--exclude-standard").splitlines())
+    if not base or any(f in local for f in impl):
         return None
     times: list[datetime] = []
-    for f in impl:
-        out = git("log", "-1", "--format=%aI", "--", f).strip()
-        dt = parse_iso(out)
-        if dt:
-            times.append(dt)
+    for path in impl:
+        for value in git("log", f"{base}..HEAD", "--format=%aI", "--", path).splitlines():
+            stamp = parse_iso(value)
+            if stamp is not None:
+                times.append(stamp)
     return min(times) if times else None
 
 
@@ -185,10 +233,15 @@ def main(argv: list[str]) -> int:
 
     base = None if args.files else resolve_base(args.base)
     changed = changed_files(base, args.files)
-    new_tests = [f for f in changed if TEST_FILE_RE.match(f)]
+    required, mapping_errors = required_test_requirements(changed)
+    if mapping_errors:
+        for err in mapping_errors:
+            print(f"FAIL — {err}")
+        return 1
+    new_tests = sorted(required)
 
     if not new_tests:
-        print("PASS — 变更集不含测试文件，无需测试批准")
+        print("PASS — no implementation or test changes requiring test approval")
         return 0
 
     print(f"变更集含 {len(new_tests)} 个测试文件（触发门禁 1）：")
@@ -196,12 +249,17 @@ def main(argv: list[str]) -> int:
         print(f"  {f}")
 
     effective = [a for a in approvals if is_effective(a)]
-    impl_dt = implementation_time(changed, new_tests)
-    print(f"变更集中实现代码最早提交时间: {impl_dt.isoformat() if impl_dt else '（变更集不含实现代码）'}")
+    impl_dt = implementation_time(changed, new_tests, base)
+    print(f"变更集中实现代码最早提交时间: {impl_dt.isoformat() if impl_dt else '（无可证明的实现提交时间；工作区实现不得视为已获前置批准）'}")
 
     unapproved: list[str] = []
     for f in new_tests:
         matched = [a for a in effective if f in (a.get("test_files") or [])]
+        needed = required.get(f, set())
+        covered = {rid for a in matched for rid in a.get("req_ids", [])}
+        if needed - covered:
+            unapproved.append(f"{f}: requirements lack human approval {sorted(needed - covered)}")
+            continue
         if not matched:
             invalid = [a.get("id") for a in approvals if f in (a.get("test_files") or [])]
             if invalid:
@@ -209,6 +267,9 @@ def main(argv: list[str]) -> int:
             else:
                 unapproved.append(f"{f}（无任何批准记录）")
             continue
+        # Unknown implementation timing is not proof of preimplementation approval.
+        if impl_dt is None and any(p.endswith(".py") and not TEST_FILE_RE.match(p) for p in changed):
+            unapproved.append(f"{f}（实现时间无法核实，不能证明前置批准）")
         # 时序：批准必须早于实现开始
         if impl_dt is not None:
             times = [parse_iso(str(a.get("approved_at", ""))) for a in matched]
@@ -224,8 +285,8 @@ def main(argv: list[str]) -> int:
         print()
         print("  依据：课程 §6 门禁 1 —— tests must be approved BEFORE implementation began。")
         print(f"  处置：在 {APPROVALS.relative_to(ROOT).as_posix()} 追加一条 status: approved 的记录，")
-        print("        填写 req_ids / test_files / 具名 approved_by / approved_at（ISO 8601 含时区），")
-        print("        并确保 approved_at 早于对应实现的提交时间。")
+        print("        填写 req_ids / test_files / actor_kind: human / 具名 approved_by / approved_at（ISO 8601 含时区），")
+        print("        真实审批时间必须早于实现；事后验收应另记，不得回填或伪造前置批准。")
         return 1
 
     print()

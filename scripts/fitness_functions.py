@@ -43,7 +43,7 @@ NEGATIVE_MARKERS = ("反例", "negative test", "must fail", "会失败")
 COVERAGE_MAP = ROOT / "docs" / "code-governance" / "acceptance-coverage-map.yaml"
 
 # S1：包名 → 架构元素（来自 architecture-blueprint.md §4 组件分解）
-# 注：bidding 为 V2（docs2/ 轮次）预留包，登记在此以免 V2 开工时触发 S1 误报。
+# bidding is active in V2; its real enforcement targets are checked below.
 ELEMENT_BY_PACKAGE = {
     "ads": "① 素材契约 + 候选集构建",
     "scene": "② 场景输入契约",
@@ -52,7 +52,7 @@ ELEMENT_BY_PACKAGE = {
     "render": "⑤ 输出契约",
     "audit": "⑥ 证据子系统",
     "app": "⑦ 编排 / pipeline / CLI / 降级路径",
-    "bidding": "⑧ [V2 预留] 竞价引擎",
+    "bidding": "⑧ V2 确定性竞价与原子预算账本",
 }
 
 # V4：本轮之前必须存在的测试模块（本轮新增模块不在此列，视为 append）
@@ -77,6 +77,11 @@ REQUIRED_TEST_MODULES = {
     "test_provenance.py",
     # BUG-008（交付完整性）新增：把"源码必须被 git 跟踪"变成会失败的反例
     "test_repo_completeness.py",
+    "test_bidding_v2.py",
+    "test_pipeline_v2.py",
+    "test_relevance_v2.py",
+    "test_v2_governance.py",
+    "test_v2_eval.py",
 }
 
 # S2：authority 边界——这些包不得被"展示路径"直接绕过 compliance 调用
@@ -200,7 +205,7 @@ def check_s2(rep: Report) -> None:
             )
 
     rep.note("S2: 权威边界已机械检查（selector ↮ compliance 双向禁止依赖）")
-    rep.note("S2: V1 forward build——src/ 全为本轮新增，无基线文件被修改（S2 的『永不替换』本轮无适用对象）")
+    rep.note("S2: V1 history preserved; V2 is additive and all historical test modules remain mandatory")
 
 
 # --------------------------------------------------------------------------
@@ -251,11 +256,12 @@ def check_v1(rep: Report, registry: dict, corpus: dict[str, str]) -> None:
         if rid not in entries:
             rep.fail("V1", f"{rid} 未出现在 acceptance-coverage-map.yaml 中")
 
+    v2_ids = {r["id"] for r in registry.get("baseline_requirements", []) if r.get("version") == "V2"}
     backed = 0
     for rid, e in entries.items():
         if e.get("test_backed"):
             backed += 1
-            if rid not in joined:
+            if rid not in joined and rid not in v2_ids:
                 rep.fail(
                     "V1",
                     f"{rid} 在覆盖表中声明 test_backed=true，但没有任何测试模块引用它（映射与事实不符）",
@@ -297,7 +303,7 @@ def check_v2(rep: Report, registry: dict, corpus: dict[str, str]) -> None:
             continue
         e = entries[inv]
         if e.get("negative_test_backed"):
-            if inv not in negative_text:
+            if inv not in negative_text and not inv.startswith("INV-V2-"):
                 rep.fail(
                     "V2",
                     f"{inv} 声明 negative_test_backed=true，但没有任何含反例标记的测试引用它",
@@ -341,6 +347,91 @@ def check_trace_sync(rep: Report, registry: dict) -> None:
 
 # --------------------------------------------------------------------------
 
+def evidence_errors(evidence: list[str], *, negative: bool = False) -> list[str]:
+    """V2 evidence must resolve to an actual nontrivial test function.
+
+    This is a structural check, not a claim that an assertion passed. Pytest
+    and fixed replay supply behavioral evidence. A pending note is no substitute.
+    """
+    errors: list[str] = []
+    if not evidence:
+        return ["no exact evidence test"]
+    for item in evidence:
+        parts = item.split("::")
+        if len(parts) != 2:
+            errors.append(f"evidence must name test_file.py::test_function: {item}")
+            continue
+        path = TEST_DIR / parts[0]
+        if not path.is_file():
+            errors.append(f"missing evidence file {item}")
+            continue
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        functions = [n for n in ast.walk(tree) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name == parts[1]]
+        if not functions:
+            errors.append(f"missing evidence function {item}")
+            continue
+        fn = functions[0]
+        assertions = [n for n in ast.walk(fn) if isinstance(n, ast.Assert) and not isinstance(n.test, ast.Constant)]
+        raises = [n for n in ast.walk(fn) if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute) and n.func.attr == "raises"]
+        if not assertions and not raises:
+            errors.append(f"empty or trivial evidence test {item}")
+    return errors
+
+
+def target_exists(target: str) -> bool:
+    """Resolve the longest real module path, then its AST class/function names."""
+    bits = target.split(".")
+    for prefix in (SRC, ROOT):
+        for size in range(len(bits), 0, -1):
+            path = prefix.joinpath(*bits[:size]).with_suffix(".py")
+            if not path.is_file():
+                continue
+            nodes = ast.parse(path.read_text(encoding="utf-8")).body
+            for name in bits[size:]:
+                found = next((node for node in nodes if isinstance(node, (ast.FunctionDef, ast.ClassDef, ast.AsyncFunctionDef)) and node.name == name), None)
+                if found is None:
+                    return False
+                nodes = found.body
+            return True
+    return False
+
+
+def check_v2_contracts(rep: Report, registry: dict) -> None:
+    """Check active V2 targets, exact tests and all declared V2 counterexamples."""
+    coverage = load_coverage_map()
+    req_evidence = {e["id"]: e for e in coverage.get("requirements", [])}
+    inv_evidence = {e["id"]: e for e in coverage.get("invariants", [])}
+    v2 = [r for r in registry.get("baseline_requirements", []) if r.get("version") == "V2"]
+    if len(v2) != 19:
+        rep.fail("V2-CONTRACT", f"expected all 19 published V2 requirements, got {len(v2)}")
+    for req in v2:
+        targets = req.get("enforcement") or []
+        if not targets:
+            rep.fail("V2-CONTRACT", f"{req['id']} has no concrete enforcement")
+        for target in targets:
+            if not target_exists(target):
+                rep.fail("V2-CONTRACT", f"{req['id']} missing enforcement target {target}")
+        entry = req_evidence.get(req["id"], {})
+        if not entry.get("test_backed"):
+            rep.fail("V2-CONTRACT", f"{req['id']} only pending; active V2 needs executable evidence")
+        for err in evidence_errors(entry.get("evidence", [])):
+            rep.fail("V2-CONTRACT", f"{req['id']}: {err}")
+    for inv in {i for req in v2 for i in req.get("invariants", [])}:
+        entry = inv_evidence.get(inv, {})
+        if not entry.get("negative_test_backed"):
+            rep.fail("V2-CONTRACT", f"{inv} has no counterexample")
+        for err in evidence_errors(entry.get("evidence", []), negative=True):
+            rep.fail("V2-CONTRACT", f"{inv}: {err}")
+    for py in (SRC / "bidding").glob("*.py"):
+        tree = ast.parse(py.read_text(encoding="utf-8"))
+        forbidden = {"selector", "urllib", "http", "requests", "openai"}
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ImportFrom) and (node.module or "").split(".")[0] in forbidden:
+                rep.fail("V2-CONTRACT", f"bidding core imports model/network layer: {py.name}")
+            if isinstance(node, ast.Import) and any(a.name.split(".")[0] in forbidden for a in node.names):
+                rep.fail("V2-CONTRACT", f"bidding core imports model/network layer: {py.name}")
+
+
 def main() -> int:
     sys.stdout.reconfigure(encoding="utf-8")
     registry = load_registry()
@@ -355,6 +446,7 @@ def main() -> int:
     check_v3(rep, corpus)
     check_v4(rep, corpus)
     check_trace_sync(rep, registry)
+    check_v2_contracts(rep, registry)
 
     counts = {
         "S1": sum(1 for f in rep.failures if f.startswith("[S1]")),
@@ -364,6 +456,7 @@ def main() -> int:
         "V2": sum(1 for f in rep.failures if f.startswith("[V2]")),
         "V3": sum(1 for f in rep.failures if f.startswith("[V3]")),
         "V4": sum(1 for f in rep.failures if f.startswith("[V4]")),
+        "V2-CONTRACT": sum(1 for f in rep.failures if f.startswith("[V2-CONTRACT]")),
         "TRACE": sum(1 for f in rep.failures if f.startswith("[TRACE]")),
     }
 

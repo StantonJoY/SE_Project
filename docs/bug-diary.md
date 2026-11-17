@@ -172,3 +172,20 @@
 | `REQ-ADS-NFR-QA-004`（待编号） | `BUG-005` | 测试断言不得固化可变数据规模；须以相对量表达 |
 
 > 此两条**尚未正式立为需求**（避免凭空造 ID）——建议在 `OQ-003` 关闭、素材规模确定时一并立为 `REQ-ADS-NFR-QA-*` 条目并补对应不变量。
+
+
+## V2 实际契约缺陷与治理反例（2026-10-31）
+
+- BUG-V2-001：预算快照允许合法额外字段时触发 KeyError；独立测试暴露，监督交回核心 BUILD 修复，不改断言迎合实现。
+- BUG-V2-002：相关性解析器返回逐候选 dict，竞价引擎要求 integer relevance；集成 BUILD 显式提取数值以遵守接口。
+- BUG-V2-003：V1 replay 的 MUST_FAIL matched=false 未参与 passed；修正为任一安全预期未达即阻断，新增治理反例。
+- BUG-V2-004：Gate 1 原先代码-only 变更直接 PASS；改为代码路径→需求→具体获批测试，拒绝 AI proxy 充当 human。
+- BUG-V2-005：Gate 4 原先只认独立 prompt 文件，忽略实际 Python prompt 和 V2 policy；改为实际语义路径触发两套 replay。
+
+中断、反馈、拒绝和重定向的摘要见 [V2 评审备忘录](review-memo.md) 与 [AI 使用记录](ai-use-log.yaml)。对应原始记录在本地归档。
+
+- BUG-V2-006：lone-surrogate输入/输出曾在UTF-8编码时崩溃。严格Unicode校验、ASCII指纹和转义JSON证据使其结构化拒绝且可重开核对；非法request_id在存储前拒绝。
+- BUG-V2-007：HTTP socket inactivity timeout未限制总调用时长。改为公开调用总deadline与单客户端有界后台worker；真实本地慢滴流/延迟headers/302复核通过，后台清理限制明确记录。
+- BUG-V2-008：原变异工具把导入、签名和setup错误误算为检出；新增同节点无变异基线和结构化call阶段失败证据，错误基础设施不再算成功。
+- BUG-V2-009：INV-ADS-015素材schema不变量曾错误映射随机confidence探针。独立审查否决原覆盖结论，改为真实非法设备枚举进入系统的schema绕过探针，不修改不变量迁就旧实现。
+- EVIDENCE-V2-001：协作指令的系统储存正文为密文；受支持read_thread也未提供明文。可导出记录与解释性干预注释保留，但不能宣称完整可读会话已恢复。

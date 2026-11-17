@@ -9,6 +9,7 @@ description = "Scenario-based ad recommendation engine with deterministic compli
 requires-python = ">=3.10"
 dependencies = [
     "jsonschema>=4.20",
+    "PyYAML>=6.0",
     # Python 3.10 无 tomllib；scripts/check_dependencies.py 读 pyproject.toml 时需要回退
     "tomli>=2.0; python_version < '3.11'",
 ]
@@ -16,7 +17,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0",
-    "PyYAML>=6.0",
+    "pytest-cov>=5.0",
     "ruff>=0.6",
     "mypy>=1.10",
     "types-jsonschema>=4.20",
@@ -38,6 +39,8 @@ addopts = "-q"
 import_fallbacks = ["tomli"]
 # 已知未声明的第三方 import 来源（应为空；非空即技术债，须登记并清理）
 known_undeclared = []
+# Invoked by CI command line, rather than imported by project modules.
+cli_tools = ["pytest_cov", "ruff", "mypy"]
 
 # --- ruff：lint（门禁 2） ---------------------------------------------------
 # 规则集刻意保持**有观点但可达成**：默认集 + import 排序 + 现代语法 + 精简写法。

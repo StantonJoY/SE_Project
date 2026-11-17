@@ -1,3 +1,32 @@
+# AGENTS.md — 当前 V2 治理入口
+
+> **V2 当前指令（2026-10-31）**：原课程 PDF、真实用户指令及 `docs/plans/V2-execution.md` 为本轮依据。以下 V2 段优先于后面的 V1 历史快照；历史文字保留供审计，不把其 docs2、整包冻结或尚未启动描述当作当前门槛。`.opencode/rules.md` 保持 human-only。
+
+## V2 当前构建与授权
+
+真实用户在 2026-10-30T12:10:56.447Z 授权本地完成 V2，并委托监督代理与实际 agent 交互。计划及技术测试设计由 AI proxy 审查，**不能写成新的具名人类批准**。正式验收状态为 `docs/v2-approval-status.yaml` 的 pending_human_acceptance；既有四条测试批准原样保留，门禁 1 在证据不足时应阻断。
+
+有效需求仍在 `docs/req/requirements.yaml`，22 条 V1 + 原有 19 条 V2 ID。版本策略显式声明 V1/V2；不删除版本校验。读 ADR-005、V2 ASR/INV/trace/memory/runtime 增量及原 V1 安全边界后按计划实现。
+
+| 当前模块 | 职责与公开契约 |
+|---|---|
+| `src/bidding/models.py` | `Bid`、`BidError`、`validate_bids`，报价 sidecar 校验 |
+| `src/bidding/engine.py` | `AuctionChoice`、`choose_winner`，relevance*bid、ad_id 平局、pay_as_bid |
+| `src/bidding/ledger.py` | `Ledger.seed/budgets/lookup/finalize/close`，预算+结果+审计同事务；`audit_records` 仅离线验证 |
+| `src/selector/relevance.py` | `RelevanceClient.score`、`FixedRelevanceClient`、`HTTPRelevanceClient`、`parse_relevance_output` |
+| `src/app/pipeline_v2.py` | `recommend_v2`：sanitize → 模型建议 → 确定性竞价 → FINAL AUTHORITY 合规 → 原子结算 |
+| `src/app/cli_v2.py` | 严格配置加载、持久 SQLite、显式 HTTP/env 名称边界 |
+| `src/render/schema_v2.py` | `validate_v2_result`，ad / no_ad / status_unknown |
+| `eval/v2_runner.py`、`eval/v2_cases.json` | 独立 V2 固定评估，和 V1 一起由语义门禁调用 |
+
+允许范围：新增 V2 模块/数据/config/test/eval，原需求和架构目录增量维护，必要治理脚本/CI 修正；不改原 V1 安全规则或删除/跳过既有测试，不修改 `.opencode/rules.md`，不提交密钥、不推送。BUILD 不修改 TEST 的断言；独立 TEST 依据规格先写测试。监督/VERIFY 可读取实现与测试以诊断契约差异，需记录角色与干预，不将历史互盲约定当作禁止必要评审的课程硬条。
+
+运行时只允许显式配置的 HTTP relevance 请求；V2_LLM_API_KEY 是环境变量名称，值不入库、不打印、不进入审计。默认 fixed，离线测试/CI 禁止 live API。预算是跨请求持久状态，不能每次 seed 重置。
+
+验证：需求 schema → fitness 实际 V2 enforcement/证据函数检查 → V1+V2 全量回归（含 bidding >=90% 语句覆盖）→ 两套固定 replay。语义触发覆盖 Python prompt、竞价、pipeline、bids、config。无可信正式批准、未跟踪新文件、远程保护未验证或真实模型未测时必须如实报告；不得为变绿自我批准或自动 git add。
+
+## V1 历史快照（原文保留）
+
 # AGENTS.md — 编码代理治理入口
 
 > **D3 交付物** · 课程对应：note 行 3755–3799（P182–183）、行 5405–5414

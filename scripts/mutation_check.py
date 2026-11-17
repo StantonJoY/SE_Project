@@ -13,7 +13,7 @@
   1. 按 `MUTATIONS` 表把某个函数**变异**为违反该不变量的版本；
   2. 在**子进程**中运行该不变量对应的测试子集；
   3. 断言测试**确实失败**。
-  若注入违规后测试**仍然全绿** → 该"反例测试"不具备证伪能力 → 本脚本 FAIL。
+  若注入违规后未获得可信的行为检出 → 该"反例测试"不具备证伪能力 → 本脚本 FAIL。
 
 **两条安全性设计**
   · **绝不修改仓库源文件**：变异通过 pytest 插件在**内存中** monkeypatch 实现。
@@ -29,10 +29,15 @@
 from __future__ import annotations
 
 import argparse
+import copy
+import json
+import math
 import os
 import random
+import re
 import subprocess
 import sys
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -43,6 +48,9 @@ COVERAGE_MAP = ROOT / "docs" / "code-governance" / "acceptance-coverage-map.yaml
 # 子进程加载 `scripts/mutation_check.py` 作为 pytest 插件（`-p mutation_check`），
 # 由环境变量 MUTATION_ID 选择要注入的变异。故 PYTHONPATH 必须含 `scripts/`。
 PLUGIN_ID = "mutation_check"
+# Both supported evaluator import names must resolve before plugin configuration.
+for _module_root in (SRC, ROOT / "scripts", ROOT / "eval", ROOT):
+    sys.path.insert(0, str(_module_root))
 
 
 @dataclass(frozen=True)
@@ -214,19 +222,73 @@ MUTATIONS: tuple[Mutation, ...] = (
     ),
     Mutation(
         invariant="INV-ADS-015",
-        mutation_id="MUT-DETERMINISM-BREAK",
-        description="破坏确定性：让解析结果带**随机 confidence**",
-        target="selector:parse_llm_output",
-        replacement="lambda raw, candidate_ids: _nondeterministic()",
+        mutation_id="MUT-AD-SCHEMA-OPEN",
+        description="绕过素材加载器的 schema 校验，使非法设备枚举真实进入素材库",
+        target="ads.repository:jsonschema.validate",
+        replacement="lambda instance, schema: None",
         tests=(
-            "test/offline/test_selector.py::test_parse_is_deterministic",
+            "test/offline/test_ads.py::test_load_invalid_device_value_rejected",
         ),
         why_bound_here=(
-            "必须打**包级** `selector.parse_llm_output`：测试写的是 "
-            "`from selector import parse_llm_output`（包级绑定），"
-            "补丁打在 `selector.parser` 上对它无效 → 假通过"
+            "加载器实际调用 `ads.repository.jsonschema.validate(instance, schema)`，"
+            "以签名相容的 callable 绕过该校验，保留插件替换项的公开契约。"
+            "反例保留全部必填字段，仅 allowed_devices=['pc'] 违反枚举；"
+            "绕过校验后 Ad.from_dict 接纳该素材，必须由原加载拒绝断言检出。"
         ),
     ),
+)
+
+
+MUTATIONS += (
+    Mutation("INV-V2-001", "MUT-V2-BID-RANGE-OFF", "Accept bids outside declared bounds while retaining integer typing",
+             "bidding.models:Bid.__post_init__", "_bid_without_bounds",
+             ("test/offline/test_bidding_v2.py::test_reject_out_of_range_status_and_extra_fields",),
+             "Bid constructor calls its class post-init; preserve all checks except declared interval."),
+    Mutation("INV-V2-002", "MUT-V2-BUDGET-REPAIR", "Silently repair an inconsistent budget instead of rejecting it",
+             "bidding:choose_winner", "_winner_repair_budget",
+             ("test/offline/test_bidding_v2.py::test_engine_refuses_inconsistent_or_noninteger_budget_snapshots",),
+             "Patch definition and package re-export used by independent engine tests."),
+    Mutation("INV-V2-003", "MUT-V2-AFFORDABILITY-OFF", "Permit inactive or unaffordable high bids to win",
+             "bidding:choose_winner", "_winner_ignore_affordability",
+             ("test/offline/test_bidding_v2.py::test_ineligible_high_bid_cannot_displace_affordable_candidate",),
+             "Patch both public engine bindings, preserving score calculation while violating eligibility."),
+    Mutation("INV-V2-004", "MUT-V2-COMMIT-ON-FAULT", "Commit partial debit/request/audit writes even when a transaction fault occurs",
+             "bidding.ledger:Ledger._transaction", "_transaction_commit_on_fault",
+             ("test/offline/test_bidding_v2.py::test_injected_transaction_failure_rolls_back_every_boundary",),
+             "Replace the actual transaction context manager; the existing test inspects all three durable effects."),
+    Mutation("INV-V2-005", "MUT-V2-COERCE-MONEY", "Coerce floating point money instead of rejecting its type",
+             "bidding.models:_integer", "_integer_coerce_float",
+             ("test/offline/test_bidding_v2.py::test_reject_invalid_budget_and_bound_types",),
+             "Bid.__post_init__ resolves the integer guard from its defining module."),
+    Mutation("INV-V2-006", "MUT-V2-REVERSE-TIE", "Choose descending ID for tied deterministic scores",
+             "bidding:choose_winner", "_winner_reverse_tie",
+             ("test/offline/test_bidding_v2.py::test_pure_deterministic_tie_break_does_not_depend_on_input_order",),
+             "Patch package and defining module so test-imported winner cannot evade the mutant."),
+    Mutation("INV-V2-007", "MUT-V2-COERCE-RELEVANCE", "Accept invalid relevance numbers by normalizing them before strict parsing",
+             "selector.relevance:parse_relevance_output", "_parse_normalize_numbers",
+             ("test/offline/test_relevance_v2.py::test_reject_noninteger_nonfinite_out_of_range_relevance",),
+             "The independent parser test imports its definition binding after plugin configuration."),
+    Mutation("INV-V2-008", "MUT-V2-FORGED-PRICE", "Authorize positive integer charges different from immutable seed bid terms",
+             "bidding.ledger:Ledger.finalize", "_finalize_forged_price",
+             ("test/offline/test_bidding_v2.py::test_ledger_refuses_invalid_or_non_bid_charges_atomically[6]",
+              "test/offline/test_bidding_v2.py::test_ledger_refuses_invalid_or_non_bid_charges_atomically[8]"),
+             "Alter the real persisted price authority before finalization; selected cases isolate pricing from type checks."),
+    Mutation("INV-V2-009", "MUT-V2-STRIP-ECONOMIC-EXTRAS", "Silently accept AI economic authority fields by stripping them",
+             "selector.relevance:parse_relevance_output", "_parse_strip_economic_fields",
+             ("test/offline/test_relevance_v2.py::test_ai_cannot_write_economic_fields_or_extra_keys",),
+             "Patch the actual parser used by the schema authority counterexamples."),
+    Mutation("INV-V2-010", "MUT-V2-IGNORE-FINGERPRINT", "Reuse saved response even when request fingerprint conflicts",
+             "bidding.ledger:Ledger._lookup", "_lookup_ignore_fingerprint",
+             ("test/offline/test_bidding_v2.py::test_request_id_fingerprint_conflict_cannot_charge_again",),
+             "Static lookup is used both by public lookup and the in-transaction duplicate check."),
+    Mutation("INV-V2-011", "MUT-V2-DELETE-AUDIT", "Delete real canonical audit after a charged transaction commits",
+             "bidding.ledger:Ledger.finalize", "_finalize_without_audit",
+             ("test/offline/test_pipeline_v2.py::test_success_uses_deterministic_auction_and_exact_transaction_snapshot",),
+             "Finalization executes normally, then removes the actual audit row; pipeline exact evidence assertions must fail."),
+    Mutation("INV-V2-012", "MUT-V2-NO-SEMANTIC-TRIGGER", "Ignore actual prompt/auction/config semantic changes",
+             "check_semantic_eval:semantic_changes", "_semantic_changes_empty",
+             ("test/offline/test_v2_governance.py::test_semantic_gate_tracks_real_prompt_and_auction_paths",),
+             "Tests import the same first-party script module; return no triggers instead of the actual required paths."),
 )
 
 
@@ -239,19 +301,19 @@ MUTATIONS: tuple[Mutation, ...] = (
 #   使测试因**无关原因**失败或通过（假象）。定义在同处即可消除该陷阱。
 # --------------------------------------------------------------------------
 
-def _approved():
+def _approved(*args, **kwargs):
     """合规检查的「恒通过」返回值。"""
     from compliance.models import CheckResult
-    return CheckResult.ok()
+    return CheckResult(ok=True, rule="mutated")
 
 
-def _judgment():
+def _judgment(*args, **kwargs):
     """绕过解析校验：返回一个合法判断（使畸形输出也被接受）。"""
     from selector.types import OutputJudgment
     return OutputJudgment(ad_id="ad_001", reason="mutated", confidence=0.99)
 
 
-def _high_conf():
+def _high_conf(*args, **kwargs):
     """把 confidence 恒定抬高到 1.0（低置信度永远过阈值）。"""
     from selector.types import OutputJudgment
     return OutputJudgment(ad_id="ad_001", reason="mutated-high-conf", confidence=1.0)
@@ -348,7 +410,7 @@ MUTANT = os.environ.get("MUTATION_ID", "")
 
 def _approved():
     from compliance.models import CheckResult
-    return CheckResult.ok()
+    return CheckResult(ok=True, rule="mutated")
 
 
 def _judgment():
@@ -425,9 +487,8 @@ REPLACEMENTS: dict[str, list[tuple[str, str, object]]] = {
         ("selector", "verify_explanation", _verdict_lambda),
         ("selector.explanation", "verify_explanation", _verdict_lambda),
     ],
-    "MUT-DETERMINISM-BREAK": [
-        ("selector", "parse_llm_output", _nondet_lambda),
-        ("selector.parser", "parse_llm_output", _nondet_lambda),
+    "MUT-AD-SCHEMA-OPEN": [
+        ("ads.repository", "jsonschema.validate", lambda instance, schema: None),
     ],
     "MUT-INJECTION-CLEAN": [
         ("app.sanitize", "scan_for_injection", _clean_lambda),
@@ -453,6 +514,136 @@ REPLACEMENTS: dict[str, list[tuple[str, str, object]]] = {
 }
 
 
+
+_ORIGINALS: dict[tuple[str, str], object] = {}
+
+
+def _original(module: str, name: str):
+    return _ORIGINALS[(module, name)]
+
+
+def _bid_without_bounds(self):
+    from bidding.models import BidError, _identifier, _integer
+    _identifier(self.ad_id)
+    _integer(self.bid_cents, "bid_cents", minimum=1)
+    _integer(self.budget_cents, "budget_cents")
+    _integer(self.bid_floor, "bid_floor", minimum=1)
+    _integer(self.bid_ceiling, "bid_ceiling", minimum=1)
+    if self.status not in {"active", "paused", "exhausted"}:
+        raise BidError("invalid status")
+
+
+def _winner_repair_budget(bids, scores, budgets):
+    copied = copy.deepcopy(budgets)
+    for budget in copied.values():
+        if (type(budget.get("total_cents")) is int and type(budget.get("spent_cents")) is int
+                and 0 <= budget["spent_cents"] <= budget["total_cents"]):
+            budget["remaining_cents"] = budget["total_cents"] - budget["spent_cents"]
+    return _original("bidding.engine", "choose_winner")(bids, scores, copied)
+
+
+def _winner_ignore_affordability(bids, scores, budgets):
+    from dataclasses import replace
+    copied = copy.deepcopy(budgets)
+    offers = {ad_id: replace(bid, status="active") for ad_id, bid in bids.items()}
+    for ad_id, budget in copied.items():
+        if ad_id in bids:
+            budget.update(total_cents=max(budget["total_cents"], bids[ad_id].bid_cents),
+                          spent_cents=0, status="active")
+            budget["remaining_cents"] = budget["total_cents"]
+    return _original("bidding.engine", "choose_winner")(offers, scores, copied)
+
+
+@contextmanager
+def _transaction_commit_on_fault(self):
+    from bidding.ledger import LedgerError
+    with self._lock:
+        connection = self._connection()
+        connection.execute("BEGIN IMMEDIATE")
+        try:
+            yield connection
+            connection.commit()
+        except Exception as exc:
+            connection.commit()  # Deliberate partial-state violation, not a fabricated test exception.
+            if isinstance(exc, LedgerError):
+                raise
+            raise LedgerError("mutated transaction committed on fault") from exc
+
+
+def _integer_coerce_float(value, name, *, minimum=0):
+    if type(value) is float and math.isfinite(value):
+        value = int(value)
+    return _original("bidding.models", "_integer")(value, name, minimum=minimum)
+
+
+def _winner_reverse_tie(bids, scores, budgets):
+    choose = _original("bidding.engine", "choose_winner")
+    choices = [choose({ad_id: bid}, {ad_id: scores[ad_id]}, budgets) for ad_id, bid in bids.items()]
+    return max((choice for choice in choices if choice is not None),
+               key=lambda choice: (choice.score, choice.ad_id), default=None)
+
+
+def _parse_normalize_numbers(raw, candidate_ids):
+    payload = json.loads(raw)
+    for score in payload["scores"]:
+        value = score["relevance"]
+        if type(value) is not int or not 0 <= value <= 100:
+            score["relevance"] = 90
+    return _original("selector.relevance", "parse_relevance_output")(json.dumps(payload), candidate_ids)
+
+
+def _finalize_forged_price(self, request_id, fingerprint, result, evidence, *, ad_id=None, charge_cents=0):
+    if ad_id is not None and type(charge_cents) is int and charge_cents > 0:
+        with self._transaction() as connection:
+            connection.execute("UPDATE budget SET bid_cents = ? WHERE ad_id = ?", (charge_cents, ad_id))
+    return _original("bidding.ledger", "Ledger.finalize")(
+        self, request_id, fingerprint, result, evidence, ad_id=ad_id, charge_cents=charge_cents)
+
+
+def _parse_strip_economic_fields(raw, candidate_ids):
+    payload = json.loads(raw)
+    normalized = {"scores": [{key: score[key] for key in ("ad_id", "relevance", "reason")}
+                             for score in payload["scores"]]}
+    return _original("selector.relevance", "parse_relevance_output")(json.dumps(normalized), candidate_ids)
+
+
+def _lookup_ignore_fingerprint(connection, request_id, fingerprint):
+    row = connection.execute("SELECT fingerprint FROM requests WHERE request_id = ?", (request_id,)).fetchone()
+    actual = row["fingerprint"] if row is not None else fingerprint
+    return _original("bidding.ledger", "Ledger._lookup")(connection, request_id, actual)
+
+
+def _finalize_without_audit(self, request_id, fingerprint, result, evidence, *, ad_id=None, charge_cents=0):
+    saved = _original("bidding.ledger", "Ledger.finalize")(
+        self, request_id, fingerprint, result, evidence, ad_id=ad_id, charge_cents=charge_cents)
+    with self._transaction() as connection:
+        connection.execute("DELETE FROM audit WHERE request_id = ?", (request_id,))
+    return saved
+
+
+def _semantic_changes_empty(changed):
+    return []
+
+
+def _winner_bindings(payload):
+    return [("bidding.engine", "choose_winner", payload), ("bidding", "choose_winner", payload)]
+
+
+REPLACEMENTS.update({
+    "MUT-V2-BID-RANGE-OFF": [("bidding.models", "Bid.__post_init__", _bid_without_bounds)],
+    "MUT-V2-BUDGET-REPAIR": _winner_bindings(_winner_repair_budget),
+    "MUT-V2-AFFORDABILITY-OFF": _winner_bindings(_winner_ignore_affordability),
+    "MUT-V2-COMMIT-ON-FAULT": [("bidding.ledger", "Ledger._transaction", _transaction_commit_on_fault)],
+    "MUT-V2-COERCE-MONEY": [("bidding.models", "_integer", _integer_coerce_float)],
+    "MUT-V2-REVERSE-TIE": _winner_bindings(_winner_reverse_tie),
+    "MUT-V2-COERCE-RELEVANCE": [("selector.relevance", "parse_relevance_output", _parse_normalize_numbers)],
+    "MUT-V2-FORGED-PRICE": [("bidding.ledger", "Ledger.finalize", _finalize_forged_price)],
+    "MUT-V2-STRIP-ECONOMIC-EXTRAS": [("selector.relevance", "parse_relevance_output", _parse_strip_economic_fields)],
+    "MUT-V2-IGNORE-FINGERPRINT": [("bidding.ledger", "Ledger._lookup", staticmethod(_lookup_ignore_fingerprint))],
+    "MUT-V2-DELETE-AUDIT": [("bidding.ledger", "Ledger.finalize", _finalize_without_audit)],
+    "MUT-V2-NO-SEMANTIC-TRIGGER": [("check_semantic_eval", "semantic_changes", _semantic_changes_empty)],
+})
+
 def pytest_configure(config) -> None:  # noqa: ARG001
     """pytest 插件入口（子进程以 `-p mutation_check` 加载）。
 
@@ -475,8 +666,19 @@ def pytest_configure(config) -> None:  # noqa: ARG001
             host = getattr(host, p)
         if not hasattr(host, parts[-1]):
             raise SystemExit(f"变异目标不存在: {mod_name}:{attr}")
+        _ORIGINALS[(mod_name, attr)] = getattr(host, parts[-1])
         setattr(host, parts[-1], replacement)
         print(f"[mutation] 已注入 {mutant} → {mod_name}:{attr}", flush=True)
+
+
+def pytest_runtest_makereport(item, call):
+    """Emit actual failed phase and exception identity; never infer a kill from exit alone."""
+    if not os.environ.get("MUTATION_ID") or call.excinfo is None:
+        return
+    payload = {"mutation": os.environ["MUTATION_ID"], "nodeid": item.nodeid,
+               "phase": call.when, "exception": call.excinfo.type.__name__,
+               "message": str(call.excinfo.value)[:600]}
+    print("[mutation-failure] " + json.dumps(payload, ensure_ascii=True), flush=True)
 
 
 # --------------------------------------------------------------------------
@@ -501,48 +703,60 @@ def _declared_invariants() -> list[str]:
 
 
 def _classify(returncode: int, output: str) -> tuple[bool, str]:
-    """判定一次变异运行是否构成「被检出」。
-
-    返回 `(detected, note)`。
-
-    **必须同时满足**才算被检出：
-      ① 输出含注入标记 `[mutation]` —— 否则变异根本没生效，结果不可信；
-      ② 退出码非零，且**不是** 4（pytest 用法/收集错误 —— 插件自身写错的情形）。
-
-    抽成独立函数是为了让它**可被测试**：本脚本开发中真实踩过"假检出"，
-    故该判定逻辑本身需要回归保护。
-    """
+    """Only an injected, baseline-clean behavioral call failure counts as a kill."""
     if "[mutation]" not in output:
-        return False, "⚠️ 变异未被注入（插件未生效）—— 结果不可信，**不计为被检出**"
-    if returncode == 4:
-        return False, "⚠️ pytest 退出码 4（用法/收集错误）—— 不计为被检出"
-    return returncode != 0, ""
+        return False, "变异未被注入（插件未生效），不计为被检出"
+    if returncode != 1:
+        return False, f"pytest 退出码 {returncode}，不是一次正常测试失败，不计为被检出"
+    if re.search(r"INTERNALERROR|ERROR collecting|ImportError|ModuleNotFoundError|SyntaxError", output):
+        return False, "导入/收集/内部错误不能构成变异检出"
+    injected = set(re.findall(r"\[mutation\] 已注入 (\S+)", output))
+    if len(injected) != 1:
+        return False, "注入标记缺少唯一 mutation ID"
+    records = []
+    for line in output.splitlines():
+        if "[mutation-failure] " in line:
+            try:
+                records.append(json.loads(line.split("[mutation-failure] ", 1)[1]))
+            except ValueError:
+                return False, "变异失败证据格式错误"
+    if not records:
+        return False, "没有调用阶段与异常类型的结构化失败证据"
+    for record in records:
+        if record.get("mutation") not in injected:
+            return False, "失败证据与本次 mutation ID 不匹配"
+        if record.get("phase") != "call":
+            return False, "setup/teardown 失败不能构成变异检出"
+        kind, message = record.get("exception"), record.get("message", "")
+        expected_escape = (record.get("mutation") == "MUT-RAISE-INSTEAD-OF-DEGRADE"
+                           and kind == "RuntimeError" and message.startswith("mutated: 不再降级"))
+        behavioral = kind == "AssertionError" or (kind == "Failed" and "DID NOT RAISE" in message)
+        if not behavioral and not expected_escape:
+            return False, f"非行为断言失败 {kind}，不能将载荷/类型错误伪装成检出"
+    return True, ""
 
 
 def run_mutation(mut: Mutation, *, python: str, plugin_path: Path) -> MutationResult:
-    """在子进程中注入变异并运行目标测试；测试**失败**即算「被检出」。"""
+    """Require the same test nodes to pass before injecting an in-memory violation."""
     env = dict(os.environ)
-    env["MUTATION_ID"] = mut.mutation_id
+    env.pop("MUTATION_ID", None)
     env["PYTHONPATH"] = os.pathsep.join(
-        [str(SRC), str(ROOT / "scripts"), str(ROOT), env.get("PYTHONPATH", "")]
+        [str(SRC), str(ROOT / "scripts"), str(ROOT / "eval"), str(ROOT), env.get("PYTHONPATH", "")]
     )
     env["PYTHONIOENCODING"] = "utf-8"
-    cmd = [
-        python, "-m", "pytest", "-p", "mutation_check",
-        "-p", "no:cacheprovider", "--no-header", "-q", "--tb=no",
-        *mut.tests,
-    ]
-    proc = subprocess.run(
-        cmd, cwd=ROOT, capture_output=True, text=True,
-        encoding="utf-8", errors="replace", env=env,
-    )
+    cmd = [python, "-m", "pytest", "-p", PLUGIN_ID, "-p", "no:cacheprovider",
+           "--no-header", "-q", "-s", "--tb=short", *mut.tests]
+    kwargs = {"cwd": ROOT, "capture_output": True, "text": True, "encoding": "utf-8", "errors": "replace"}
+    baseline = subprocess.run(cmd, env=env, **kwargs)
+    baseline_out = (baseline.stdout or "") + (baseline.stderr or "")
+    if baseline.returncode != 0:
+        return MutationResult(mut, False, baseline.returncode, baseline_out,
+                              "未注入时目标测试已失败；基线异常不计为变异检出")
+    env["MUTATION_ID"] = mut.mutation_id
+    proc = subprocess.run(cmd, env=env, **kwargs)
     out = (proc.stdout or "") + (proc.stderr or "")
     detected, note = _classify(proc.returncode, out)
-    tail = [ln for ln in out.strip().splitlines() if ln.strip()]
-    return MutationResult(
-        mutation=mut, detected=detected, returncode=proc.returncode,
-        output=tail[-1] if tail else "(无输出)", note=note,
-    )
+    return MutationResult(mut, detected, proc.returncode, out, note)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -584,7 +798,8 @@ def main(argv: list[str] | None = None) -> int:
         mark = "✓ 被检出" if r.detected else "✗ 未被检出"
         print(f"  {mark}  {m.invariant:14s} {m.mutation_id}")
         print(f"            变异: {m.description}")
-        print(f"            测试: {r.output or '(无输出)'}")
+        print(f"            baseline: {'FAIL' if r.note.startswith('未注入时') else 'PASS'}; pytest exit={r.returncode}")
+        print(r.output or "(无输出)", flush=True)
         if r.note:
             print(f"            {r.note}")
 
@@ -596,7 +811,7 @@ def main(argv: list[str] | None = None) -> int:
         for inv in missing:
             print(f"  - {inv}：变异表中**没有**对应变异（未被验证）")
         for r in undetected:
-            print(f"  - {r.mutation.invariant}：注入「{r.mutation.description}」后测试**仍然全绿**")
+            print(f"  - {r.mutation.invariant}：注入「{r.mutation.description}」后未获得可信的行为检出")
             print(f"    即该反例测试无法发现此类违规（{r.mutation.mutation_id}）")
         print()
         print("  依据：INV-ADS-011 / REQ-ADS-NFR-QA-002 ——")
