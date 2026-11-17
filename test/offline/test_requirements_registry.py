@@ -55,9 +55,9 @@ def test_registry_passes_validation(registry: dict, schema: dict) -> None:
 def test_effective_baseline_versions_and_candidates_are_deferred(registry: dict) -> None:
     """V2 规格迁移：有效基线保留 V1 并纳入 V2；此迁移不是实现前人工批准。"""
     declared = set(registry["project"]["baseline_versions"])
-    assert declared == {"V1", "V2"}
+    assert declared == {"V1", "V2", "V3"}
     assert {r["version"] for r in registry["baseline_requirements"]} == declared
-    assert registry["project"]["baseline_version"] == "V2"
+    assert registry["project"]["baseline_version"] == "V3"
     for r in registry["baseline_requirements"]:
         assert r["version"] in declared
         assert "deferred_to_round" not in r
@@ -242,7 +242,7 @@ def test_status_verified_without_automated_check_rejected(registry: dict) -> Non
 def test_baseline_version_mismatch_rejected(registry: dict) -> None:
     """V2 是已声明的合法基线版本；未声明版本仍必须拒绝。"""
     bad = copy.deepcopy(registry)
-    bad["baseline_requirements"][0]["version"] = "V3"
+    bad["baseline_requirements"][0]["version"] = "V99"
     assert any("baseline_version" in e for e in _consistency_errors(bad))
 
 

@@ -181,29 +181,29 @@ requirements:
 
   # ---- V3（PR-0 登记，测试待 PR-1/PR-2 落地）----
   - id: "REQ-ADS-FR-009"
-    test_backed: false
-    pending_test: "PR-1/PR-2/PR-3 实现时补"
-    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+    test_backed: true
+    evidence: ["test_corpus.py::test_load_thirty_items", "test_corpus.py::test_item_does_not_hold_long_description", "test_corpus.py（文件缺失/坏 JSON/空语料/重复 ID/缺标签五条反例）"]
+    note: "PR-1 语料接入已实现；PR-2 的合规分项另行登记。"
   - id: "REQ-ADS-ARCH-013"
-    test_backed: false
-    pending_test: "PR-1/PR-2/PR-3 实现时补"
-    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+    test_backed: true
+    evidence: ["test_corpus.py::test_projection_all_pass_ad_schema", "test_corpus.py::test_raw_corpus_item_rejected_by_ad_schema"]
+    note: "PR-1 语料接入已实现；PR-2 的合规分项另行登记。"
   - id: "REQ-ADS-FR-010"
-    test_backed: false
-    pending_test: "PR-1/PR-2/PR-3 实现时补"
-    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+    test_backed: true
+    evidence: ["test_corpus.py::test_projection_ad_id_pattern", "test_corpus.py::test_projection_empty_genres_fallback"]
+    note: "PR-1 语料接入已实现；PR-2 的合规分项另行登记。"
   - id: "REQ-ADS-FR-011"
-    test_backed: false
-    pending_test: "PR-1/PR-2/PR-3 实现时补"
-    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+    test_backed: true
+    evidence: ["test_corpus.py::test_select_orders_by_hits_then_item_id", "test_corpus.py::test_select_empty_match_returns_empty", "test_corpus.py::test_select_respects_k"]
+    note: "PR-1 语料接入已实现；PR-2 的合规分项另行登记。"
   - id: "REQ-ADS-ARCH-014"
-    test_backed: false
-    pending_test: "PR-1/PR-2/PR-3 实现时补"
-    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+    test_backed: true
+    evidence: ["test_corpus.py::test_select_is_deterministic", "test_corpus.py::test_corpus_package_has_no_forbidden_imports"]
+    note: "PR-1 语料接入已实现；PR-2 的合规分项另行登记。"
   - id: "REQ-ADS-NFR-COST-002"
-    test_backed: false
-    pending_test: "PR-1/PR-2/PR-3 实现时补"
-    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+    test_backed: true
+    evidence: ["test_corpus.py::test_k_upper_bound_rejected"]
+    note: "PR-1 语料接入已实现；PR-2 的合规分项另行登记。"
   - id: "REQ-ADS-ARCH-015"
     test_backed: false
     pending_test: "PR-1/PR-2/PR-3 实现时补"
@@ -221,9 +221,9 @@ requirements:
     pending_test: "PR-1/PR-2/PR-3 实现时补"
     blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
   - id: "REQ-ADS-SEC-003"
-    test_backed: false
-    pending_test: "PR-1/PR-2/PR-3 实现时补"
-    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+    test_backed: true
+    evidence: ["test_corpus.py::test_injected_corpus_text_blocked"]
+    note: "PR-1 语料接入已实现；PR-2 的合规分项另行登记。"
   - id: "REQ-ADS-NFR-QA-005"
     test_backed: false
     pending_test: "PR-1/PR-2/PR-3 实现时补"
@@ -409,12 +409,14 @@ invariants:
       - "test/offline/test_v2_governance.py::test_semantic_gate_tracks_real_prompt_and_auction_paths"
   - id: "INV-V3-001"
     negative_test_backed: false
-    pending_test: "PR-2 实现时补反例"
-    blocked_by: "V3 实现未开始（PR-0 仅登记）"
+    evidence: ["test_corpus.py::test_raw_corpus_item_rejected_by_ad_schema"]
+    pending_test: "变异注入（MUTATIONS 表）在 PR-2 统一补齐"
+    blocked_by: "PR-1 只做语料接入；变异按不变量分组在 PR-2 加"
   - id: "INV-V3-002"
     negative_test_backed: false
-    pending_test: "PR-2 实现时补反例"
-    blocked_by: "V3 实现未开始（PR-0 仅登记）"
+    evidence: ["test_corpus.py::test_select_is_deterministic"]
+    pending_test: "变异注入（MUTATIONS 表）在 PR-2 统一补齐"
+    blocked_by: "PR-1 只做语料接入；变异按不变量分组在 PR-2 加"
   - id: "INV-V3-003"
     negative_test_backed: false
     pending_test: "PR-2 实现时补反例"
@@ -429,8 +431,9 @@ invariants:
     blocked_by: "V3 实现未开始（PR-0 仅登记）"
   - id: "INV-V3-006"
     negative_test_backed: false
-    pending_test: "PR-2 实现时补反例"
-    blocked_by: "V3 实现未开始（PR-0 仅登记）"
+    evidence: ["test_corpus.py::test_injected_corpus_text_blocked"]
+    pending_test: "变异注入（MUTATIONS 表）在 PR-2 统一补齐"
+    blocked_by: "PR-1 只做语料接入；变异按不变量分组在 PR-2 加"
   - id: "INV-V3-007"
     negative_test_backed: false
     pending_test: "PR-2 实现时补反例"

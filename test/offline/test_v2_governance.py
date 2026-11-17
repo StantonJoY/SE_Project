@@ -35,7 +35,7 @@ def test_effective_baseline_preserves_v1_and_activates_all_nineteen_v2_ids():
     registry = _registry()
     assert len([r for r in registry["baseline_requirements"] if r["version"] == "V1"]) == 22
     assert len([r for r in registry["baseline_requirements"] if r["version"] == "V2"]) == 19
-    assert registry["project"]["baseline_versions"] == ["V1", "V2"]
+    assert registry["project"]["baseline_versions"] == ["V1", "V2", "V3"]
     assert not registry["candidate_requirements"]
     assert not requirements.check_consistency(registry)
 
@@ -48,7 +48,7 @@ def test_version_policy_still_rejects_undeclared_or_missing_versions():
     registry["project"]["baseline_versions"] = ["V2"]
     assert requirements.check_consistency(registry)
     registry = _registry()
-    registry["project"]["baseline_versions"].append("V3")
+    registry["project"]["baseline_versions"].append("V99")
     assert requirements.check_consistency(registry)
 
 
