@@ -1,7 +1,7 @@
 # V3 执行计划（Execution Plan）· 真实语料接入
 
 > **状态**：草案待人工批准（批准前禁止写代码）
-> **依据**：`docs/req/requirements-v3-se.md`（15 条需求）、`V3spike结论.md`（可行性实测）、
+> **依据**：`docs/req/requirements-v3-se.md`（17 条需求）、`V3spike结论.md`（可行性实测）、
 > `docs/plans/V2-execution.md`（先例：PR 分阶段 + 人工评审卡点）
 > **编号**：需求以 `requirements-v3-se.md` 的**草案标签**引用，正式 ID 在 PR-0 录入时确定
 
@@ -167,62 +167,150 @@ cases:
 
 ---
 
-## ⑤ Implementation Steps
+## ⑤ Implementation Steps（开发分步计划）
+
+### 总览
+
+| 阶段 | 目标 | 人的动作 | 估时 | 出口条件 |
+|---|---|---|---|---|
+| **PR-0** 治理前置 | 解锁所有受保护路径 | 批准 ADR-006、登记 TA-0005 | 1 天（含等人） | 注册表 58 条校验通过 + ADR Accepted |
+| **PR-1** 语料接入 | 真实语料能进管道 | 无 | 2.5 天 | 30 条投影过 AdRepository + 管道出 `ad` + 零回归 |
+| **PR-2** 合规扩展 | 合规能看见内容分级 | 评审合规改动（safety-critical） | 3 天 | 5×3 场景矩阵 100% 符合 + 五步顺序不变 |
+| **PR-3** V2 接入 | 定价 → 出价 → 结算跑通 | 无 | 2 天 | 20 次耗尽对每条样本成立 + `bidding/` 零改动 |
+| **PR-4** 评估与收尾 | 证据齐、可交付 | 无 | 1.5 天 | 全量检查绿 + 评估分区报告 |
+| | | | **≈10 人天** | |
+
+### 依赖关系（哪些能并行）
+
+```
+PR-0 ──▶ PR-1 ──▶ PR-2 ──▶ PR-3 ──▶ PR-4
+          │
+          └─ 内部可并行：models+repository ｜ select+config
+
+硬卡点：
+  · PR-0 的 ADR-006 未 Accepted → 后续全部不能开（check_safety_paths 会拦）
+  · TA-0005 必须先于 PR-1 的测试存在（门禁 1）
+  · PR-2 与 PR-3 不能并行：都依赖 compliance 的 facts 形参
+```
+
+---
 
 ### PR-0 · 治理前置（**先于任何代码**，需人工批准）
 
-1. 写 `docs/architecture/adr-006-v3-corpus-boundary.md`：
-   - 为什么沿用 `docs/`（验证平面绑定路径，新建 `docs3/` 会让 V3 脱离自动化校验）；
-   - 只读语料、投影旁路、不扩 AD_SCHEMA；
-   - 合规只动 2 个函数、五步顺序不变；
-   - `scope.out` 的 RAG 条从"延后到 V3"改为"V4 或 withdrawn"。
-2. `docs/req/requirements.yaml`：追加 15 条（`version: "V3"`）+ `evolution_rounds` 加 V3 + 改 `scope.out`。
-3. `docs/architecture/invariants.md`：追加 `INV-V3-001..006`（**仅只读，须人工批准**）。
-4. `docs/code-governance/acceptance-coverage-map.yaml`：登记 15 条的测试去向。
-5. `docs/test-approvals.yaml`：新增 `TA-0005`，覆盖 PR-1 的语料测试（**具名人类、时间早于实现**）。
-6. 跑 `validate_requirements.py` + `check_safety_paths.py --base origin/main`，确认 ADR 伴随通过。
+| # | 动作 | 产出 | 自验 |
+|---|---|---|---|
+| 0.1 | 写 ADR-006：沿用 `docs/` 的理由、只读语料、投影旁路、合规只动 2 个函数、`scope.out` 的 RAG 条改判 | `docs/architecture/adr-006-v3-corpus-boundary.md` | `check_safety_paths.py --show-paths` 能解析到新清单 |
+| 0.2 | 注册表追加 **17 条**（`version: "V3"`，ID 续 ADS 编号）+ `evolution_rounds` 加 V3 + 改 `scope.out` | `docs/req/requirements.yaml` | `validate_requirements.py` PASS，条数 41 → 58 |
+| 0.3 | 不变量登记 `INV-V3-001..008` | `docs/architecture/invariants.md` | `validate_requirements.py` 的双向一致性不掉 |
+| 0.4 | 覆盖表登记 17 条的测试去向 | `acceptance-coverage-map.yaml` | `fitness_functions.py` PASS |
+| 0.5 | 登记 `TA-0005`（具名人类、`approved_at` 早于 PR-1 首次提交） | `docs/test-approvals.yaml` | `check_test_approval.py --base origin/main` 通过 |
+| 0.6 | 提交 PR-0 并请求人工批准 ADR | — | PR 上 Gate 1/4/6 全绿 |
 
-> **PR-0 的验收**：注册表 56 条（41+15）校验通过；ADR-006 状态为 Accepted；TA-0005 已登记。
+> **PR-0 的出口**：注册表 58 条校验通过；ADR-006 状态 `Accepted`（**具名人类**）；`TA-0005` 已登记。
+> **没到位就不开 PR-1** —— 否则 PR-1 一提交就会被 `check_safety_paths` 和三道 PR 门禁同时拦住。
 
-### PR-1 · 语料接入（不碰合规）
+---
 
-7. `src/corpus/models.py` + `repository.py`：只加载轻字段，`CorpusLoadError` fail-closed。
-8. `src/corpus/projection.py`：`corpus_to_ad` 返回 `(Ad, CorpusFacts)`；`ad_id = ad_<item_id>`；三级兜底。
-9. `src/corpus/select.py`：确定性 top-K（K 来自 config）。
-10. `config.yaml` 加 `corpus` 段；`scripts/fitness_functions.py` 的 `ELEMENT_BY_PACKAGE` 加 `"corpus"`。
-11. 测试 + 变异；跑全量回归（617 应为 617+ 新增）。
+### PR-1 · 语料接入（不碰冻结层）
 
-> **PR-1 的验收**：30 条投影全部通过 `AdRepository`；管道能端到端产出 `ad`；零回归。
+| # | 动作 | 产出 | 自验 |
+|---|---|---|---|
+| 1.1 | `models.py`：`CorpusItem`，**不持有** `description_clean` | `src/corpus/models.py` | 结构断言测试 |
+| 1.2 | `repository.py`：只读加载两文件、fail-closed（`CorpusLoadError`） | `src/corpus/repository.py` | 缺文件/坏 JSON/空表三条负例 |
+| 1.3 | `projection.py`：`corpus_to_ad` → `(Ad, CorpusFacts)`；`ad_id = ad_<item_id>`；三级兜底 | `src/corpus/projection.py` | 30/30 过 `AD_SCHEMA`（spike 已验证可过） |
+| 1.4 | `select.py`：确定性 top-K（命中数降序 + `item_id` 升序） | `src/corpus/select.py` | 双跑 diff = 0；空匹配返回 `[]` |
+| 1.5 | `config.yaml` 加 `corpus` 段（路径、K=30、场景标签映射） | `config.yaml` | 配置校验拒绝 K > 50 |
+| 1.6 | `fitness_functions.py` 的 `ELEMENT_BY_PACKAGE` 加 `"corpus"` | 同上 | `fitness_functions.py` PASS（**受保护路径，PR-0 的 ADR 覆盖**） |
+| 1.7 | 测试 + 变异 + 全量回归 | `test/offline/test_corpus*.py` | 617 → 新增后全绿 |
+
+> **PR-1 的出口**：30 条投影全过 `AdRepository`；V1 管道在语料上端到端产出 `ad`；零回归。
+
+---
 
 ### PR-2 · 合规扩展（唯一动冻结层的 PR）
 
-12. `data/scene-content-rules.yaml`：三档禁项 + 年龄上限。
-13. `src/compliance/pipeline.py`：`run_compliance(..., facts=None)`、`check_scene(..., facts=None)`；并集判据 + 年龄兜底。
-14. 反例测试：CS2 / Among Us / R6S / Viscera / Stardew 五条真实样本 × 三个场景矩阵。
-15. 管道顺序契约测试（证明五步没动）。
+| # | 动作 | 产出 | 自验 |
+|---|---|---|---|
+| 2.1 | `data/scene-content-rules.yaml`：三档禁项 + 年龄上限 | 新数据文件 | 加载 fail-closed；三档可解析 |
+| 2.2 | `run_compliance(..., facts=None)` + `check_scene(..., facts=None)` | `src/compliance/pipeline.py` | 不传 facts 时**行为与 V1 完全一致**（旧测试全绿） |
+| 2.3 | 并集判据：`warnings ∪ 映射后的 descriptors` 与场景禁项求交 | 同上 | CS2 在 family 被拒；Among Us 被 warnings 一侧拦下 |
+| 2.4 | 年龄兜底：`required_age > 场景上限` → 拒 | 同上 | R6S 在 campus 拒、competitive 过 |
+| 2.5 | 五步顺序契约测试 | `test_v3_compliance_order.py` | 步骤列表与 V1 逐位一致 |
+| 2.6 | 5×3 矩阵测试（CS2 / Among Us / R6S / Viscera / Stardew × 三档） | `test_v3_compliance_matrix.py` | 15 格全部符合预期 |
+| 2.7 | 变异验证：三条新不变量各注入违规 | `scripts/mutation_check.py` | 三条全部可检出 |
 
-> **PR-2 的验收**：三档矩阵 100% 符合预期；`mutation_check` 新增不变量全部可检出。
+> **PR-2 的出口**：矩阵 100% 符合；`mutation_check` 新增 3 条可检出；旧 617 测试零回归。
+
+---
 
 ### PR-3 · V2 接入（定价 → 出价 → 结算）
 
-16. `src/corpus/pricing.py`：`bid_cents_from_price` / `budget_cents_for`，5% 与 20 次只在此处。
-17. `scripts/build_bids_v3.py`：生成 `data/bids-corpus.json`（幂等、可复算）；`config-v3.yaml` 指向它。
-18. `src/app/pipeline_v2.py`：调用 `run_compliance(..., facts=...)`；竞价与账本逻辑零改动。
-19. 测试：30 条表驱动（含 `ad_413150` → 75 分、`ad_730` → 1 分）；连续 20 次成交后 `remaining == 0 / exhausted`；第 21 次 `budget_race` 且不透支。
+| # | 动作 | 产出 | 自验 |
+|---|---|---|---|
+| 3.1 | `pricing.py`：`bid_cents_from_price` / `budget_cents_for`（5% 与 20 只在此） | `src/corpus/pricing.py` | `ad_413150`→75、`ad_730`→1、`ad_1086940`→300 |
+| 3.2 | `build_bids_v3.py`：生成 sidecar（幂等、逐字节一致） | `scripts/build_bids_v3.py` + `data/bids-corpus.json` | 重跑两次 hash 相同 |
+| 3.3 | `pipeline_v2` 透传 `facts` | `src/app/pipeline_v2.py` | `git diff --stat src/bidding/` 为空 |
+| 3.4 | `config-v3.yaml`：语料路径、bids sidecar、`logs/bidding-v3.sqlite3` | `config-v3.yaml` | 启动期配置校验 |
+| 3.5 | 20 次耗尽测试（免费 / 中价 / 高价三条） | `test_v3_pricing.py` | 20 次后 `exhausted`；第 21 次 `InsufficientBudget` |
 
-> **PR-3 的验收**：V2 端到端在语料上跑通；20 次耗尽对每一条样本成立；`bidding/` 目录零改动（用 git diff 证明）。
+> **PR-3 的出口**：V2 端到端在语料上跑通；`bidding/` 零改动（git diff 为证）；20 次耗尽对每条样本成立。
+
+---
 
 ### PR-4 · 评估与收尾
 
-20. `eval/eval_cases.json` 加 V3 分区（12–15 条，含 ≥3 条无匹配负例）；`eval_runner.py` 支持分区统计。
-21. 同步 `trace-matrix` / `ai-use-log` / `acceptance-coverage-map`。
-22. 全量检查：需求 schema、fitness、依赖、完整性、安全路径、评估 replay、变异验证。
+| # | 动作 | 产出 | 自验 |
+|---|---|---|---|
+| 4.1 | V3 评估分区（12–15 条，含 ≥3 条无匹配负例） | `eval/eval_cases.json` | 新分区 `case_count` 登记；负例不硬凑 |
+| 4.2 | runner 支持分区统计 | `eval/eval_runner.py` | 旧分区报告与 V2 基线 diff = 0 |
+| 4.3 | 同步 `trace-matrix` / `ai-use-log` / 覆盖表 | 三份工件 | `check_ai_use_log.py` 通过 |
+| 4.4 | 全量检查（一次跑完） | 见下方命令块 | 全绿 |
+
+```bash
+# PR-4 收尾自检（仓库根目录）
+python scripts/validate_requirements.py
+python scripts/fitness_functions.py
+python scripts/check_dependencies.py
+python scripts/check_repo_completeness.py
+python scripts/check_safety_paths.py --base origin/main
+pytest test/offline -q
+python scripts/audit_implementation.py
+python scripts/mutation_check.py
+python eval/eval_runner.py
+```
+
+---
+
+### 每周/每 PR 的固定自检（不要等到最后）
+
+```bash
+pytest test/offline -q -p no:cacheprovider     # 约 20 秒
+python scripts/fitness_functions.py            # S1/S2 会立刻抓到架构漂移
+python scripts/validate_requirements.py        # 抓工件不一致
+```
+
+> 经验值：本仓库全量 617 测试 ≈ 19 秒、变异验证 ≈ 50 秒。
+> **红得越早越便宜**——V2 的教训是治理问题拖到最后才发现（`TD-023`）。
+
+---
+
+### 完成定义（DoD）
+
+- [ ] 17 条 V3 需求全部 `implemented` 或 `verified`，覆盖表无悬空项
+- [ ] 8 条 `INV-V3-*` 各有**会失败**的反例，且被 `mutation_check` 检出
+- [ ] 旧 617 测试零回归；V3 新增测试全部引用 REQ/INV ID
+- [ ] `bidding/`、`ads/`、`scene/`、`selector/` 零改动（git diff 可证）
+- [ ] 合规五步顺序与 V1 逐位一致
+- [ ] V2 在语料上端到端跑通，20 次耗尽对每条样本成立
+- [ ] ADR-006 为 `Accepted`（具名人类），`TA-0005` 在案
+- [ ] 评估 V3 分区通过阈值，负例不硬凑
+- [ ] `trace-matrix` / `acceptance-coverage-map` / `ai-use-log` 三份工件同步
 
 ---
 
 ## 回退与未知
 
-- **回退**：PR-1 只新增文件，删除 `src/corpus/` 即回到 V2 状态；PR-2 的合规改动保留 `facts=None` 的旧行为，回退只需不传参。
+- **回退**：PR-1 只新增文件，删除 `src/corpus/` 即回到 V2 状态；PR-2 的合规改动保留 `facts=None` 的旧行为，回退只需不传参；PR-3 回退 = 删 `data/bids-corpus.json` + 去掉 `pipeline_v2` 的 `facts` 实参（竞价逻辑本来就没改）。
 - **未知**：全量 25,899 条语料尚未交付，本计划只用 30 条样本 + 仓库内子集（建议 300 条）；若语料形态变化，`parser_ver` 升版需重跑 PR-1 的验收。
 - **风险**：`data/scene-content-rules.yaml` 一旦入库即为 safety-critical，任何调参都要 ADR + 回归。
 - **风险（V2 接入）**：`Ledger.seed()` 会拒绝**已存在账本**中不同的报价契约 —— 改了 5% 口径或语料集合后，
