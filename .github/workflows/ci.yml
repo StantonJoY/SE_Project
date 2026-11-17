@@ -17,7 +17,7 @@ name: blocking-gates
 
 on:
   push:
-    branches: [main]
+    branches: [main, main-v2]
   pull_request:
     branches: [main]
 
@@ -26,9 +26,6 @@ permissions:
 
 env:
   PYTHONIOENCODING: utf-8
-  # 受限环境下无法在仓库内写缓存；显式指向 runner 临时目录
-  RUFF_CACHE_DIR: ${{ runner.temp }}/ruff-cache
-  MYPY_CACHE_DIR: ${{ runner.temp }}/mypy-cache
 
 jobs:
   # =========================================================================
@@ -68,8 +65,13 @@ jobs:
       - name: Install
         run: pip install -e ".[dev]"
       - name: Lint (ruff)
+        # 缓存目录只能引用 runner 上下文，而该上下文在 workflow 级 env 不可用
+        env:
+          RUFF_CACHE_DIR: ${{ runner.temp }}/ruff-cache
         run: ruff check src test scripts eval
       - name: Type check (mypy)
+        env:
+          MYPY_CACHE_DIR: ${{ runner.temp }}/mypy-cache
         run: mypy
       - name: Dependency check (declared vs used)
         run: python scripts/check_dependencies.py
