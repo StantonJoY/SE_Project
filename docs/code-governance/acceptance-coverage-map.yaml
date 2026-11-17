@@ -179,6 +179,80 @@ requirements:
     evidence: ["test_bidding_v2.py::test_hundred_candidate_offline_compute_median_below_fifty_ms"]
     acceptance: pending_human_acceptance
 
+  # ---- V3（PR-0 登记，测试待 PR-1/PR-2 落地）----
+  - id: "REQ-ADS-FR-009"
+    test_backed: false
+    pending_test: "PR-1/PR-2/PR-3 实现时补"
+    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+  - id: "REQ-ADS-ARCH-013"
+    test_backed: false
+    pending_test: "PR-1/PR-2/PR-3 实现时补"
+    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+  - id: "REQ-ADS-FR-010"
+    test_backed: false
+    pending_test: "PR-1/PR-2/PR-3 实现时补"
+    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+  - id: "REQ-ADS-FR-011"
+    test_backed: false
+    pending_test: "PR-1/PR-2/PR-3 实现时补"
+    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+  - id: "REQ-ADS-ARCH-014"
+    test_backed: false
+    pending_test: "PR-1/PR-2/PR-3 实现时补"
+    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+  - id: "REQ-ADS-NFR-COST-002"
+    test_backed: false
+    pending_test: "PR-1/PR-2/PR-3 实现时补"
+    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+  - id: "REQ-ADS-ARCH-015"
+    test_backed: false
+    pending_test: "PR-1/PR-2/PR-3 实现时补"
+    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+  - id: "REQ-ADS-NFR-SAFETY-008"
+    test_backed: false
+    pending_test: "PR-1/PR-2/PR-3 实现时补"
+    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+  - id: "REQ-ADS-NFR-SAFETY-009"
+    test_backed: false
+    pending_test: "PR-1/PR-2/PR-3 实现时补"
+    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+  - id: "REQ-ADS-NFR-SAFETY-010"
+    test_backed: false
+    pending_test: "PR-1/PR-2/PR-3 实现时补"
+    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+  - id: "REQ-ADS-SEC-003"
+    test_backed: false
+    pending_test: "PR-1/PR-2/PR-3 实现时补"
+    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+  - id: "REQ-ADS-NFR-QA-005"
+    test_backed: false
+    pending_test: "PR-1/PR-2/PR-3 实现时补"
+    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+  - id: "REQ-ADS-NFR-QA-006"
+    test_backed: false
+    pending_test: "PR-1/PR-2/PR-3 实现时补"
+    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+  - id: "REQ-ADS-GOV-004"
+    test_backed: false
+    pending_test: "PR-1/PR-2/PR-3 实现时补"
+    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+  - id: "REQ-ADS-NFR-QA-007"
+    test_backed: false
+    pending_test: "PR-1/PR-2/PR-3 实现时补"
+    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+  - id: "REQ-ADS-GOV-005"
+    test_backed: false
+    pending_test: "PR-1/PR-2/PR-3 实现时补"
+    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+  - id: "REQ-ADS-FR-012"
+    test_backed: false
+    pending_test: "PR-1/PR-2/PR-3 实现时补"
+    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+  - id: "REQ-ADS-ARCH-016"
+    test_backed: false
+    pending_test: "PR-1/PR-2/PR-3 实现时补"
+    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+
 invariants:
 
   - id: "INV-ADS-015"
@@ -333,6 +407,38 @@ invariants:
     mutation_id: "MUT-V2-NO-SEMANTIC-TRIGGER"
     mutation_test_nodes:
       - "test/offline/test_v2_governance.py::test_semantic_gate_tracks_real_prompt_and_auction_paths"
+  - id: "INV-V3-001"
+    negative_test_backed: false
+    pending_test: "PR-2 实现时补反例"
+    blocked_by: "V3 实现未开始（PR-0 仅登记）"
+  - id: "INV-V3-002"
+    negative_test_backed: false
+    pending_test: "PR-2 实现时补反例"
+    blocked_by: "V3 实现未开始（PR-0 仅登记）"
+  - id: "INV-V3-003"
+    negative_test_backed: false
+    pending_test: "PR-2 实现时补反例"
+    blocked_by: "V3 实现未开始（PR-0 仅登记）"
+  - id: "INV-V3-004"
+    negative_test_backed: false
+    pending_test: "PR-2 实现时补反例"
+    blocked_by: "V3 实现未开始（PR-0 仅登记）"
+  - id: "INV-V3-005"
+    negative_test_backed: false
+    pending_test: "PR-2 实现时补反例"
+    blocked_by: "V3 实现未开始（PR-0 仅登记）"
+  - id: "INV-V3-006"
+    negative_test_backed: false
+    pending_test: "PR-2 实现时补反例"
+    blocked_by: "V3 实现未开始（PR-0 仅登记）"
+  - id: "INV-V3-007"
+    negative_test_backed: false
+    pending_test: "PR-2 实现时补反例"
+    blocked_by: "V3 实现未开始（PR-0 仅登记）"
+  - id: "INV-V3-008"
+    negative_test_backed: false
+    pending_test: "PR-2 实现时补反例"
+    blocked_by: "V3 实现未开始（PR-0 仅登记）"
 
 summary:
   requirements_total: 41

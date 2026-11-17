@@ -237,3 +237,31 @@ ADR-001（AI is advisory）
 | `REQ-ADS-NFR-PERF-002` | implemented；本地测试，正式验收 pending | `bidding.engine.choose_winner` / `INV-V2-006` | `test_bidding_v2.py::test_hundred_candidate_offline_compute_median_below_fifty_ms` | SQLite 权威快照：`request_id`、候选/分数/预算/成交价/结果；离线重算差额=0 |
 
 观测口径：上述 SQLite 字段是实际持久化证据，不冒称 Prometheus 指标。重复/冲突/零余额及事务失败由固定 replay 与反例核对。线上告警基础设施尚未部署。
+
+---
+
+## V3 增量（2026-11-17，待人工批准）
+
+V3 在 `docs/architecture/` 原地追加（理由见 ADR-006）。下表 18 条为 `version: V3` 的需求；
+**状态列写 `specified` 是因为 PR-0 只做登记**，实现与测试证据由 PR-1..PR-4 补齐后改为 `implemented`。
+
+| 需求 | 状态 | 强制组件 / 不变量 | 测试证据（计划） | 运行时 monitor（计划） |
+|---|---|---|---|---|
+| `REQ-ADS-FR-009` | specified（PR-1 实现） | `corpus.repository.CorpusRepository / INV-V3-001` | `test_corpus.py::test_load_thirty_items` | 候选语料条目数、被跳过条目数 |
+| `REQ-ADS-ARCH-013` | specified（PR-1 实现） | `corpus.projection.corpus_to_ad / INV-V3-001` | `test_corpus.py::test_raw_corpus_item_rejected_by_ad_schema` | 投影通过 AD_SCHEMA 的条数、失败原因 |
+| `REQ-ADS-FR-010` | specified（PR-1 实现） | `corpus.projection.corpus_to_ad` | `test_corpus.py::test_projection_empty_genres_fallback` | category 三级兜底命中次数 |
+| `REQ-ADS-FR-011` | specified（PR-1 实现） | `corpus.select.select_candidates / INV-V3-002` | `test_corpus.py::test_select_is_deterministic` | top-K 规模、命中标签数分布 |
+| `REQ-ADS-ARCH-014` | specified（PR-1 实现） | `corpus.select.select_candidates / INV-V3-002` | `test_corpus.py::test_select_is_deterministic` | 双跑 diff 次数 |
+| `REQ-ADS-NFR-COST-002` | specified（PR-1 实现） | `corpus.config.CorpusConfig` | `test_corpus.py::test_k_upper_bound_rejected` | 装配上下文 token 数 / 预算 |
+| `REQ-ADS-ARCH-015` | specified（PR-2 实现） | `compliance.pipeline.run_compliance / INV-V3-005` | `test_v3_compliance.py::test_pipeline_order_unchanged` | 五步序列与 V1 的逐位差异数 |
+| `REQ-ADS-NFR-SAFETY-008` | specified（PR-2 实现） | `compliance.pipeline.check_scene / INV-V3-003` | `test_v3_compliance.py::test_among_us_rejected_by_warnings_side` | 内容并集命中数与命中规则 |
+| `REQ-ADS-NFR-SAFETY-009` | specified（PR-2 实现） | `compliance.pipeline.check_scene / INV-V3-004` | `test_v3_compliance.py::test_age_gate_rejects_above_limit` | 年龄超限拦截数 |
+| `REQ-ADS-NFR-SAFETY-010` | specified（PR-2 实现） | `compliance.pipeline.check_scene` | `test_v3_compliance.py::test_three_tier_scene_matrix` | 三档场景放行/拒绝矩阵 |
+| `REQ-ADS-SEC-003` | specified（PR-1 实现） | `app.pipeline.recommend / INV-V3-006` | `test_corpus.py::test_injected_corpus_text_blocked` | 注入检出数与检出率 |
+| `REQ-ADS-NFR-QA-005` | specified（PR-4 实现） | `app.pipeline.recommend` | `test/offline 全量回归` | 离线测试通过数与旧分区 replay diff |
+| `REQ-ADS-NFR-QA-006` | specified（PR-4 实现） | `eval.eval_runner` | `test_v3_eval.py::test_v3_partition_registered` | V3 分区用例数与负例数 |
+| `REQ-ADS-GOV-004` | specified（PR-0 已产出 ADR） | `docs.architecture.adr_006` | `check_safety_paths.py` | ADR 状态与被覆盖的受保护路径数 |
+| `REQ-ADS-NFR-QA-007` | specified（PR-1 实现） | `scripts.fitness_functions` | `fitness_functions.py` | ELEMENT_BY_PACKAGE 是否含 corpus |
+| `REQ-ADS-GOV-005` | specified（PR-0 登记 TA-0005 待签） | `docs.test_approvals` | `check_test_approval.py` | 测试批准记录与实现时间的先后 |
+| `REQ-ADS-FR-012` | specified（PR-3 实现） | `corpus.pricing.bid_cents_from_price` | `test_corpus.py::test_bid_is_five_percent_of_price` | 出价分布、免费游戏保底命中数 |
+| `REQ-ADS-ARCH-016` | specified（PR-3 实现） | `corpus.pricing / bidding.ledger.Ledger.finalize / INV-V3-007/008` | `test_corpus.py::test_twenty_impressions_exhaust_budget` | 5% 常量出现位置数、20 次后的 remaining |

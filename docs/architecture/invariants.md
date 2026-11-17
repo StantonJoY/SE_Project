@@ -454,3 +454,74 @@
 - 强制：`scripts.check_semantic_eval.semantic_changes`。
 - 反例证据：`test_v2_governance.py::test_semantic_gate_tracks_real_prompt_and_auction_paths`。
 - 失败动作：评估资产缺失或任一阈值/安全反例失败阻断；代理不得自我批准。
+
+---
+
+## V3 增量（2026-11-17，待人工批准）
+
+V3 在 `docs/architecture/` 原地追加（理由见 ADR-006）；V1/V2 条目全部保留。以下 8 条对应注册表 `version: V3` 的需求。
+
+### `INV-V3-001`
+
+- 不变量：语料进入系统但不进 Ad 契约：扩展字段一律走旁路映射，AD_SCHEMA 不变。
+- 来源：`REQ-ADS-ARCH-013`；ADR-006。
+- 强制：`corpus.projection.corpus_to_ad`。
+- 反例证据：`test_corpus.py::test_raw_corpus_item_rejected_by_ad_schema`（PR-1/PR-2 实现时落地）。
+- 失败动作：整批拒绝加载；不得放宽 AD_SCHEMA。
+
+### `INV-V3-002`
+
+- 不变量：候选生成无状态且确定：不回读审计、不读时间与随机数。
+- 来源：`REQ-ADS-ARCH-014`；ADR-006。
+- 强制：`corpus.select.select_candidates`。
+- 反例证据：`test_corpus.py::test_select_is_deterministic`（PR-1/PR-2 实现时落地）。
+- 失败动作：拒绝加载或返回空候选，不静默使用非确定性输入。
+
+### `INV-V3-003`
+
+- 不变量：内容并集判据不可绕过：warnings 与 descriptors 任一侧命中即拒。
+- 来源：`REQ-ADS-NFR-SAFETY-008`；ADR-006。
+- 强制：`compliance.pipeline.check_scene`。
+- 反例证据：`test_v3_compliance.py::test_among_us_rejected_by_warnings_side`（PR-1/PR-2 实现时落地）。
+- 失败动作：展示终止，返回 no_ad 并记录命中的规则。
+
+### `INV-V3-004`
+
+- 不变量：年龄兜底：required_age 超场景上限即拒。
+- 来源：`REQ-ADS-NFR-SAFETY-009`；ADR-006。
+- 强制：`compliance.pipeline.check_scene`。
+- 反例证据：`test_v3_compliance.py::test_age_gate_rejects_above_limit`（PR-1/PR-2 实现时落地）。
+- 失败动作：展示终止，返回 no_ad。
+
+### `INV-V3-005`
+
+- 不变量：权威链顺序不变：合规五步与 V1 逐位一致。
+- 来源：`REQ-ADS-ARCH-015`；ADR-006。
+- 强制：`compliance.pipeline.run_compliance`。
+- 反例证据：`test_v3_compliance.py::test_pipeline_order_unchanged`（PR-1/PR-2 实现时落地）。
+- 失败动作：结构断言失败即阻断构建，不允许调整步骤顺序。
+
+### `INV-V3-006`
+
+- 不变量：语料文本不可信：进 prompt 前必过注入门。
+- 来源：`REQ-ADS-SEC-003`；ADR-006。
+- 强制：`app.pipeline.recommend`。
+- 反例证据：`test_corpus.py::test_injected_corpus_text_blocked`（PR-1/PR-2 实现时落地）。
+- 失败动作：拒绝该条目，不进入候选集。
+
+### `INV-V3-007`
+
+- 不变量：广告费派生唯一来源：5% 与取整只在一处。
+- 来源：`REQ-ADS-ARCH-016`；ADR-006。
+- 强制：`corpus.pricing.bid_cents_from_price`。
+- 反例证据：`test_corpus.py::test_five_percent_constant_single_source`（PR-1/PR-2 实现时落地）。
+- 失败动作：静态检查失败即阻断。
+
+### `INV-V3-008`
+
+- 不变量：预算不可透支：20 次成交恰耗尽，第 21 次拒绝。
+- 来源：`REQ-ADS-ARCH-016`；ADR-006。
+- 强制：`bidding.ledger.Ledger.finalize`。
+- 反例证据：`test_corpus.py::test_twenty_impressions_exhaust_budget`（PR-1/PR-2 实现时落地）。
+- 失败动作：拒绝成交，返回 InsufficientBudget 或 no_ad。
+
