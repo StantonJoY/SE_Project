@@ -417,3 +417,15 @@ entries:
     evidence: "docs/review-memo.md"
     review_kind: "ai_proxy"
     notes: "两次 CityU 生成均通过场景验收。正常成交写入一条审计，重复请求返回相同结果，医疗品类被确定性拒绝且余额不变。本地钩子已安装并通过暂存预演。工程实现的前置人工批准状态未变。"
+
+  - id: "AIU-0028"
+    date: "2026-11-17"
+    agent: "Codex CI repair and review agents"
+    tool: "Codex native collaboration"
+    role: "build"
+    task: "修复 GitHub Actions 无法解析顶层 env 中 runner.temp 的错误"
+    artifacts: [".github/workflows/ci.yml"]
+    outcome: "accepted"
+    evidence: "https://github.com/StantonJoY/SE_Project/actions/runs/41941541305"
+    authorization: "用户在当前会话中明确要求修复 CI 配置并上传新版 V2。"
+    notes: "Ruff 和 mypy 的缓存变量分别移到对应步骤的 env。独立复核确认除变量所在作用域外，触发条件、任务和检查命令一致。"
