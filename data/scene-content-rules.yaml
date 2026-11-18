@@ -1,0 +1,49 @@
+# V3 场景内容分级规则（safety-critical，改动须 ADR + 人工批准）
+#
+# 依据：REQ-ADS-NFR-SAFETY-008/009/010、ADR-006 D4。
+# 判据是**并集**：content_warnings ∪ descriptor 映射标签。
+# 三档由场景标签决定（见 tag_to_tier），没有匹配标签时落到 default_tier。
+#
+# descriptor 编号（Steam 官方）：
+#   1 = Some Nudity or Sexual Content
+#   2 = Frequent Violence or Gore   → 这里只映射为 Violence；
+#       Gore 交给 warnings 精确判定（2 同时表示"暴力或血腥"，粒度太粗）
+#   3 = Adult Only Sexual Content（数据集已剔除）
+#   4 = Frequent Nudity or Sexual Content
+#   5 = General Mature Content
+
+tiers:
+  # 严：家庭场景，任何暴力/血腥/性/毒品/脏话/恐怖/赌博都不行
+  family:
+    max_age: 0
+    block_labels: [
+      "Violence", "Blood", "Gore", "Sexual Content", "Nudity",
+      "Drugs", "Alcohol", "Strong Language", "Horror Themes", "Gambling", "Mature",
+    ]
+
+  # 中：校园场景，禁重度内容；暴力本身不拦（学生也玩射击游戏）
+  campus:
+    max_age: 13
+    block_labels: ["Violence", "Gore", "Sexual Content", "Nudity", "Drugs", "Gambling"]
+
+  # 宽：竞技场景，只拦性相关内容与血腥
+  competitive:
+    max_age: 18
+    block_labels: ["Gore", "Sexual Content", "Nudity"]
+
+# 场景标签 → 档位（按 user_tags 顺序取第一个命中的）
+tag_to_tier:
+  family: family
+  parent: family
+  student: campus
+  teacher: campus
+  gamer: competitive
+  esports: competitive
+
+default_tier: campus
+
+descriptor_labels:
+  1: ["Sexual Content", "Nudity"]
+  2: ["Violence"]
+  4: ["Sexual Content", "Nudity"]
+  5: ["Mature"]

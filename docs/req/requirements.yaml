@@ -1048,7 +1048,7 @@ baseline_requirements:
     invariants: ["INV-V3-005"]
     source_refs:
       - {source: "req_v3_draft", locator: "docs/req/requirements-v3-se.md"}
-    status: "specified"
+    status: "implemented"
     notes: "草案编号 REQ-V3-SE-06。"
 
   - id: "REQ-ADS-NFR-SAFETY-008"
@@ -1065,7 +1065,7 @@ baseline_requirements:
     invariants: ["INV-V3-003"]
     source_refs:
       - {source: "req_v3_draft", locator: "docs/req/requirements-v3-se.md"}
-    status: "specified"
+    status: "implemented"
     notes: "草案编号 REQ-V3-SE-07。只用 descriptors 会漏 7/30。"
 
   - id: "REQ-ADS-NFR-SAFETY-009"
@@ -1082,7 +1082,7 @@ baseline_requirements:
     invariants: ["INV-V3-004"]
     source_refs:
       - {source: "req_v3_draft", locator: "docs/req/requirements-v3-se.md"}
-    status: "specified"
+    status: "implemented"
     notes: "草案编号 REQ-V3-SE-08。80% 样本 age=0，故仅作兜底。"
 
   - id: "REQ-ADS-NFR-SAFETY-010"
@@ -1098,7 +1098,7 @@ baseline_requirements:
     fallback: "规则表缺失或非法即拒绝启动（fail-closed）。"
     source_refs:
       - {source: "req_v3_draft", locator: "docs/req/requirements-v3-se.md"}
-    status: "specified"
+    status: "implemented"
     notes: "草案编号 REQ-V3-SE-09。"
 
   - id: "REQ-ADS-SEC-003"
@@ -1248,8 +1248,8 @@ baseline_requirements:
     priority: "must"
     fit_criterion: "以 --corpus 运行端到端返回 ad 或结构化 no_ad；候选数等于 top_k；单次请求（含 5,000 条加载、选候选、投影）不超过 500 ms；非法场景仍返回 scene_invalid 而非在接线层吞掉。"
     verification: ["unit_test", "deterministic_replay"]
-    enforced_by: "app.cli.load_corpus_repository"
-    enforcement: ["app.cli.load_corpus_repository", "corpus.select.select_candidates"]
+    enforced_by: "app.cli.load_corpus_context"
+    enforcement: ["app.cli.load_corpus_context", "corpus.select.select_candidates"]
     asr: false
     source_refs:
       - {source: "req_v3_draft", locator: "requirements-v3-se.md §1.6"}

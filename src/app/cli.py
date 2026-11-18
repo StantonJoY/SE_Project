@@ -19,9 +19,12 @@ import json
 import sys
 from pathlib import Path
 
+from dataclasses import dataclass
+
 from ads.banned_words import BannedWords
 from ads.repository import AdRepository
 from audit import JsonlAuditStore
+from compliance.content_rules import ContentPolicy, ContentRules
 from compliance.rules import SceneRules
 from corpus import CorpusRepository, load_corpus_config, project_all, select_candidates
 from render import to_json
@@ -34,22 +37,33 @@ from .pipeline import recommend
 DEFAULT_CONFIG = "config.yaml"
 
 
-def load_corpus_repository(scene_raw: object, config_path: str | Path, root: Path) -> AdRepository:
-    """V3 接线：场景 → 语料 top-K → 投影成 Ad → 交给既有管道（REQ-ADS-FR-014）。
+@dataclass(frozen=True)
+class CorpusContext:
+    """V3 语料模式的接线结果：候选仓库 + 合规用的内容事实。"""
 
-    **不改 `pipeline.recommend` 的签名**：语料只是换了一个候选来源，
-    权威链（LLM 建议 → 合规 → 渲染 → 审计）原样复用。
-    场景非法时返回空仓库——让管道自己走 `scene_invalid` 降级路径，不在接线层吞掉。
+    repository: AdRepository
+    policy: ContentPolicy | None
+
+
+def load_corpus_context(scene_raw: object, config_path: str | Path, root: Path) -> CorpusContext:
+    """V3 接线：场景 → 语料 top-K → 投影成 Ad → 连同内容事实交给既有管道（REQ-ADS-FR-014）。
+
+    **不改 `pipeline.recommend` 的权威链**：语料只是换了候选来源，
+    合规仍是 FINAL AUTHORITY；内容分级通过 `ContentPolicy` 注入到既有的
+    `scene` 步骤内部，五步顺序不变（REQ-ADS-ARCH-015）。
+    场景非法时返回空仓库与空事实——让管道自己走 `scene_invalid`，不在接线层吞掉。
     """
     corpus_config = load_corpus_config(config_path)
     corpus = CorpusRepository.load(root / corpus_config.items_path, root / corpus_config.tags_path)
+    rules = ContentRules.load(root / corpus_config.content_rules_path)
     try:
         scene = parse_scene(scene_raw)
     except SceneInputError:
-        return AdRepository([])
+        return CorpusContext(repository=AdRepository([]), policy=None)
+
     picked = select_candidates(scene, corpus.all(), corpus_config.tag_mapping, corpus_config.top_k)
-    ads, _facts = project_all(picked)
-    return AdRepository(ads)
+    ads, facts = project_all(picked)
+    return CorpusContext(repository=AdRepository(ads), policy=ContentPolicy(rules=rules, facts=facts))
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -114,9 +128,11 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     # ---- ③ 只读数据源 ----
+    policy = None
     try:
         if args.corpus:
-            repo = load_corpus_repository(scene_raw, root / args.config, root)
+            ctx = load_corpus_context(scene_raw, root / args.config, root)
+            repo, policy = ctx.repository, ctx.policy
         else:
             repo = AdRepository.load(root / config.data.ads_path)
         banned = BannedWords.load(root / config.data.banned_words_path)
@@ -139,6 +155,7 @@ def main(argv: list[str] | None = None) -> int:
         client=MockLLM(),
         audit_store=store,
         config=config,
+        content_policy=policy,
     )
 
     indent = None if args.indent == 0 else args.indent

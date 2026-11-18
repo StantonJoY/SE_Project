@@ -31,6 +31,7 @@ class CorpusConfig:
     top_k: int = 30
     budget_impressions: int = 20
     tag_mapping: Mapping[str, tuple[str, ...]] = field(default_factory=dict)
+    content_rules_path: str = "data/scene-content-rules.yaml"
 
     @classmethod
     def from_mapping(cls, raw: Mapping[str, Any] | None) -> CorpusConfig:
@@ -49,13 +50,20 @@ class CorpusConfig:
             top_k=data.get("top_k", 30),
             budget_impressions=data.get("budget_impressions", 20),
             tag_mapping=mapping,
+            content_rules_path=str(
+                data.get("content_rules_path", "data/scene-content-rules.yaml")
+            ),
         )
         config.validate()
         return config
 
     def validate(self) -> None:
         errors: list[str] = []
-        for label, value in (("items_path", self.items_path), ("tags_path", self.tags_path)):
+        for label, value in (
+            ("items_path", self.items_path),
+            ("tags_path", self.tags_path),
+            ("content_rules_path", self.content_rules_path),
+        ):
             if not isinstance(value, str) or not value.strip():
                 errors.append(f"corpus.{label} 不得为空")
         if type(self.top_k) is not int or not (1 <= self.top_k <= MAX_TOP_K):

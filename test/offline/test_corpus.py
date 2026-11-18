@@ -32,7 +32,7 @@ from ads.banned_words import BannedWords
 from ads.repository import AdRepository
 from ads.schema import AD_SCHEMA
 from app import AppConfig, recommend
-from app.cli import load_corpus_repository
+from app.cli import load_corpus_context
 from audit import InMemoryAuditStore
 from compliance.rules import SceneRules
 from corpus import (
@@ -288,15 +288,17 @@ def test_corpus_package_has_no_forbidden_imports():
 
 # ---------------------------------------------------------------- 接入（FR-014 / SEC-003）
 def test_cli_corpus_repository_wiring():
-    """REQ-ADS-FR-014：场景 → top-K → AdRepository；非法场景返回空仓库交给管道降级。"""
-    repo = load_corpus_repository(
+    """REQ-ADS-FR-014：场景 → top-K → AdRepository + 内容事实；非法场景交给管道降级。"""
+    ctx = load_corpus_context(
         {"time_slot": "night", "device": "mobile", "user_tags": ["student"]}, CONFIG_PATH, ROOT
     )
-    assert repo.count == load_corpus_config(CONFIG_PATH).top_k
-    assert all(ad.ad_id.startswith("ad_") for ad in repo.all())
+    assert ctx.repository.count == load_corpus_config(CONFIG_PATH).top_k
+    assert all(ad.ad_id.startswith("ad_") for ad in ctx.repository.all())
+    assert ctx.policy is not None and len(ctx.policy.facts) == ctx.repository.count
 
-    empty = load_corpus_repository({"time_slot": "day", "device": "mobile"}, CONFIG_PATH, ROOT)
-    assert empty.count == 0, "非法场景不得在接线层被吞掉，交给管道返回 scene_invalid"
+    empty = load_corpus_context({"time_slot": "day", "device": "mobile"}, CONFIG_PATH, ROOT)
+    assert empty.repository.count == 0, "非法场景不得在接线层被吞掉，交给管道返回 scene_invalid"
+    assert empty.policy is None
 
 
 def _pipeline_env():

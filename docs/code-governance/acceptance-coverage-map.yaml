@@ -205,21 +205,17 @@ requirements:
     evidence: ["test_corpus.py::test_k_upper_bound_rejected"]
     note: "PR-1 语料接入已实现；PR-2 的合规分项另行登记。"
   - id: "REQ-ADS-ARCH-015"
-    test_backed: false
-    pending_test: "PR-2 五步顺序契约测试"
-    blocked_by: "合规扩展（PR-2）未实现"
+    test_backed: true
+    evidence: ["test_v3_compliance.py::test_pipeline_order_unchanged", "test_v3_compliance.py::test_policy_none_is_identical_to_v1"]
   - id: "REQ-ADS-NFR-SAFETY-008"
-    test_backed: false
-    pending_test: "PR-2 内容并集反例"
-    blocked_by: "合规扩展（PR-2）未实现"
+    test_backed: true
+    evidence: ["test_v3_compliance.py::test_among_us_rejected_by_warnings_side", "test_v3_compliance.py::test_three_tier_matrix"]
   - id: "REQ-ADS-NFR-SAFETY-009"
-    test_backed: false
-    pending_test: "PR-2 年龄兜底反例"
-    blocked_by: "合规扩展（PR-2）未实现"
+    test_backed: true
+    evidence: ["test_v3_compliance.py::test_age_gate_rejects_above_limit", "test_v3_compliance.py::test_three_tier_matrix"]
   - id: "REQ-ADS-NFR-SAFETY-010"
-    test_backed: false
-    pending_test: "PR-2 三档场景矩阵"
-    blocked_by: "合规扩展（PR-2）未实现"
+    test_backed: true
+    evidence: ["test_v3_compliance.py::test_three_tier_matrix", "test_v3_compliance.py::test_content_rules_fail_closed"]
   - id: "REQ-ADS-SEC-003"
     test_backed: true
     evidence: ["test_corpus.py::test_injected_corpus_text_blocked"]

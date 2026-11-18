@@ -32,6 +32,7 @@ from dataclasses import dataclass
 from ads.banned_words import BannedWords
 from ads.repository import AdRepository
 from audit import AuditRecordBuilder, AuditStore, AuditWriteError, MetricSnapshot, new_audit_id
+from compliance.content_rules import ContentPolicy
 from compliance.pipeline import run_compliance
 from compliance.rules import SceneRules
 from render import DegradeReason, RenderResult, render_ad, render_no_ad
@@ -102,6 +103,7 @@ def recommend(
     client: LLMClient,
     audit_store: AuditStore,
     config: AppConfig,
+    content_policy: ContentPolicy | None = None,
 ) -> Recommendation:
     """执行一次推荐：场景 → 建议 → 确定性过滤 → 渲染 + 审计。
 
@@ -246,7 +248,7 @@ def recommend(
             rec, metrics, DegradeReason.COMPLIANCE_REJECTED,
             f"选中的 {judgment.ad_id} 不在素材库中", attempts=attempts,
         )
-    verdict = run_compliance(chosen, scene, candidates, banned_words, rules)
+    verdict = run_compliance(chosen, scene, candidates, banned_words, rules, content_policy)
     rec.add(
         compliance={
             "approved": verdict.approved,

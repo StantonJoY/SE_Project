@@ -255,10 +255,10 @@ V3 在 `docs/architecture/` 原地追加（理由见 ADR-006）。下表 18 条�
 | `REQ-ADS-FR-011` | specified（PR-1 实现） | `corpus.select.select_candidates / INV-V3-002` | `test_corpus.py::test_select_is_deterministic` | top-K 规模、命中标签数分布 |
 | `REQ-ADS-ARCH-014` | specified（PR-1 实现） | `corpus.select.select_candidates / INV-V3-002` | `test_corpus.py::test_select_is_deterministic` | 双跑 diff 次数 |
 | `REQ-ADS-NFR-COST-002` | specified（PR-1 实现） | `corpus.config.CorpusConfig` | `test_corpus.py::test_k_upper_bound_rejected` | 装配上下文 token 数 / 预算 |
-| `REQ-ADS-ARCH-015` | specified（PR-2 实现） | `compliance.pipeline.run_compliance / INV-V3-005` | `test_v3_compliance.py::test_pipeline_order_unchanged` | 五步序列与 V1 的逐位差异数 |
-| `REQ-ADS-NFR-SAFETY-008` | specified（PR-2 实现） | `compliance.pipeline.check_scene / INV-V3-003` | `test_v3_compliance.py::test_among_us_rejected_by_warnings_side` | 内容并集命中数与命中规则 |
-| `REQ-ADS-NFR-SAFETY-009` | specified（PR-2 实现） | `compliance.pipeline.check_scene / INV-V3-004` | `test_v3_compliance.py::test_age_gate_rejects_above_limit` | 年龄超限拦截数 |
-| `REQ-ADS-NFR-SAFETY-010` | specified（PR-2 实现） | `compliance.pipeline.check_scene` | `test_v3_compliance.py::test_three_tier_scene_matrix` | 三档场景放行/拒绝矩阵 |
+| `REQ-ADS-ARCH-015` | implemented（V3） | `compliance.pipeline.run_compliance / INV-V3-005` | `test_v3_compliance.py::test_pipeline_order_unchanged` | 五步序列与 V1 的逐位差异数 |
+| `REQ-ADS-NFR-SAFETY-008` | implemented（V3） | `compliance.pipeline.check_scene / INV-V3-003` | `test_v3_compliance.py::test_among_us_rejected_by_warnings_side` | 内容并集命中数与命中规则 |
+| `REQ-ADS-NFR-SAFETY-009` | implemented（V3） | `compliance.pipeline.check_scene / INV-V3-004` | `test_v3_compliance.py::test_age_gate_rejects_above_limit` | 年龄超限拦截数 |
+| `REQ-ADS-NFR-SAFETY-010` | implemented（V3） | `compliance.pipeline.check_scene` | `test_v3_compliance.py::test_three_tier_scene_matrix` | 三档场景放行/拒绝矩阵 |
 | `REQ-ADS-SEC-003` | specified（PR-1 实现） | `app.pipeline.recommend / INV-V3-006` | `test_corpus.py::test_injected_corpus_text_blocked` | 注入检出数与检出率 |
 | `REQ-ADS-NFR-QA-005` | specified（PR-4 实现） | `app.pipeline.recommend` | `test/offline 全量回归` | 离线测试通过数与旧分区 replay diff |
 | `REQ-ADS-NFR-QA-006` | specified（PR-4 实现） | `eval.eval_runner` | `test_v3_eval.py::test_v3_partition_registered` | V3 分区用例数与负例数 |
