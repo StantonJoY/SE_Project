@@ -18,10 +18,14 @@ import yaml
 
 from ads.banned_words import BannedWords
 from ads.repository import AdRepository
+from app.cli import load_corpus_context
 from app.pipeline_v2 import recommend_v2
 from bidding import Ledger, validate_bids
 from compliance.rules import SceneRules
+from corpus import load_corpus_config, select_candidates
+from corpus.select import target_labels
 from render.schema_v2 import validate_v2_result
+from scene.parser import SceneInputError, parse_scene
 from selector.relevance import FixedRelevanceClient, HTTPRelevanceClient, RelevanceClient
 
 DEFAULT_CONFIG = "config-v2.yaml"
@@ -33,11 +37,30 @@ def _keys(value: object, expected: set[str], name: str) -> dict:
     return value
 
 
+def _keys_optional(value: object, required: set[str], optional: set[str], name: str) -> dict:
+    """允许 `optional` 中的键出现但不强制（V3 的 corpus 段）。"""
+    if not isinstance(value, dict):
+        raise ValueError(f"{name} must be an object")
+    missing = required - set(value)
+    extra = set(value) - (required | optional)
+    if missing or extra:
+        raise ValueError(
+            f"{name} has missing or extra configuration fields "
+            f"(missing={sorted(missing)}, extra={sorted(extra)})"
+        )
+    return value
+
+
 def load_v2_config(path: str | Path) -> dict:
     """Fail loudly at startup; pricing/formula identifiers select one audited policy."""
     with Path(path).open(encoding="utf-8") as stream:
         value = yaml.safe_load(stream)
-    config = _keys(value, {"model", "prompt", "paths", "policy", "replay"}, "config")
+    config = _keys_optional(
+        value,
+        {"model", "prompt", "paths", "policy", "replay"},
+        {"corpus"},
+        "config",
+    )
     model = _keys(config["model"], {"provider", "version", "name", "endpoint", "api_key_env", "timeout_sec", "fixed_scores"}, "model")
     if model["provider"] not in {"fixed", "http"}:
         raise ValueError("model.provider must be fixed or http")
@@ -73,7 +96,7 @@ def load_v2_config(path: str | Path) -> dict:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="python -m app.cli_v2", description="V2 deterministic pay-as-bid recommendation")
-    parser.add_argument("--config", default=DEFAULT_CONFIG)
+    parser.add_argument("--config", default=None)
     parser.add_argument("--request-id", required=True)
     scene = parser.add_mutually_exclusive_group()
     scene.add_argument("--scene", help="JSON scene object")
@@ -83,6 +106,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--db", help="persistent SQLite ledger path")
     parser.add_argument("--bids", "--bids-file", dest="bids")
     parser.add_argument("--provider", choices=("fixed", "http"))
+    parser.add_argument("--corpus", action="store_true", help="候选来自真实语料（V3）")
     parser.add_argument("--model")
     parser.add_argument("--base-url", help="HTTP API root; /chat/completions is appended")
     parser.add_argument("--endpoint", help="complete chat-completions HTTP URL")
@@ -94,27 +118,54 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     root = Path(__file__).resolve().parents[2]
-    config_path = Path(args.config)
+    # --corpus 需要 corpus 段；没显式给 --config 时自动用 V3 配置，避免"跑出空候选"的坑
+    config_name = args.config or ("config-v3.yaml" if args.corpus else DEFAULT_CONFIG)
+    config_path = Path(config_name)
     if not config_path.is_absolute():
         config_path = root / config_path
     try:
         config = load_v2_config(config_path)
         source = config_path.parent
         paths, model, policy = config["paths"], config["model"], config["policy"]
-        repo = AdRepository.load(source / paths["ads"])
         banned = BannedWords.load(source / paths["banned_words"])
         rules = SceneRules.load(source / paths["scene_rules"])
-        bids_path = Path(args.bids) if args.bids else source / paths["bids"]
-        with bids_path.open(encoding="utf-8") as stream:
-            bids = validate_bids(json.load(stream), known_ad_ids={ad.ad_id for ad in repo.all()})
         if args.scene is not None:
             raw_scene = json.loads(args.scene)
         else:
             raw_scene = {"time_slot": args.time_slot, "device": args.device, "user_tags": args.tag}
+
+        # ---- V3：语料模式（候选由标签匹配选 top-K，出价由定价派生）----
+        candidate_ids: list[str] | None = None
+        content_policy = None
+        if args.corpus:
+            ctx = load_corpus_context(raw_scene, config_path, root, all_items=True)
+            repo = ctx.repository
+            content_policy = ctx.policy
+            corpus_config = load_corpus_config(config_path)
+            try:
+                scene_obj = parse_scene(raw_scene)
+                targets = target_labels(scene_obj, corpus_config.tag_mapping)
+                picked = select_candidates(
+                    scene_obj, ctx.corpus_items, corpus_config.tag_mapping, corpus_config.top_k
+                )
+                candidate_ids = [f"ad_{item.item_id}" for item in picked]
+                scores = {
+                    f"ad_{item.item_id}": min(100, 20 * len(item.match_labels() & targets))
+                    for item in picked
+                }
+            except SceneInputError:
+                candidate_ids, scores = [], {}
+        else:
+            repo = AdRepository.load(source / paths["ads"])
+            scores = dict(model["fixed_scores"])
+
+        bids_path = Path(args.bids) if args.bids else source / paths["bids"]
+        with bids_path.open(encoding="utf-8") as stream:
+            bids = validate_bids(json.load(stream), known_ad_ids={ad.ad_id for ad in repo.all()})
         provider = args.provider or model["provider"]
         client: RelevanceClient
         if provider == "fixed":
-            client = FixedRelevanceClient(model["fixed_scores"])
+            client = FixedRelevanceClient(scores)
             model_version = model["version"]
         else:
             api_key = os.environ.get(args.api_key_env or model["api_key_env"], "")
@@ -133,7 +184,9 @@ def main(argv: list[str] | None = None) -> int:
             ledger.seed(bids)  # Idempotent initialization; never resets durable spending.
             result = recommend_v2(raw_scene, request_id=args.request_id, repo=repo, bids=bids, client=client,
                                   ledger=ledger, banned_words=banned, rules=rules, model_version=model_version,
-                                  policy_version=policy["version"], context_budget_tokens=config["prompt"]["context_budget_tokens"])
+                                  policy_version=policy["version"],
+                                  context_budget_tokens=config["prompt"]["context_budget_tokens"],
+                                  candidate_ids=candidate_ids, content_policy=content_policy)
         errors = validate_v2_result(result)
         if errors:
             raise ValueError("V2 result contract: " + "; ".join(errors))

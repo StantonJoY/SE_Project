@@ -222,12 +222,11 @@ requirements:
     note: "PR-1 语料接入已实现；PR-2 的合规分项另行登记。"
   - id: "REQ-ADS-NFR-QA-005"
     test_backed: false
-    pending_test: "PR-4 全量回归核对"
-    blocked_by: "V3 评估与收尾（PR-4）未做"
+    pending_test: "由全量回归套件 + fitness V4 跨轮次检查覆盖，无单条用例引用该 ID"
+    blocked_by: "该要求是聚合断言（617→660 全绿），不适合写进某个测试函数"
   - id: "REQ-ADS-NFR-QA-006"
-    test_backed: false
-    pending_test: "PR-4 V3 评估分区"
-    blocked_by: "V3 评估与收尾（PR-4）未做"
+    test_backed: true
+    evidence: ["test_v3_eval.py::test_v3_partition_passes_without_escaping", "test_v3_eval.py::test_v3_partition_is_registered_and_sized"]
   - id: "REQ-ADS-GOV-004"
     test_backed: false
     pending_test: "ADR-006 待具名人类批准"
@@ -241,14 +240,11 @@ requirements:
     pending_test: "TA-0005 待具名人类签署"
     blocked_by: "测试批准记录缺失（Gate 1 会拦）"
   - id: "REQ-ADS-FR-012"
-    test_backed: false
-    pending_test: "PR-3 定价派生测试"
-    blocked_by: "V2 接入（PR-3）未实现"
+    test_backed: true
+    evidence: ["test_v3_pricing.py::test_bid_is_five_percent_of_price", "test_v3_pricing.py::test_free_game_bids_one_cent", "test_v3_pricing.py::test_bids_sidecar_matches_corpus_prices"]
   - id: "REQ-ADS-ARCH-016"
-    test_backed: false
-    pending_test: "PR-3 派生唯一来源 + 20 次耗尽"
-    blocked_by: "V2 接入（PR-3）未实现"
-
+    test_backed: true
+    evidence: ["test_v3_pricing.py::test_twenty_impressions_exhaust_budget", "test_v3_pricing.py::test_five_percent_constant_single_source"]
   - id: "REQ-ADS-FR-013"
     test_backed: true
     evidence: ["test_corpus.py::test_subset_manifest_matches_committed_files", "test_corpus.py::test_subset_selection_is_deterministic_and_covers_boundaries"]

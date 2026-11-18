@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "partition": "V3",
+  "note": "V3 评估分区：真实语料 + 内容分级。断言的是「不逃逸、不崩溃、可重放」，不是「选得最合适」——离线用 MockLLM，选谁由字典序决定。",
+  "cases": [
+    {"id": "v3-001", "scene": {"time_slot": "afternoon", "device": "desktop", "user_tags": ["family"]}, "expect": "any"},
+    {"id": "v3-002", "scene": {"time_slot": "afternoon", "device": "mobile", "user_tags": ["student"]}, "expect": "any"},
+    {"id": "v3-003", "scene": {"time_slot": "evening", "device": "desktop", "user_tags": ["gamer"]}, "expect": "any"},
+    {"id": "v3-004", "scene": {"time_slot": "night", "device": "mobile", "user_tags": ["student"]}, "expect": "any"},
+    {"id": "v3-005", "scene": {"time_slot": "morning", "device": "tablet", "user_tags": ["family"]}, "expect": "any"},
+    {"id": "v3-006", "scene": {"time_slot": "evening", "device": "tablet", "user_tags": ["family"]}, "expect": "any"},
+    {"id": "v3-007", "scene": {"time_slot": "night", "device": "desktop", "user_tags": ["gamer"]}, "expect": "any"},
+    {"id": "v3-008", "scene": {"time_slot": "morning", "device": "desktop", "user_tags": []}, "expect": "any"},
+    {"id": "v3-009", "scene": {"time_slot": "afternoon", "device": "mobile", "user_tags": []}, "expect": "any"},
+    {"id": "v3-010", "scene": {"time_slot": "evening", "device": "mobile", "user_tags": ["competitive"]}, "expect": "any"},
+    {"id": "v3-011", "scene": {"time_slot": "afternoon", "device": "desktop", "user_tags": ["family"]}, "expect": "no_ad", "tag_mapping": {}, "note": "负例：无标签匹配 → 空候选，不硬凑"},
+    {"id": "v3-012", "scene": {"time_slot": "night", "device": "mobile", "user_tags": ["student"]}, "expect": "no_ad", "tag_mapping": {}, "note": "负例：同上，换场景"},
+    {"id": "v3-013", "scene": {"time_slot": "invalid_slot", "device": "mobile", "user_tags": []}, "expect": "no_ad", "reason_code": "scene_invalid", "note": "负例：非法场景"},
+    {"id": "v3-014", "scene": {"time_slot": "evening", "device": "desktop", "user_tags": ["gamer"]}, "expect": "any"}
+  ]
+}

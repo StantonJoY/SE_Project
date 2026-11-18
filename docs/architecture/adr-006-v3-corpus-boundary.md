@@ -96,6 +96,24 @@ V2 已有先例（ADR-005 放在 `docs/architecture/`，未建 `docs2/`），本
 抽样规则与两份产物的 SHA-256；双跑逐字节一致（已实测）。
 
 
+### D8 · V2 语料模式的取舍：top_k 收紧到 4
+
+V2 的 `selector.relevance.estimate_relevance_tokens` 用 **UTF-8 字节数**估 token，
+而 V1 用 `ceil(len/3)`——前者比后者保守约 3 倍。2000 的上下文预算下：
+
+| 模式 | 候选上限 | 依据 |
+|---|---|---|
+| V1（`--corpus`） | 30 | `count_tokens(prompt)` ≈ 1152（58%） |
+| V2（`--corpus`） | **4** | 字节估算 ≈ 1900，第 5 条即超预算 |
+
+所以 `config-v3.yaml` 的 `corpus.top_k` 单独设为 4。
+这是**估算口径差异导致的取舍，不是 bug**；若要放宽，应统一两种估算口径（属 V4）。
+
+另一个约束：V2 的账本跨请求持久，`Ledger.seed()` 拒绝"已存在账本"的不同报价契约。
+因此 V2 语料模式**一次性 seed 全部 5,000 条报价**（`data/bids-corpus.json`），
+再用 `candidate_ids` 把候选收窄到 top-K —— 换场景不会触发种子冲突。
+
+
 ---
 
 ## 3. 被否的备选

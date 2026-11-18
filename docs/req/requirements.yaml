@@ -1146,7 +1146,7 @@ baseline_requirements:
     metric: {name: 'v3_eval_partition_cases', unit: 'case', threshold: 12, direction: 'at_least'}
     source_refs:
       - {source: "req_v3_draft", locator: "docs/req/requirements-v3-se.md"}
-    status: "specified"
+    status: "implemented"
     notes: "草案编号 REQ-V3-SE-12。"
 
   - id: "REQ-ADS-GOV-004"
@@ -1207,7 +1207,7 @@ baseline_requirements:
     asr: false
     source_refs:
       - {source: "req_v3_draft", locator: "docs/req/requirements-v3-se.md"}
-    status: "specified"
+    status: "implemented"
     notes: "草案编号 REQ-V3-SE-16，演示级口径。"
 
   - id: "REQ-ADS-ARCH-016"
@@ -1224,7 +1224,7 @@ baseline_requirements:
     invariants: ["INV-V3-007", "INV-V3-008"]
     source_refs:
       - {source: "req_v3_draft", locator: "docs/req/requirements-v3-se.md"}
-    status: "specified"
+    status: "implemented"
     notes: "草案编号 REQ-V3-SE-17，演示级口径。"
   - id: "REQ-ADS-FR-013"
     version: "V3"
