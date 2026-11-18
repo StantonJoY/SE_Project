@@ -29,7 +29,7 @@ import pytest
 from jsonschema import Draft202012Validator
 
 from ads.banned_words import BannedWords
-from ads.repository import AdRepository
+from ads.repository import AdLoadError, AdRepository
 from ads.schema import AD_SCHEMA
 from app import AppConfig, recommend
 from app.cli import load_corpus_context
@@ -223,6 +223,25 @@ def test_raw_corpus_item_rejected_by_ad_schema():
     }
     with pytest.raises(jsonschema.ValidationError):
         jsonschema.validate(instance=raw, schema=AD_SCHEMA)
+
+
+def test_repository_rejects_extra_fields_in_raw_items(monkeypatch):
+    """REQ-ADS-ARCH-013 / INV-V3-001：**加载路径**也必须拒绝额外字段。
+
+    与上一条的区别：这条走 `AdRepository.load`（读的是 `ads.repository.AD_SCHEMA`），
+    因此能检出"把 AD_SCHEMA 放开"这类变异——直接调 jsonschema 的用例检不出。
+    """
+    payload = json.dumps([{
+        "ad_id": "ad_413150", "title": "Stardew Valley", "copy": "farm",
+        "category": "Simulation", "target_tags": [],
+        "scene_restrictions": {"not_night": False, "not_campus": False, "allowed_devices": []},
+        "banned_check": "checked",
+        "content_descriptors": [],
+    }], ensure_ascii=False)
+    monkeypatch.setattr(Path, "exists", lambda self: True)
+    monkeypatch.setattr("builtins.open", lambda *a, **k: io.StringIO(payload))
+    with pytest.raises(AdLoadError):
+        AdRepository.load(Path("corpus-as-ads.json"))
 
 
 # ---------------------------------------------------------------- 候选生成（FR-011 / ARCH-014）

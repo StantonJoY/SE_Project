@@ -407,40 +407,29 @@ invariants:
     mutation_test_nodes:
       - "test/offline/test_v2_governance.py::test_semantic_gate_tracks_real_prompt_and_auction_paths"
   - id: "INV-V3-001"
-    negative_test_backed: false
-    evidence: ["test_corpus.py::test_raw_corpus_item_rejected_by_ad_schema"]
-    pending_test: "变异注入（MUTATIONS 表）在 PR-2 统一补齐"
-    blocked_by: "PR-1 只做语料接入；变异按不变量分组在 PR-2 加"
+    negative_test_backed: true
+    evidence: ["test_corpus.py::test_repository_rejects_extra_fields_in_raw_items", "scripts/mutation_check.py（变异注入：破坏实现后该用例确实失败）"]
   - id: "INV-V3-002"
-    negative_test_backed: false
-    evidence: ["test_corpus.py::test_select_is_deterministic"]
-    pending_test: "变异注入（MUTATIONS 表）在 PR-2 统一补齐"
-    blocked_by: "PR-1 只做语料接入；变异按不变量分组在 PR-2 加"
+    negative_test_backed: true
+    evidence: ["test_corpus.py::test_select_is_deterministic", "scripts/mutation_check.py（变异注入：破坏实现后该用例确实失败）"]
   - id: "INV-V3-003"
-    negative_test_backed: false
-    pending_test: "PR-2 实现时补反例"
-    blocked_by: "V3 实现未开始（PR-0 仅登记）"
+    negative_test_backed: true
+    evidence: ["test_v3_compliance.py::test_among_us_rejected_by_warnings_side", "scripts/mutation_check.py（变异注入：破坏实现后该用例确实失败）"]
   - id: "INV-V3-004"
-    negative_test_backed: false
-    pending_test: "PR-2 实现时补反例"
-    blocked_by: "V3 实现未开始（PR-0 仅登记）"
+    negative_test_backed: true
+    evidence: ["test_v3_compliance.py::test_age_gate_rejects_above_limit", "scripts/mutation_check.py（变异注入：破坏实现后该用例确实失败）"]
   - id: "INV-V3-005"
-    negative_test_backed: false
-    pending_test: "PR-2 实现时补反例"
-    blocked_by: "V3 实现未开始（PR-0 仅登记）"
+    negative_test_backed: true
+    evidence: ["test_v3_compliance.py::test_pipeline_order_unchanged", "scripts/mutation_check.py（变异注入：破坏实现后该用例确实失败）"]
   - id: "INV-V3-006"
-    negative_test_backed: false
-    evidence: ["test_corpus.py::test_injected_corpus_text_blocked"]
-    pending_test: "变异注入（MUTATIONS 表）在 PR-2 统一补齐"
-    blocked_by: "PR-1 只做语料接入；变异按不变量分组在 PR-2 加"
+    negative_test_backed: true
+    evidence: ["test_corpus.py::test_injected_corpus_text_blocked", "scripts/mutation_check.py（变异注入：破坏实现后该用例确实失败）"]
   - id: "INV-V3-007"
-    negative_test_backed: false
-    pending_test: "PR-2 实现时补反例"
-    blocked_by: "V3 实现未开始（PR-0 仅登记）"
+    negative_test_backed: true
+    evidence: ["test_v3_pricing.py::test_five_percent_constant_single_source", "scripts/mutation_check.py（变异注入：破坏实现后该用例确实失败）"]
   - id: "INV-V3-008"
-    negative_test_backed: false
-    pending_test: "PR-2 实现时补反例"
-    blocked_by: "V3 实现未开始（PR-0 仅登记）"
+    negative_test_backed: true
+    evidence: ["test_v3_pricing.py::test_twenty_impressions_exhaust_budget", "scripts/mutation_check.py（变异注入：破坏实现后该用例确实失败）"]
 
 summary:
   requirements_total: 41

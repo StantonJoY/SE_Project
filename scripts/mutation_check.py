@@ -289,6 +289,48 @@ MUTATIONS += (
              "check_semantic_eval:semantic_changes", "_semantic_changes_empty",
              ("test/offline/test_v2_governance.py::test_semantic_gate_tracks_real_prompt_and_auction_paths",),
              "Tests import the same first-party script module; return no triggers instead of the actual required paths."),
+
+    # ---- V3（真实语料 / 内容分级 / 定价派生）----
+    Mutation("INV-V3-001", "MUT-V3-SCHEMA-OPEN",
+             "让 AD_SCHEMA 接受额外字段（语料扩展信息可直接混进 Ad 契约）",
+             "ads.repository:AD_SCHEMA", "_ad_schema_open()",
+             ("test/offline/test_corpus.py::test_repository_rejects_extra_fields_in_raw_items",),
+             "AdRepository.load 在**调用时**读模块全局 AD_SCHEMA；打 ads.schema 对已导入引用无效"),
+    Mutation("INV-V3-002", "MUT-V3-SELECT-RANDOM",
+             "把确定性候选生成变异为**随机取前 K 条**（同输入不同输出）",
+             "corpus.select:select_candidates + corpus:select_candidates", "_select_unstable",
+             ("test/offline/test_corpus.py::test_select_is_deterministic",),
+             "测试从包级 corpus 导入该函数，故两处绑定都要替换，否则假通过"),
+    Mutation("INV-V3-003", "MUT-V3-LABELS-NO-WARNINGS",
+             "内容判据只保留 descriptors、丢掉 warnings 一侧（并集被破坏）",
+             "compliance.content_rules:ContentRules.labels_for", "_labels_descriptors_only",
+             ("test/offline/test_v3_compliance.py::test_among_us_rejected_by_warnings_side",),
+             "合规按实例方法调用，补丁打在类属性上即可；Among Us 的 descriptors 为空，只能靠 warnings 拦"),
+    Mutation("INV-V3-004", "MUT-V3-AGE-UNBOUNDED",
+             "把所有档位的年龄上限抬到 999（年龄兜底失效）",
+             "compliance.content_rules:ContentRules.tier_for", "_tier_ignore_age",
+             ("test/offline/test_v3_compliance.py::test_age_gate_rejects_above_limit",),
+             "check_scene 通过 policy.rules.tier_for(scene) 取档位，故替换该方法即生效"),
+    Mutation("INV-V3-005", "MUT-V3-ORDER-SWAP",
+             "把合规五步的顺序改成 scene 优先（权威链顺序被破坏）",
+             "compliance.pipeline:run_compliance + app.pipeline:run_compliance", "_run_compliance_reordered",
+             ("test/offline/test_v3_compliance.py::test_pipeline_order_unchanged",),
+             "app.pipeline 在 import 时固定了 run_compliance 引用，两处都要替换"),
+    Mutation("INV-V3-006", "MUT-V3-INJECTION-CLEAN",
+             "把 pre-model 注入门变异为恒判干净（语料文本中的注入可抵达 LLM）",
+             "app.sanitize:scan_for_injection + app.pipeline:scan_for_injection", "lambda text: _clean()",
+             ("test/offline/test_corpus.py::test_injected_corpus_text_blocked",),
+             "与 INV-ADS-005 同一处接线，但这里验证的是**语料文本**这条路径"),
+    Mutation("INV-V3-007", "MUT-V3-BID-TEN-PERCENT",
+             "把广告费率从 5% 改成 10%（派生口径被破坏）",
+             "corpus.pricing:bid_cents_from_price", "_bid_ten_percent",
+             ("test/offline/test_v3_pricing.py::test_bid_is_five_percent_of_price",),
+             "出价由该函数唯一派生；测试直接断言具体数值，改比例必然红"),
+    Mutation("INV-V3-008", "MUT-V3-SEED-UNBOUNDED",
+             "给每笔报价灌入 100 倍预算（「20 次恰好耗尽」不再成立）",
+             "bidding.ledger:Ledger.seed", "_seed_unbounded",
+             ("test/offline/test_v3_pricing.py::test_twenty_impressions_exhaust_budget",),
+             "预算在 seed 时落到账本；放大后 20 次后仍有余额，耗尽断言必红"),
 )
 
 
@@ -625,6 +667,79 @@ def _semantic_changes_empty(changed):
     return []
 
 
+def _ad_schema_open():
+    """返回放开 `additionalProperties` 的 AD_SCHEMA（违反 INV-V3-001）。"""
+    import copy as _copy
+
+    from ads.schema import AD_SCHEMA as _schema
+
+    schema = _copy.deepcopy(_schema)
+    schema["additionalProperties"] = True
+    return schema
+
+
+def _select_unstable(scene, items, mapping, k):
+    """随机取前 K 条，破坏候选生成的确定性（违反 INV-V3-002）。"""
+    picked = list(items)
+    random.shuffle(picked)
+    return picked[: max(0, k)]
+
+
+def _labels_descriptors_only(self, facts):
+    """只映射 descriptors、丢掉 warnings（违反 INV-V3-003 的并集判据）。"""
+    labels = set()
+    for code in facts.content_descriptors:
+        labels.update(self.descriptor_labels.get(int(code), ()))
+    return frozenset(labels)
+
+
+def _tier_ignore_age(self, scene):
+    """所有档位的年龄上限抬到 999（违反 INV-V3-004）。"""
+    import dataclasses as _dc
+
+    tier = self.tiers[self.default_tier]
+    return _dc.replace(tier, max_age=999)
+
+
+def _run_compliance_reordered(ad, scene, candidates, banned_words, rules, policy=None):
+    """把 scene 检查提到第一位（违反 INV-V3-005 的五步顺序）。"""
+    from compliance import pipeline as _p
+
+    results = (
+        _p.check_scene(ad, scene, rules, policy),
+        _p.check_output(ad, candidates),
+        _p.check_banned_words(ad, banned_words),
+        _p.check_banned_check(ad),
+        _p.check_category(ad, rules),
+    )
+    return _p.ComplianceVerdict(approved=all(r.ok for r in results), results=results)
+
+
+def _bid_ten_percent(price_cents):
+    """把广告费率改成 10%（违反 INV-V3-007）。"""
+    if not price_cents or price_cents <= 0:
+        return 1
+    return max(1, round(price_cents * 0.10))
+
+
+def _seed_unbounded(self, bids):
+    """给每笔报价灌入 100 倍预算（违反 INV-V3-008）。"""
+    from bidding.models import Bid as _Bid
+
+    inflated = {
+        ad_id: _Bid(
+            ad_id=bid.ad_id,
+            bid_cents=bid.bid_cents,
+            budget_cents=bid.budget_cents * 100,
+            bid_floor=bid.bid_floor,
+            bid_ceiling=bid.bid_ceiling,
+            status=bid.status,
+        )
+        for ad_id, bid in bids.items()
+    }
+    return _ORIGINALS[("bidding.ledger", "Ledger.seed")](self, inflated)
+
+
 def _winner_bindings(payload):
     return [("bidding.engine", "choose_winner", payload), ("bidding", "choose_winner", payload)]
 
@@ -833,3 +948,30 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+REPLACEMENTS.update({
+    "MUT-V3-SCHEMA-OPEN": [("ads.repository", "AD_SCHEMA", _ad_schema_open())],
+    "MUT-V3-SELECT-RANDOM": [
+        ("corpus.select", "select_candidates", _select_unstable),
+        ("corpus", "select_candidates", _select_unstable),
+    ],
+    "MUT-V3-LABELS-NO-WARNINGS": [
+        ("compliance.content_rules", "ContentRules.labels_for", _labels_descriptors_only),
+    ],
+    "MUT-V3-AGE-UNBOUNDED": [
+        ("compliance.content_rules", "ContentRules.tier_for", _tier_ignore_age),
+    ],
+    "MUT-V3-ORDER-SWAP": [
+        ("compliance.pipeline", "run_compliance", _run_compliance_reordered),
+        ("app.pipeline", "run_compliance", _run_compliance_reordered),
+    ],
+    "MUT-V3-INJECTION-CLEAN": [
+        ("app.sanitize", "scan_for_injection", lambda text: _clean()),
+        ("app.pipeline", "scan_for_injection", lambda text: _clean()),
+    ],
+    "MUT-V3-BID-TEN-PERCENT": [
+        ("corpus.pricing", "bid_cents_from_price", _bid_ten_percent),
+    ],
+    "MUT-V3-SEED-UNBOUNDED": [("bidding.ledger", "Ledger.seed", _seed_unbounded)],
+})
+
