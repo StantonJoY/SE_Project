@@ -26,6 +26,7 @@ from pathlib import Path
 
 import jsonschema
 import pytest
+from jsonschema import Draft202012Validator
 
 from ads.banned_words import BannedWords
 from ads.repository import AdRepository
@@ -179,13 +180,17 @@ def test_subset_selection_is_deterministic_and_covers_boundaries():
 
 # ---------------------------------------------------------------- 投影（ARCH-013 / FR-010）
 def test_projection_all_pass_ad_schema(projected, corpus):
-    """REQ-ADS-ARCH-013：**全部**子集条目投影后通过 AD_SCHEMA 与 AdRepository。"""
+    """REQ-ADS-ARCH-013：**全部**子集条目投影后通过 AD_SCHEMA 与 AdRepository。
+
+    复用同一个 validator 实例：`jsonschema.validate()` 每次调用都会重建校验器，
+    5,000 条时会把一次测试拖到 27 秒（实测）；复用后约 1 秒，且仍是全量校验。
+    """
     ads, facts = projected
     assert len(ads) == corpus.count == len(facts)
+    validator = Draft202012Validator(AD_SCHEMA)
     for ad in ads:
-        jsonschema.validate(
-            instance=asdict(ad) | {"scene_restrictions": asdict(ad.scene_restrictions)}, schema=AD_SCHEMA
-        )
+        instance = asdict(ad) | {"scene_restrictions": asdict(ad.scene_restrictions)}
+        validator.validate(instance)
     assert AdRepository(ads).count == corpus.count
 
 
