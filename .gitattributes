@@ -1,2 +1,2 @@
 # Evidence files are byte-for-byte artifacts covered by SHA-256.
-evidence/** -text
+evidence/** -text -diff

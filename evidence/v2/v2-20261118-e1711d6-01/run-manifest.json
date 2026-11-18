@@ -1,4 +1,11 @@
 {
+  "demo": {
+  "status": "COMPLETED",
+  "screenshot_count": 11,
+  "command_file_count": 12,
+  "script_document": "docs/testing/V2-Demo-Script.md",
+  "screenshots_document": "docs/testing/V2-Demo-Screenshots.md"
+},
   "run_id": "v2-20261118-e1711d6-01",
   "mode": "offline_plus_live",
   "scope": "V2 auction, settlement, safety, V1 regression, operational live validation",

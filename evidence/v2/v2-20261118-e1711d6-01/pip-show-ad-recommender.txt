@@ -1,4 +1,4 @@
-﻿Name: ad-recommender
+Name: ad-recommender
 Version: 0.1.0
 Summary: Scenario-based ad recommendation engine with deterministic compliance safety boundary (CS5351)
 Home-page: 

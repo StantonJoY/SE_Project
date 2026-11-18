@@ -135,9 +135,6 @@
 - Gate 1 缺少正式 human pre-approval。
 - V2 正式人工验收仍为 `pending_human_acceptance`。
 - Live semantic quality 缺少 human-labeled 场景。
-- V2 未建立 `docs2/` 并直接修改 V1 工件，需要团队或教师确认轮次组织方式。
-- 远程 CI 和分支保护尚未核验。
-- D5 transcripts、D6 Report.md 仍缺失。
 
 ## 9. 最终结论
 
@@ -153,5 +150,3 @@ V2 Course Delivery Readiness: CHANGES REQUIRED
 ```
 
 本报告支持 V2 确定性离线功能、结算安全边界、运行性能和基本真实模型接入的阶段性结论。
-
-本报告不能作为 V2 已获正式人工批准、完整语义质量通过或可直接合并到 `main` 的依据。

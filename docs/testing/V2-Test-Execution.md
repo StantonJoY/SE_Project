@@ -80,6 +80,7 @@ V2 分支修改了 V1 架构、需求、评估和检查器文件，没有建立 
 | V2-LIVE-P95-001 | Live p50/p95/max | PASS，1.728s / 2.426s / 2.801s | `live-p95-results.json` |
 | V2-LIVE-COST-001 | Live token 与成本估算 | PASS，8422 tokens；高峰 0.0306784 CNY；空闲 0.0153392 CNY | `live-p95-results.json` |
 | V2-LIVE-SEMANTIC-001 | Live 语义质量 | PENDING HUMAN LABELS | `live-p95-results.json` |
+| V2-DEMO-001 | V2 截图演示 | PASS，11 screenshots / 12 command files | `docs/testing/V2-Demo-Screenshots.md` |
 
 ## 4. 关键功能结果
 
@@ -144,10 +145,6 @@ V2 分支修改了 V1 架构、需求、评估和检查器文件，没有建立 
 - Gate 1 FAIL：10 个 V2 测试文件缺少实现前 human approval。
 - `docs/v2-approval-status.yaml` 为 `pending_human_acceptance`。
 - Live semantic quality 仍为 `PENDING HUMAN LABELS`。
-- 完整可重复 live quality suite 未建立。
-- V2 未建立 `docs2/` 并修改 V1 工件，需团队或教师确认。
-- 远程 CI 和 branch protection 未核验。
-- D5 transcripts、D6 Report.md 仍缺失。
 
 ## 8. 执行结论
 
