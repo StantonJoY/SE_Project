@@ -1,0 +1,20 @@
+{
+  "ad": {
+    "ad_id": "ad_002",
+    "category": "food_delivery",
+    "copy": "早起十分钟，热粥配包子",
+    "title": "晨间早餐套餐"
+  },
+  "auction": {
+    "bid_cents": 200,
+    "budget_after_cents": 400,
+    "budget_before_cents": 600,
+    "price_cents": 200,
+    "relevance": 95,
+    "score": 19000
+  },
+  "audit_id": "aud-v2-e201442fa072ca4e4599ebe5",
+  "explanation": "Morning breakfast delivery matches the morning time slot and targets students.",
+  "kind": "ad",
+  "request_id": "v2-live-smoke-2"
+}

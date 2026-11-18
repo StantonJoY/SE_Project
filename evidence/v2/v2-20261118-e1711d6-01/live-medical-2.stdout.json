@@ -1,0 +1,7 @@
+{
+  "audit_id": "aud-v2-7683596c8dd3deca049e63b6",
+  "detail": "Deterministic compliance rejected rule category.",
+  "kind": "no_ad",
+  "reason_code": "compliance_rejected",
+  "request_id": "v2-live-medical-2"
+}

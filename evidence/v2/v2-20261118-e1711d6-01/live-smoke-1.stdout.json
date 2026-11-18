@@ -1,0 +1,7 @@
+{
+  "audit_id": "aud-v2-4fc5a5bd28db71eb58a109a3",
+  "detail": "Relevance provider failed; no auction was accepted.",
+  "kind": "no_ad",
+  "reason_code": "llm_error",
+  "request_id": "v2-live-smoke-1"
+}

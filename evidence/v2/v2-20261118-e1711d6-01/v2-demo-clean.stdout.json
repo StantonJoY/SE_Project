@@ -1,0 +1,168 @@
+{
+  "provider": "fixed_offline",
+  "live_provider_tested": false,
+  "scene": {
+    "time_slot": "morning",
+    "device": "mobile",
+    "user_tags": [
+      "student"
+    ]
+  },
+  "scenario_count": 7,
+  "passed": true,
+  "scenarios": [
+    {
+      "scenario": "normal_ad_001_wins",
+      "result": {
+        "ad": {
+          "ad_id": "ad_001",
+          "category": "food_delivery",
+          "copy": "加班夜，一杯热美式送到家",
+          "title": "深夜咖啡外卖"
+        },
+        "auction": {
+          "bid_cents": 120,
+          "budget_after_cents": 120,
+          "budget_before_cents": 240,
+          "price_cents": 120,
+          "relevance": 90,
+          "score": 10800
+        },
+        "audit_id": "aud-v2-4ae5e28d8f88aca075c2c9fc",
+        "explanation": "Fixed offline relevance fixture.",
+        "kind": "ad",
+        "request_id": "normal-1"
+      }
+    },
+    {
+      "scenario": "repeat_id_no_extra_charge",
+      "result": {
+        "ad": {
+          "ad_id": "ad_001",
+          "category": "food_delivery",
+          "copy": "加班夜，一杯热美式送到家",
+          "title": "深夜咖啡外卖"
+        },
+        "auction": {
+          "bid_cents": 120,
+          "budget_after_cents": 120,
+          "budget_before_cents": 240,
+          "price_cents": 120,
+          "relevance": 90,
+          "score": 10800
+        },
+        "audit_id": "aud-v2-4ae5e28d8f88aca075c2c9fc",
+        "explanation": "Fixed offline relevance fixture.",
+        "kind": "ad",
+        "request_id": "normal-1"
+      }
+    },
+    {
+      "scenario": "second_spend_exhausts_ad_001",
+      "result": {
+        "ad": {
+          "ad_id": "ad_001",
+          "category": "food_delivery",
+          "copy": "加班夜，一杯热美式送到家",
+          "title": "深夜咖啡外卖"
+        },
+        "auction": {
+          "bid_cents": 120,
+          "budget_after_cents": 0,
+          "budget_before_cents": 120,
+          "price_cents": 120,
+          "relevance": 90,
+          "score": 10800
+        },
+        "audit_id": "aud-v2-c7170fc083cac72af65a46dd",
+        "explanation": "Fixed offline relevance fixture.",
+        "kind": "ad",
+        "request_id": "normal-2"
+      }
+    },
+    {
+      "scenario": "next_eligible_ad_002",
+      "result": {
+        "ad": {
+          "ad_id": "ad_002",
+          "category": "food_delivery",
+          "copy": "早起十分钟，热粥配包子",
+          "title": "晨间早餐套餐"
+        },
+        "auction": {
+          "bid_cents": 200,
+          "budget_after_cents": 400,
+          "budget_before_cents": 600,
+          "price_cents": 200,
+          "relevance": 50,
+          "score": 10000
+        },
+        "audit_id": "aud-v2-462e02c399730f5cdaecc5a2",
+        "explanation": "Fixed offline relevance fixture.",
+        "kind": "ad",
+        "request_id": "normal-3"
+      }
+    },
+    {
+      "scenario": "restart_preserves_spend_and_replay",
+      "result": {
+        "ad": {
+          "ad_id": "ad_002",
+          "category": "food_delivery",
+          "copy": "早起十分钟，热粥配包子",
+          "title": "晨间早餐套餐"
+        },
+        "auction": {
+          "bid_cents": 200,
+          "budget_after_cents": 400,
+          "budget_before_cents": 600,
+          "price_cents": 200,
+          "relevance": 50,
+          "score": 10000
+        },
+        "audit_id": "aud-v2-462e02c399730f5cdaecc5a2",
+        "explanation": "Fixed offline relevance fixture.",
+        "kind": "ad",
+        "request_id": "normal-3"
+      }
+    },
+    {
+      "scenario": "medical_compliance_reject_zero_charge",
+      "result": {
+        "audit_id": "aud-v2-91e13ef88f455d5ffbf9c8c2",
+        "detail": "Deterministic compliance rejected rule category.",
+        "kind": "no_ad",
+        "reason_code": "compliance_rejected",
+        "request_id": "medical-1"
+      },
+      "observed_spent_cents": 0
+    },
+    {
+      "scenario": "transaction_fault_rolls_back_zero_observed_charge",
+      "result": {
+        "kind": "status_unknown",
+        "request_id": "fault-1",
+        "retry_same_request": true,
+        "detail": "Storage outcome is unknown; retry the identical request with the same request_id. No charge amount is asserted."
+      },
+      "observed_spent_cents": 0,
+      "observed_audit_count": 0
+    }
+  ],
+  "main_budgets": {
+    "ad_001": {
+      "total_cents": 240,
+      "spent_cents": 240,
+      "remaining_cents": 0,
+      "status": "exhausted"
+    },
+    "ad_002": {
+      "total_cents": 600,
+      "spent_cents": 200,
+      "remaining_cents": 400,
+      "status": "active"
+    }
+  },
+  "main_audit_count": 3,
+  "total_observed_spend_cents": 440
+}
