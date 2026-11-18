@@ -25,6 +25,7 @@ from .context import (
     BudgetMode,
     ContextAssembler,
     count_tokens,
+    format_scene_summary,
     route_budget,
 )
 from .explanation import (
@@ -55,6 +56,7 @@ __all__ = [
     "PROMPT_TEMPLATE_VERSION",
     "route_budget",
     "count_tokens",
+    "format_scene_summary",
     # 解释路径
     "generate_explanation",
     "verify_explanation",

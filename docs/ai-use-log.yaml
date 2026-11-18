@@ -417,3 +417,25 @@ entries:
     evidence: "docs/review-memo.md"
     review_kind: "ai_proxy"
     notes: "两次 CityU 生成均通过场景验收。正常成交写入一条审计，重复请求返回相同结果，医疗品类被确定性拒绝且余额不变。本地钩子已安装并通过暂存预演。工程实现的前置人工批准状态未变。"
+
+  - id: "AIU-0028"
+    date: "2026-11-18"
+    agent: "DeepSeek Harness（deepseek-flash）编码 agent"
+    tool: "DSH Desktop + 本地 pytest / 门禁脚本"
+    role: "build"
+    task: "V3 真实语料接入：5,000 条子集、投影旁路、确定性 top-K、场景内容分级、5% 定价接入 V2、V3 评估分区、提示词语义对齐"
+    artifacts:
+      - "src/corpus/（models/repository/projection/select/pricing/config）"
+      - "src/compliance/content_rules.py"
+      - "data/corpus/{items,tags}.jsonl + manifest.json"
+      - "data/bids-corpus.json + data/scene-content-rules.yaml"
+      - "config-v3.yaml + eval/v3_runner.py + docs/HANDOVER-V3.md"
+      - "docs/architecture/adr-006-v3-corpus-boundary.md"
+    outcome: "pending"
+    evidence: "docs/HANDOVER-V3.md；eval/v3_runner.py 14/14；pytest 675 passed；mutation_check 33/33"
+    review_kind: "ai_proxy"
+    notes: >-
+      全部实现由 AI 完成，人类仅下达目标与口径决定（5% 广告费、5,000 条规模、是否建库）。
+      正式验收仍为 pending：TA-0005 具名人类测试批准未签、ADR-006 仍为 Proposed。
+      提示词只做事实性对齐（场景语义、禁用外部知识、HISTORY 去噪），未做效果调优——
+      离线 replay 用 MockLLM，不读语义，无法证明"选得更准"；效果调优待真实模型接入后另做。

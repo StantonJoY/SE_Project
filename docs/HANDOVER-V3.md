@@ -181,7 +181,73 @@ python scripts/build_bids_v3.py
 
 ---
 
-## 10. 待办（不在本轮代码范围）
+## 10. 提示词现状（ADR-006 D9，**测试同学重点看**）
+
+### 10.1 它长什么样
+
+V1 是**六层**结构（`## SYSTEM / ## INSTRUCTIONS / ## RETRIEVED / ## HISTORY / ## STATE / ## USER`）：
+
+```
+## INSTRUCTIONS
+约束（不可协商）：
+1) 只能从候选列表中选择 ad_id，不得输出列表之外的任何条目；
+2) 不得自创或改写候选条目的标题、品类与标签；
+3) 必须输出 JSON，字段恰为 ad_id / reason / confidence，不得增减字段；
+4) 你的输出仅为建议，是否展示由确定性合规层裁决；
+5) 只依据候选行给出的品类与标签判断匹配度，**不得使用你对这些作品的外部知识**。
+
+## RETRIEVED
+- ad_115100 | RPG | Costume Quest | tags: Fantasy,Comedy,Turn-Based Combat,...
+（30 行，V1 K=30）
+
+## HISTORY
+[HISTORY] 不适用（无状态单轮推荐）
+
+## STATE
+[场景] 时段=afternoon（下午） / 设备=desktop（桌面） / 用户标签=family；家庭场景，偏好温和、合家欢内容
+```
+
+V2 是两段（system + 一段 JSON 用户消息），只传 4 个候选，`relevance` 定义为"与场景标签的匹配度，
+**不是**作品知名度。
+
+### 10.2 本轮改了什么（只改事实缺陷，不做调优）
+
+| # | 改动 | 为什么 |
+|---|---|---|
+| 1 | 场景摘要带语义（`family` → "家庭场景，偏好温和内容"） | 原来只给裸枚举，模型不知道含义 |
+| 2 | 「广告」→「候选条目（本轮素材为游戏条目）」 | 语义漂移 |
+| 3 | 新增第 5 条约束：**不得使用对外部知识** | 名作先验会压过标签匹配 |
+| 4 | `HISTORY` 层去掉内部文档路径，缩成一行 | 纯噪音、占预算 |
+
+版本号：`PROMPT_TEMPLATE_VERSION = ctx-v1.1`、`RELEVANCE_PROMPT_VERSION = relevance-v2.2`
+（审计的 `provenance.prompt_version` 会记录，便于以后对比）。
+
+**明确没做**：没把合规禁项写进 prompt（那是合规的职责），没加摘要/示例（预算不够）。
+
+### 10.3 交给测试同学的验证清单
+
+> 前提：离线 replay 用的是 `MockLLM`（按字典序选 `ad_id`），**改 prompt 对离线结果零影响**。
+> 下面这些只能在**真实模型**下做（P8 接入后）。
+
+| # | 怎么测 | 想证明什么 |
+|---|---|---|
+| 1 | 同一场景跑 20 次，统计"选中条目的标签命中数"分布 | 模型是按标签匹配选，还是在乱选 |
+| 2 | 造 5 条**标题诱导**样本（标题写 "Family Fun" 但标签是 `Gore`），看模型是否被标题带偏 | 外部知识/标题先验是否仍占上风 |
+| 3 | 造 5 条**名作对照**（`Counter-Strike 2` vs 冷门但标签更匹配的条目） | 是否按标签而不是知名度 |
+| 4 | 检查审计 `provenance.prompt_version` | 确认用的是 `ctx-v1.1` / `relevance-v2.2` |
+| 5 | 回归：`eval_runner.py` / `v2_runner.py` / `v3_runner.py` | 改 prompt 后旧分区不退化 |
+
+### 10.4 改 prompt 的红线（别踩）
+
+1. **不要动输出 schema**（`ad_id / reason / confidence`、`scores[]`）——解析器是严格闭集；
+2. **不要把合规禁项写进 prompt**——安全边界在合规层，不由模型自律；
+3. **改完必须 bump 版本号**并重跑三套 replay（`check_semantic_eval.py` 会因 prompt 变更而触发）；
+4. **不要在 `RETRIEVED` 里塞长文本**——V1 已用 1567/2000 token，再加就触发压缩甚至 `budget_exceeded`；
+5. **不要用离线 Mock 结果证明"prompt 变好了"**——它根本不读语义。
+
+---
+
+## 11. 待办（不在本轮代码范围）
 
 | 项 | 说明 |
 |---|---|

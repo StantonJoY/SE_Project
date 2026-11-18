@@ -52,27 +52,63 @@ COMPACTION_THRESHOLD_RATIO = 0.85
 # 语义：**模板结构**变化时递增（层级增删、standing constraints 改写、渲染顺序调整）。
 # 普通文案微调不改版本号，除非影响约束的表述。
 # 该常量由 `app.pipeline` 写审计记录的 `provenance.prompt_version`。
-PROMPT_TEMPLATE_VERSION = "ctx-v1"
+PROMPT_TEMPLATE_VERSION = "ctx-v1.1"
 
 # HISTORY 在 V1 的显式声明（不得默默省略）
-HISTORY_NOT_APPLICABLE = (
-    "[HISTORY — 不适用] V1 为无状态单轮推荐，不存在对话或轮次历史；"
-    "该层恒为空。理由见 docs/architecture/memory-design.md §3。"
-)
+# V3 起改为一行短句：原版带内部文档路径（docs/architecture/...），对模型无意义、纯占预算。
+HISTORY_NOT_APPLICABLE = "[HISTORY] 不适用（无状态单轮推荐）"
+
+# 场景语义提示（V3，ADR-006 D9）：模型只看到 afternoon/desktop/family 这类枚举时无从判断场景含义，
+# 会把 family 当成普通标签。这里只给**场景语义**，**不给合规禁项**——
+# 禁项由合规层裁决（security boundary），prompt 不得替代它做安全决策。
+TIME_SEMANTICS = {
+    "morning": "上午",
+    "afternoon": "下午",
+    "evening": "傍晚",
+    "night": "夜间",
+}
+DEVICE_SEMANTICS = {"mobile": "手机", "desktop": "桌面", "tablet": "平板"}
+TAG_SEMANTICS = {
+    "family": "家庭场景，偏好温和、合家欢内容",
+    "parent": "家庭场景，偏好温和、合家欢内容",
+    "student": "校园场景，公共场合使用，内容需适合学生群体",
+    "teacher": "校园场景，公共场合使用",
+    "gamer": "竞技/硬核玩家场景，可接受高强度内容",
+    "esports": "竞技场景，可接受高强度内容",
+}
+
+
+def format_scene_summary(scene) -> str:
+    """把场景对象渲染成带语义的摘要（V3）。
+
+    输出示例：`时段=afternoon（下午）/ 设备=desktop（桌面）/ 用户标签=family；家庭场景…`
+    scene 使用 duck-typing（time_slot / device / user_tags），与 `AdRepository.filter_by_scene` 一致。
+    """
+    tags = list(scene.user_tags or [])
+    parts = [
+        f"时段={scene.time_slot}（{TIME_SEMANTICS.get(scene.time_slot, '未标注')}）",
+        f"设备={scene.device}（{DEVICE_SEMANTICS.get(scene.device, '未标注')}）",
+        f"用户标签={','.join(tags) or '无'}",
+    ]
+    hint = next((TAG_SEMANTICS[t] for t in tags if t in TAG_SEMANTICS), None)
+    return " / ".join(parts) + (f"；{hint}" if hint else "")
+
 
 # 层 2 的 standing constraints —— **compaction 后必须重新注入**
 # 内容即闭集与权威边界的最小陈述（INV-ADS-002 / INV-ADS-004）。
 STANDING_CONSTRAINTS = (
     "约束（不可协商）：\n"
-    "1) 只能从候选列表中选择 ad_id，不得输出列表之外的任何广告；\n"
-    "2) 不得自创或改写广告文案；\n"
+    "1) 只能从候选列表中选择 ad_id，不得输出列表之外的任何条目；\n"
+    "2) 不得自创或改写候选条目的标题、品类与标签；\n"
     "3) 必须输出 JSON，字段恰为 ad_id / reason / confidence，不得增减字段；\n"
-    "4) 你的输出仅为建议，是否展示由确定性合规层裁决。"
+    "4) 你的输出仅为建议，是否展示由确定性合规层裁决；\n"
+    "5) 只依据候选行给出的品类与标签判断匹配度，**不得使用你对这些作品的外部知识**"
+    "（不要因为听过某个作品就认为它更合适）。"
 )
 
 SYSTEM_PROMPT = (
-    "你是场景化广告推荐系统的候选选择器，"
-    "职责是在给定场景与候选集内选择一条最合适的广告并说明理由。"
+    "你是场景化推荐系统的候选选择器，"
+    "职责是在给定场景与候选集内选择一条最合适的候选条目（本轮素材为游戏条目）并说明理由。"
     "你不拥有展示与否的最终决定权。"
 )
 
