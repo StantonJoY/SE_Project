@@ -247,7 +247,9 @@ V3 在 `docs/architecture/` 原地追加（理由见 ADR-006）。下表 18 条�
 
 | 需求 | 状态 | 强制组件 / 不变量 | 测试证据（计划） | 运行时 monitor（计划） |
 |---|---|---|---|---|
-| `REQ-ADS-FR-009` | specified（PR-1 实现） | `corpus.repository.CorpusRepository / INV-V3-001` | `test_corpus.py::test_load_thirty_items` | 候选语料条目数、被跳过条目数 |
+| `REQ-ADS-FR-009` | implemented（V3） | `corpus.repository.CorpusRepository / INV-V3-001` | `test_corpus.py::test_load_matches_file_line_count` | 候选语料条目数、被跳过条目数 |
+| `REQ-ADS-FR-013` | implemented（V3） | `scripts.build_corpus_subset.select_subset` | `test_corpus.py::test_subset_manifest_matches_committed_files` | manifest rows / SHA-256 与实际文件一致 |
+| `REQ-ADS-FR-014` | implemented（V3） | `app.cli.load_corpus_repository` | `test_corpus.py::test_cli_corpus_repository_wiring` | 候选数 = top_k；请求耗时 ≤ 500 ms |
 | `REQ-ADS-ARCH-013` | specified（PR-1 实现） | `corpus.projection.corpus_to_ad / INV-V3-001` | `test_corpus.py::test_raw_corpus_item_rejected_by_ad_schema` | 投影通过 AD_SCHEMA 的条数、失败原因 |
 | `REQ-ADS-FR-010` | specified（PR-1 实现） | `corpus.projection.corpus_to_ad` | `test_corpus.py::test_projection_empty_genres_fallback` | category 三级兜底命中次数 |
 | `REQ-ADS-FR-011` | specified（PR-1 实现） | `corpus.select.select_candidates / INV-V3-002` | `test_corpus.py::test_select_is_deterministic` | top-K 规模、命中标签数分布 |

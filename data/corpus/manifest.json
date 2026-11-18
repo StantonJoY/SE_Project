@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "generator": "scripts/build_corpus_subset.py",
+  "source": {
+    "items_rows": 25899,
+    "tags_rows": 25899,
+    "items_file_bytes": 82495125
+  },
+  "subset": {
+    "rows": 5000,
+    "items_file": "items.jsonl",
+    "tags_file": "tags.jsonl",
+    "items_sha256": "1ac42a497d024a9882ea1ed6d1506295278db29ea807e28b4ae3051076302e61",
+    "tags_sha256": "56b242b58baaa13260b2455eaeb29fb464ef22aa47d9a49160cc8c5f33f9b267"
+  },
+  "rules": {
+    "deterministic": true,
+    "must_include": [
+      "demo_ids",
+      "empty_genres(all)",
+      "required_age>=13(all)"
+    ],
+    "quotas": {
+      "descriptors_per_combo": 200,
+      "free_games": 200,
+      "remaining": "round-robin by primary genre"
+    },
+    "stripped_fields": [
+      "description_clean"
+    ],
+    "kept_item_fields": [
+      "item_id",
+      "name",
+      "genres",
+      "native_tags",
+      "required_age",
+      "content_descriptors",
+      "review_count",
+      "price_final",
+      "is_free"
+    ],
+    "kept_tag_fields": [
+      "item_id",
+      "summary",
+      "tags",
+      "model",
+      "prompt_ver",
+      "vocab_ver"
+    ]
+  },
+  "composition": {
+    "age_gated": 707,
+    "genre:Simulation": 477,
+    "genre:Strategy": 470,
+    "genre:Indie": 440,
+    "genre:Casual": 426,
+    "genre:RPG": 425,
+    "genre:Adventure": 402,
+    "genre:Action": 265,
+    "descriptors:[1, 2, 5]": 200,
+    "descriptors:[1, 5]": 200,
+    "descriptors:[2, 5]": 200,
+    "descriptors:[5]": 200,
+    "free": 200,
+    "genre:Racing": 173,
+    "genre:Massively Multiplayer": 55,
+    "genre:Free To Play": 45,
+    "genre:Sports": 33,
+    "empty_genres": 32,
+    "demo": 30,
+    "genre:Violent": 12,
+    "genre:Sexual Content": 5,
+    "genre:Education": 1,
+    "genre:Early Access": 1,
+    "genre:Nudity": 1
+  }
+}

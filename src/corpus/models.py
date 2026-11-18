@@ -41,6 +41,9 @@ class CorpusItem:
     content_descriptors: tuple[int, ...]
     review_count: int
     tags: Mapping[str, tuple[str, ...]]
+    #: 定价（美分）。`None` 表示"没有价格信息"，与"免费（0）"是**不同语义**（数据契约 §2 坑 1）。
+    price_cents: int | None = None
+    is_free: bool = False
 
     @property
     def content_warnings(self) -> tuple[str, ...]:

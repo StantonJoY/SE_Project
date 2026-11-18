@@ -944,7 +944,7 @@ baseline_requirements:
     type: "functional"
     statement: "新增只读 CorpusRepository，从 items.jsonl 与 tags.jsonl 加载真实语料；只加载轻字段，明确不加载 description_clean。"
     priority: "must"
-    fit_criterion: "加载 30 条样本成功且行数一致；加载后的对象不包含 description_clean 属性；src/corpus/ 对 audit/selector/compliance 零 import。"
+    fit_criterion: "加载条数与 items.jsonl 行数一致（相对量，不写死具体数字）；当前子集 5,000 条；加载后的对象不包含 description_clean 属性；src/corpus/ 对 audit/selector/compliance 零 import。"
     verification: ["unit_test", "negative_test", "static_analysis"]
     enforced_by: "corpus.repository.CorpusRepository"
     enforcement: ["corpus.repository.CorpusRepository", "corpus.models.CorpusItem"]
@@ -1226,6 +1226,36 @@ baseline_requirements:
       - {source: "req_v3_draft", locator: "docs/req/requirements-v3-se.md"}
     status: "specified"
     notes: "草案编号 REQ-V3-SE-17，演示级口径。"
+  - id: "REQ-ADS-FR-013"
+    version: "V3"
+    type: "functional"
+    statement: "提供可复现的语料子集构建脚本：确定性分层抽样、必含边界样本、剥离 description_clean 与无关字段、产出 manifest（来源行数、规则、SHA-256）。"
+    priority: "must"
+    fit_criterion: "双跑产物逐字节一致；genres 为空与 required_age>=13 的条目全部包含；每个 content_descriptors 组合至少 200 条；manifest 的 rows 与两份文件 SHA-256 与产物一致；子集不超过 6 MB。"
+    verification: ["unit_test", "deterministic_replay", "schema_validation"]
+    enforced_by: "scripts.build_corpus_subset.select_subset"
+    enforcement: ["scripts.build_corpus_subset.select_subset"]
+    asr: false
+    source_refs:
+      - {source: "req_v3_draft", locator: "requirements-v3-se.md §1.1 + ADR-006 D7"}
+    status: "implemented"
+    notes: "全量 25,899 条 → 5,000 条；入库 5.5 MB。抽样规则与产物 hash 见 data/corpus/manifest.json。"
+
+  - id: "REQ-ADS-FR-014"
+    version: "V3"
+    type: "functional"
+    statement: "真实语料接入既有编排：按场景选 top-K 语料、投影成 Ad 后交给 pipeline.recommend，不改动管道签名与权威链。"
+    priority: "must"
+    fit_criterion: "以 --corpus 运行端到端返回 ad 或结构化 no_ad；候选数等于 top_k；单次请求（含 5,000 条加载、选候选、投影）不超过 500 ms；非法场景仍返回 scene_invalid 而非在接线层吞掉。"
+    verification: ["unit_test", "deterministic_replay"]
+    enforced_by: "app.cli.load_corpus_repository"
+    enforcement: ["app.cli.load_corpus_repository", "corpus.select.select_candidates"]
+    asr: false
+    source_refs:
+      - {source: "req_v3_draft", locator: "requirements-v3-se.md §1.6"}
+    status: "implemented"
+    notes: "实测：加载 180 ms + 选候选 39 ms + 投影 0.2 ms ≈ 220 ms（不含解释器启动）。"
+
 candidate_requirements: []
 
 legacy_id_map:

@@ -32,7 +32,7 @@ V1 用 14 条手写素材、V2 在其上加了竞价与原子结算。课程要�
 
 **理由**：验证平面（`validate_requirements.py`、`fitness_functions.py`、`check_safety_paths.py`、
 `acceptance-coverage-map.yaml`）全部绑定 `docs/req/` 与 `docs/architecture/` 路径。
-新建 `docs3/` 会让 V3 的 18 条需求**脱离所有自动化校验**——这比"轮次目录不整齐"危险得多。
+新建 `docs3/` 会让 V3 的 20 条需求**脱离所有自动化校验**——这比"轮次目录不整齐"危险得多。
 V2 已有先例（ADR-005 放在 `docs/architecture/`，未建 `docs2/`），本轮延续并在 `evolution_rounds` 显式登记 V3。
 
 **代价**：`docs/` 里同时存在三轮工件。缓解：所有 V3 条目带 `version: "V3"`，小节标题标 `V3 增量`。
@@ -76,6 +76,25 @@ V2 已有先例（ADR-005 放在 `docs/architecture/`，未建 `docs2/`），本
 ### D6 · 不引入新的外部依赖
 
 无数据库、无向量库、无网络。语料是 JSONL，索引在内存构建；与 V1/V2 的零外部依赖约定一致。
+
+### D7 · 数据规模与存储：5,000 条本地 JSONL，不建库
+
+全量 25,899 条（items 82.5 MB / tags 18.9 MB）**不进仓库**，也不导入数据库：
+
+| 决策 | 取值 | 理由 |
+|---|---|---|
+| 入库规模 | **5,000 条**（items 2.1 MB + tags 3.4 MB） | 仓库体积可控；边界样本足够；CI 不依赖外部 zip |
+| 抽样方式 | **确定性分层**（非随机） | 空 genres 仅 34 条（0.1%）、age≥13 仅 733 条，随机抽样会漏掉大半边界样本 |
+| 字段 | 剥离 `description_clean`（43.5 MB）与 17 个无关字段 | 候选生成走标签匹配，不需要长文本；也让"进 prompt 的内容"可审计 |
+| 存储形态 | **本地 JSONL + manifest**，不建 SQL | 只读、单进程、无并发/事务需求；ADR-006 D6 的零外部依赖 |
+
+**为什么不用 zip 里的 `steam_backup.sql` / CSV / 建库指导**：那是数据工程轨的交付形态；
+本项目是单进程 CLI demo，引入数据库会新增连接管理、导入脚本与测试夹具，
+却只换来"看起来更工程化"——而且会把只读语料与 V2 的可变账本混在同一个存储层里。
+
+**可复现性**：`scripts/build_corpus_subset.py` 是唯一入口，`manifest.json` 记录源行数、
+抽样规则与两份产物的 SHA-256；双跑逐字节一致（已实测）。
+
 
 ---
 

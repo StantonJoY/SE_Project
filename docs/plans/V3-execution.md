@@ -1,7 +1,7 @@
 # V3 执行计划（Execution Plan）· 真实语料接入
 
 > **状态**：草案待人工批准（批准前禁止写代码）
-> **依据**：`docs/req/requirements-v3-se.md`（17 条需求）、`V3spike结论.md`（可行性实测）、
+> **依据**：`docs/req/requirements-v3-se.md`（20 条需求）、`V3spike结论.md`（可行性实测）、
 > `docs/plans/V2-execution.md`（先例：PR 分阶段 + 人工评审卡点）
 > **编号**：需求以 `requirements-v3-se.md` 的**草案标签**引用，正式 ID 在 PR-0 录入时确定
 
@@ -31,7 +31,7 @@ invariants:
   - "INV-V3-004 年龄兜底必拦截（新增）"
   - "INV-V3-005 权威链顺序不变（新增）"
   - "INV-V3-006 语料文本不可信（新增）"
-test_design: "pytest 离线确定性（MockLLM）+ 真实 30 条样本作为只读夹具；无网络、无临时目录"
+test_design: "pytest 离线确定性（MockLLM）+ 5,000 条真实语料子集作为只读夹具；无网络、无临时目录"
 ```
 
 **自检**：草案标签在录入前**不是**注册表 ID，`validate_requirements.py` 不认它——
@@ -174,7 +174,7 @@ cases:
 | 阶段 | 目标 | 人的动作 | 估时 | 出口条件 |
 |---|---|---|---|---|
 | **PR-0** 治理前置 | 解锁所有受保护路径 | 批准 ADR-006、登记 TA-0005 | 1 天（含等人） | 注册表 58 条校验通过 + ADR Accepted |
-| **PR-1** 语料接入 | 真实语料能进管道 | 无 | 2.5 天 | 30 条投影过 AdRepository + 管道出 `ad` + 零回归 |
+| **PR-1** 语料接入 | 真实语料能进管道 | 无 | 2.5 天 | 5,000 条投影过 AdRepository + `--corpus` 端到端出 `ad` + 零回归 |
 | **PR-2** 合规扩展 | 合规能看见内容分级 | 评审合规改动（safety-critical） | 3 天 | 5×3 场景矩阵 100% 符合 + 五步顺序不变 |
 | **PR-3** V2 接入 | 定价 → 出价 → 结算跑通 | 无 | 2 天 | 20 次耗尽对每条样本成立 + `bidding/` 零改动 |
 | **PR-4** 评估与收尾 | 证据齐、可交付 | 无 | 1.5 天 | 全量检查绿 + 评估分区报告 |
@@ -200,9 +200,9 @@ PR-0 ──▶ PR-1 ──▶ PR-2 ──▶ PR-3 ──▶ PR-4
 | # | 动作 | 产出 | 自验 |
 |---|---|---|---|
 | 0.1 | 写 ADR-006：沿用 `docs/` 的理由、只读语料、投影旁路、合规只动 2 个函数、`scope.out` 的 RAG 条改判 | `docs/architecture/adr-006-v3-corpus-boundary.md` | `check_safety_paths.py --show-paths` 能解析到新清单 |
-| 0.2 | 注册表追加 **17 条**（`version: "V3"`，ID 续 ADS 编号）+ `evolution_rounds` 加 V3 + 改 `scope.out` | `docs/req/requirements.yaml` | `validate_requirements.py` PASS，条数 41 → 58 |
+| 0.2 | 注册表追加 **20 条**（`version: "V3"`，ID 续 ADS 编号）+ `evolution_rounds` 加 V3 + 改 `scope.out` | `docs/req/requirements.yaml` | `validate_requirements.py` PASS，条数 41 → 58 |
 | 0.3 | 不变量登记 `INV-V3-001..008` | `docs/architecture/invariants.md` | `validate_requirements.py` 的双向一致性不掉 |
-| 0.4 | 覆盖表登记 17 条的测试去向 | `acceptance-coverage-map.yaml` | `fitness_functions.py` PASS |
+| 0.4 | 覆盖表登记 20 条的测试去向 | `acceptance-coverage-map.yaml` | `fitness_functions.py` PASS |
 | 0.5 | 登记 `TA-0005`（具名人类、`approved_at` 早于 PR-1 首次提交） | `docs/test-approvals.yaml` | `check_test_approval.py --base origin/main` 通过 |
 | 0.6 | 提交 PR-0 并请求人工批准 ADR | — | PR 上 Gate 1/4/6 全绿 |
 
@@ -223,7 +223,7 @@ PR-0 ──▶ PR-1 ──▶ PR-2 ──▶ PR-3 ──▶ PR-4
 | 1.6 | `fitness_functions.py` 的 `ELEMENT_BY_PACKAGE` 加 `"corpus"` | 同上 | `fitness_functions.py` PASS（**受保护路径，PR-0 的 ADR 覆盖**） |
 | 1.7 | 测试 + 变异 + 全量回归 | `test/offline/test_corpus*.py` | 617 → 新增后全绿 |
 
-> **PR-1 的出口**：30 条投影全过 `AdRepository`；V1 管道在语料上端到端产出 `ad`；零回归。
+> **PR-1 的出口**：5,000 条投影全过 `AdRepository`；`python -m app --corpus` 端到端产出 `ad`（≤500 ms）；零回归。
 
 ---
 
@@ -296,7 +296,7 @@ python scripts/validate_requirements.py        # 抓工件不一致
 
 ### 完成定义（DoD）
 
-- [ ] 17 条 V3 需求全部 `implemented` 或 `verified`，覆盖表无悬空项
+- [ ] 20 条 V3 需求全部 `implemented` 或 `verified`，覆盖表无悬空项
 - [ ] 8 条 `INV-V3-*` 各有**会失败**的反例，且被 `mutation_check` 检出
 - [ ] 旧 617 测试零回归；V3 新增测试全部引用 REQ/INV ID
 - [ ] `bidding/`、`ads/`、`scene/`、`selector/` 零改动（git diff 可证）
@@ -311,7 +311,7 @@ python scripts/validate_requirements.py        # 抓工件不一致
 ## 回退与未知
 
 - **回退**：PR-1 只新增文件，删除 `src/corpus/` 即回到 V2 状态；PR-2 的合规改动保留 `facts=None` 的旧行为，回退只需不传参；PR-3 回退 = 删 `data/bids-corpus.json` + 去掉 `pipeline_v2` 的 `facts` 实参（竞价逻辑本来就没改）。
-- **未知**：全量 25,899 条语料尚未交付，本计划只用 30 条样本 + 仓库内子集（建议 300 条）；若语料形态变化，`parser_ver` 升版需重跑 PR-1 的验收。
+- **数据**：全量 25,899 条已在手，入库 5,000 条子集（`data/corpus/`，5.5 MB）；重新抽样只需重跑 `scripts/build_corpus_subset.py`。若语料 `parser_ver` 升版，需重跑 PR-1 验收并更新 manifest。
 - **风险**：`data/scene-content-rules.yaml` 一旦入库即为 safety-critical，任何调参都要 ADR + 回归。
 - **风险（V2 接入）**：`Ledger.seed()` 会拒绝**已存在账本**中不同的报价契约 —— 改了 5% 口径或语料集合后，
   旧的 `logs/bidding-v2.sqlite3` 必须换路径或删除，否则报 `persistent seed contract cannot be changed`。

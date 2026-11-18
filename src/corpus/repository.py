@@ -25,6 +25,8 @@ _REQUIRED_ITEM_FIELDS = (
     "required_age",
     "content_descriptors",
     "review_count",
+    "price_final",
+    "is_free",
 )
 
 
@@ -113,6 +115,12 @@ class CorpusRepository:
             summary = record.get("summary") or tag_by_id[item_id].get("summary") or ""
             if not isinstance(summary, str):
                 raise CorpusLoadError(f"item_id={item_id} 的 summary 必须是字符串")
+            price_raw = record.get("price_final")
+            if price_raw is not None and type(price_raw) is not int:
+                raise CorpusLoadError(f"item_id={item_id} 的 price_final 必须是整数或 null")
+            is_free = record.get("is_free")
+            if not isinstance(is_free, bool):
+                raise CorpusLoadError(f"item_id={item_id} 的 is_free 必须是布尔值")
             items.append(
                 CorpusItem(
                     item_id=item_id,
@@ -127,6 +135,8 @@ class CorpusRepository:
                     ),
                     review_count=_int(record["review_count"], f"item_id={item_id} 的 review_count"),
                     tags=tags,
+                    price_cents=price_raw,
+                    is_free=is_free,
                 )
             )
         return cls(sorted(items, key=lambda item: item.item_id))

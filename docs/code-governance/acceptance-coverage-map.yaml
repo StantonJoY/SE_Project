@@ -206,52 +206,59 @@ requirements:
     note: "PR-1 语料接入已实现；PR-2 的合规分项另行登记。"
   - id: "REQ-ADS-ARCH-015"
     test_backed: false
-    pending_test: "PR-1/PR-2/PR-3 实现时补"
-    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+    pending_test: "PR-2 五步顺序契约测试"
+    blocked_by: "合规扩展（PR-2）未实现"
   - id: "REQ-ADS-NFR-SAFETY-008"
     test_backed: false
-    pending_test: "PR-1/PR-2/PR-3 实现时补"
-    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+    pending_test: "PR-2 内容并集反例"
+    blocked_by: "合规扩展（PR-2）未实现"
   - id: "REQ-ADS-NFR-SAFETY-009"
     test_backed: false
-    pending_test: "PR-1/PR-2/PR-3 实现时补"
-    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+    pending_test: "PR-2 年龄兜底反例"
+    blocked_by: "合规扩展（PR-2）未实现"
   - id: "REQ-ADS-NFR-SAFETY-010"
     test_backed: false
-    pending_test: "PR-1/PR-2/PR-3 实现时补"
-    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+    pending_test: "PR-2 三档场景矩阵"
+    blocked_by: "合规扩展（PR-2）未实现"
   - id: "REQ-ADS-SEC-003"
     test_backed: true
     evidence: ["test_corpus.py::test_injected_corpus_text_blocked"]
     note: "PR-1 语料接入已实现；PR-2 的合规分项另行登记。"
   - id: "REQ-ADS-NFR-QA-005"
     test_backed: false
-    pending_test: "PR-1/PR-2/PR-3 实现时补"
-    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+    pending_test: "PR-4 全量回归核对"
+    blocked_by: "V3 评估与收尾（PR-4）未做"
   - id: "REQ-ADS-NFR-QA-006"
     test_backed: false
-    pending_test: "PR-1/PR-2/PR-3 实现时补"
-    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+    pending_test: "PR-4 V3 评估分区"
+    blocked_by: "V3 评估与收尾（PR-4）未做"
   - id: "REQ-ADS-GOV-004"
     test_backed: false
-    pending_test: "PR-1/PR-2/PR-3 实现时补"
-    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+    pending_test: "ADR-006 待具名人类批准"
+    blocked_by: "ADR 仍为 Proposed"
   - id: "REQ-ADS-NFR-QA-007"
     test_backed: false
-    pending_test: "PR-1/PR-2/PR-3 实现时补"
-    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+    pending_test: "由 fitness 门禁覆盖（非 pytest 用例）"
+    blocked_by: "该要求由 CI 门禁断言，pytest 无对应用例"
   - id: "REQ-ADS-GOV-005"
     test_backed: false
-    pending_test: "PR-1/PR-2/PR-3 实现时补"
-    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+    pending_test: "TA-0005 待具名人类签署"
+    blocked_by: "测试批准记录缺失（Gate 1 会拦）"
   - id: "REQ-ADS-FR-012"
     test_backed: false
-    pending_test: "PR-1/PR-2/PR-3 实现时补"
-    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+    pending_test: "PR-3 定价派生测试"
+    blocked_by: "V2 接入（PR-3）未实现"
   - id: "REQ-ADS-ARCH-016"
     test_backed: false
-    pending_test: "PR-1/PR-2/PR-3 实现时补"
-    blocked_by: "V3 实现未开始（PR-0 仅登记需求）"
+    pending_test: "PR-3 派生唯一来源 + 20 次耗尽"
+    blocked_by: "V2 接入（PR-3）未实现"
+
+  - id: "REQ-ADS-FR-013"
+    test_backed: true
+    evidence: ["test_corpus.py::test_subset_manifest_matches_committed_files", "test_corpus.py::test_subset_selection_is_deterministic_and_covers_boundaries"]
+  - id: "REQ-ADS-FR-014"
+    test_backed: true
+    evidence: ["test_corpus.py::test_cli_corpus_repository_wiring"]
 
 invariants:
 

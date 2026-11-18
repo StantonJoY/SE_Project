@@ -23,13 +23,33 @@ from ads.banned_words import BannedWords
 from ads.repository import AdRepository
 from audit import JsonlAuditStore
 from compliance.rules import SceneRules
+from corpus import CorpusRepository, load_corpus_config, project_all, select_candidates
 from render import to_json
+from scene.parser import SceneInputError, parse_scene
 from selector import MockLLM
 
 from .config import AppConfig, ConfigError
 from .pipeline import recommend
 
 DEFAULT_CONFIG = "config.yaml"
+
+
+def load_corpus_repository(scene_raw: object, config_path: str | Path, root: Path) -> AdRepository:
+    """V3 接线：场景 → 语料 top-K → 投影成 Ad → 交给既有管道（REQ-ADS-FR-014）。
+
+    **不改 `pipeline.recommend` 的签名**：语料只是换了一个候选来源，
+    权威链（LLM 建议 → 合规 → 渲染 → 审计）原样复用。
+    场景非法时返回空仓库——让管道自己走 `scene_invalid` 降级路径，不在接线层吞掉。
+    """
+    corpus_config = load_corpus_config(config_path)
+    corpus = CorpusRepository.load(root / corpus_config.items_path, root / corpus_config.tags_path)
+    try:
+        scene = parse_scene(scene_raw)
+    except SceneInputError:
+        return AdRepository([])
+    picked = select_candidates(scene, corpus.all(), corpus_config.tag_mapping, corpus_config.top_k)
+    ads, _facts = project_all(picked)
+    return AdRepository(ads)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -46,6 +66,11 @@ def build_parser() -> argparse.ArgumentParser:
     src.add_argument("--time-slot", help="时段：morning/afternoon/evening/night")
     p.add_argument("--device", help="设备：mobile/tablet/desktop")
     p.add_argument("--tag", action="append", default=[], help="用户标签（可重复）")
+    p.add_argument(
+        "--corpus",
+        action="store_true",
+        help="候选来源改为真实语料（V3）：按场景选 top-K 后投影成 Ad",
+    )
     p.add_argument("--audit", help="审计日志路径（覆盖配置）")
     p.add_argument("--indent", type=int, default=2, help="输出 JSON 缩进（0 = 单行）")
     return p
@@ -90,12 +115,17 @@ def main(argv: list[str] | None = None) -> int:
 
     # ---- ③ 只读数据源 ----
     try:
-        repo = AdRepository.load(root / config.data.ads_path)
+        if args.corpus:
+            repo = load_corpus_repository(scene_raw, root / args.config, root)
+        else:
+            repo = AdRepository.load(root / config.data.ads_path)
         banned = BannedWords.load(root / config.data.banned_words_path)
         rules = SceneRules.load(root / config.data.scene_rules_path)
     except Exception as e:  # noqa: BLE001 —— 启动期数据问题须明确报告后退出（fail loudly）
         print(f"数据加载失败：{e}", file=sys.stderr)
         return 2
+    if args.corpus:
+        print(f"[corpus] 候选 {repo.count} 条（top_k 截断后投影）", file=sys.stderr)
 
     audit_path = Path(args.audit) if args.audit else (root / config.audit.log_path)
     store = JsonlAuditStore(audit_path)
