@@ -10,8 +10,8 @@ Implements: ADR-006 D2/D3
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Mapping
 
 #: 七维标签的固定键（与 `demo_steam_30` 的受控词表一致）
 TAG_DIMENSIONS: tuple[str, ...] = (

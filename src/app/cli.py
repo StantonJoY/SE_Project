@@ -17,9 +17,8 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from pathlib import Path
-
 from dataclasses import dataclass
+from pathlib import Path
 
 from ads.banned_words import BannedWords
 from ads.repository import AdRepository

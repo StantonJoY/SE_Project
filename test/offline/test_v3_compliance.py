@@ -17,8 +17,8 @@ import pytest
 
 from ads.banned_words import BannedWords
 from compliance.content_rules import ContentPolicy, ContentRules, ContentRulesError
-from compliance.pipeline import run_compliance
 from compliance.models import ComplianceVerdict
+from compliance.pipeline import run_compliance
 from compliance.rules import SceneRules
 from corpus import CorpusRepository, project_all
 from scene.parser import parse_scene
@@ -110,9 +110,9 @@ def test_age_gate_rejects_above_limit(samples, rules, env):
     ad = next(a for a in ads if a.ad_id == "ad_359550")
     assert facts[ad.ad_id].required_age == 17
     # competitive 上限 18：年龄本身不拦（但内容仍按档位判定）
-    assert 17 <= rules.tiers["competitive"].max_age
+    assert rules.tiers["competitive"].max_age >= 17
     # campus 上限 13：年龄超限
-    assert 17 > rules.tiers["campus"].max_age
+    assert rules.tiers["campus"].max_age < 17
     detail = _verdict(ad, ads, SCENES["campus"], facts, rules, env).detail_of("scene") or ""
     assert "17" in detail
 
@@ -148,7 +148,6 @@ def test_content_rules_fail_closed():
 
 def test_content_rules_reject_unknown_tier_reference(tmp_path=None):
     """REQ-ADS-NFR-SAFETY-010：tag_to_tier 指向未知档位必须拒绝。"""
-    import io
     import tempfile
 
     payload = (

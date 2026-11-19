@@ -18,7 +18,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from corpus.pricing import budget_cents_for, bid_cents_from_price  # noqa: E402
+from corpus.pricing import bid_cents_from_price, budget_cents_for  # noqa: E402
 
 
 def build_bids(items_path: Path) -> list[dict]:

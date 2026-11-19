@@ -23,11 +23,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
+from ads.banned_words import BannedWords  # noqa: E402
+from ads.repository import AdRepository  # noqa: E402
 from app import AppConfig, recommend  # noqa: E402
 from app.cli import CorpusContext, load_corpus_context  # noqa: E402
 from audit import InMemoryAuditStore  # noqa: E402
-from ads.banned_words import BannedWords  # noqa: E402
-from ads.repository import AdRepository  # noqa: E402
 from compliance.rules import SceneRules  # noqa: E402
 from corpus import load_corpus_config  # noqa: E402
 from scene.parser import parse_scene  # noqa: E402

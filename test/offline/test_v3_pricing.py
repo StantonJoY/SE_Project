@@ -18,7 +18,7 @@ import pytest
 
 from bidding import Bid, InsufficientBudget, Ledger, validate_bids
 from corpus import CorpusRepository
-from corpus.pricing import AD_FEE_RATIO, DEFAULT_IMPRESSIONS, budget_cents_for, bid_cents_from_price
+from corpus.pricing import AD_FEE_RATIO, DEFAULT_IMPRESSIONS, bid_cents_from_price, budget_cents_for
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS_DIR = ROOT / "data" / "corpus"

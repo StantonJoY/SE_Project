@@ -189,5 +189,6 @@ def test_every_replacement_entry_is_well_formed(mutation_id: str) -> None:
         assert isinstance(mod_name, str) and mod_name
         assert isinstance(attr, str) and attr
         assert (
-            callable(replacement) or isinstance(replacement, property) or isinstance(replacement, dict)
+            callable(replacement)
+            or isinstance(replacement, (property, dict))
         ), f"{mutation_id}: {attr} 的替换对象既不可调用、不是 property、也不是常量 dict"

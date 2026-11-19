@@ -47,8 +47,8 @@ from corpus import (
 )
 from corpus import repository as corpus_repository
 from scene.parser import parse_scene
-from selector import MockLLM
 from scripts.build_corpus_subset import select_subset
+from selector import MockLLM
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS_DIR = ROOT / "data" / "corpus"
@@ -263,7 +263,7 @@ def test_select_orders_by_hits_then_item_id(corpus, config):
         targets |= {v.lower() for v in config.tag_mapping.get(key, ())}
     hits = [len(item.match_labels() & targets) for item in picked]
     assert hits == sorted(hits, reverse=True)
-    for left, right in zip(picked, picked[1:]):
+    for left, right in zip(picked, picked[1:], strict=False):
         if len(left.match_labels() & targets) == len(right.match_labels() & targets):
             assert left.item_id < right.item_id
 
