@@ -1,6 +1,6 @@
 # V3 阶段性测试报告
 
-> 报告状态：LIVE_SEMANTIC_PASS_WITH_LIMITATIONS / GATE1_DEFERRED
+> 报告状态：SCREENSHOT_DEMO_COMPLETE / EVIDENCE_COMPLETE / GATE1_DEFERRED
 > 功能结论：V3 CORE PASS；全量回归 675 PASS；V1/V2 E2E PASS；replay PASS；mutation PASS；static PASS；live prompt PASS_WITH_LIMITATIONS
 > 课程交付准备度：NOT READY
 > 初始 Run ID：`v3-20261120-53d37fc-01`
@@ -10,6 +10,7 @@
 > 原始测试 Commit：`53d37fcf933013af46714a7b29c084e4e07a6696`
 > 修复后 Commit：`15cc2895a2ee6c60732a1d8a9a84d384ce009a0d`
 > 当前 Commit：`161381887e421a121cd2878fcbf397d42a8ac818`
+> 截图取证 Commit：`4da29339ae7e150302fe7123422bf78fa8135c04`
 > Handover 对照：核心路径已覆盖；family/gamer 独立审计 detail 尚未单独录制；V2 live semantic 已覆盖；V1 product CLI 为 offline-only，test-only live 为 PASS_WITH_LIMITATIONS
 
 ## 1. 结论摘要
@@ -46,7 +47,8 @@
 - 按用户决定暂缓 Gate 1 修复，状态保留为 `DEFERRED / FAIL`；
 - 最终静态检查 ruff/mypy/依赖/Schema/fitness/repo/safety/audit 全部 PASS；
 - V3 新模块覆盖率总 86%，XML 已生成；项目未声明强制覆盖率门槛；
-- video demo 尚未准备。
+- 最终验收截图已完成 10/10。
+- 最终 `README.md`、`run-manifest.json` 和 `checksums.sha256` 已完成。
 
 ## 2. 已确认结果
 
@@ -162,15 +164,6 @@ test/offline/test_v3_prompt.py: changed test has no requirement-specific coverag
 
 状态：`DEFERRED / OPEN · GOVERNANCE FIX REQUIRED`
 
-## 4. 剩余工作
-
-- video demo 录制；
-- 最终 run-manifest、checksums 和 evidence 索引；
-- 最终测试文档提交；
-- Gate 1 mapping/approval 处理，当前保持 `DEFERRED / FAIL`；
-- family/gamer 两条 CLI 审计 `detail` 的独立录像；
-- 更广泛的人类标注 live corpus（不属于本次闭环）。
-
 ## 5. 当前验收判定
 
 ```text
@@ -191,7 +184,8 @@ V3 Static Analysis: PASS（ruff/mypy/deps/schema/fitness/repo/safety/audit）
 V3 Coverage: RECORDED（86%）
 V3 Live Prompt: PASS_WITH_LIMITATIONS
 V3 Governance: DEFERRED / FAIL（Gate 1 / mapping gaps）
-V3 Video Demo: NOT READY
+V3 Screenshot Demo: COMPLETE（10/10）
+V3 Evidence Package: COMPLETE
 ```
 
 Live prompt evidence is recorded in [V3-Live-Prompt-Semantic-Report.md](V3-Live-Prompt-Semantic-Report.md). Confirmed labels and limitations are in [V3-live-prompt-human-labels.json](V3-live-prompt-human-labels.json).

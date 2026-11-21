@@ -1,0 +1,2 @@
+[corpus] 候选 0 条（top_k 截断后投影）
+[audit_id] aud-00206fe8c8ea

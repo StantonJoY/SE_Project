@@ -1,0 +1,4 @@
+﻿app=E:\cityu\SE\project\SE_Project-v3-test\src\app\__init__.py
+corpus=E:\cityu\SE\project\SE_Project-v3-test\src\corpus\__init__.py
+compliance=E:\cityu\SE\project\SE_Project-v3-test\src\compliance\__init__.py
+bidding=E:\cityu\SE\project\SE_Project-v3-test\src\bidding\__init__.py

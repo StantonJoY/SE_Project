@@ -1,0 +1,8 @@
+结构检查通过：4 条批准记录，生效起点 2026-10-06
+FAIL — eval/v3_runner.py: no requirement-to-test mapping; approval cannot be established
+FAIL — scripts/build_bids_v3.py: no requirement-to-test mapping; approval cannot be established
+FAIL — scripts/fitness_functions.py: REQ-ADS-NFR-QA-007 has no concrete evidence test
+FAIL — src/app/pipeline.py: REQ-ADS-NFR-QA-005 has no concrete evidence test
+FAIL — src/compliance/content_rules.py: no requirement-to-test mapping; approval cannot be established
+FAIL — src/selector/context.py: no requirement-to-test mapping; approval cannot be established
+FAIL — test/offline/test_v3_prompt.py: changed test has no requirement-specific coverage mapping

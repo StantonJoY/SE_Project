@@ -1,0 +1,7 @@
+{
+  "kind": "no_ad",
+  "request_id": "v3-r1",
+  "audit_id": "",
+  "reason_code": "request_conflict",
+  "detail": "request_id already belongs to different inputs; no new charge was attempted."
+}

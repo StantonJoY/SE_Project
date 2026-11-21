@@ -1,0 +1,20 @@
+{
+  "ad": {
+    "ad_id": "ad_2993780",
+    "category": "RPG",
+    "copy": "An adventurer sails to an uncharted island and travels between its present and its thriving past to uncover its downfall. Players switch freely among 14 jobs, gathering, crafting, cooking and fighting, shape the island and town, explore an open world, and play with up to four friends.",
+    "title": "FANTASY LIFE i: The Girl Who Steals Time"
+  },
+  "auction": {
+    "bid_cents": 300,
+    "budget_after_cents": 5400,
+    "budget_before_cents": 5700,
+    "price_cents": 300,
+    "relevance": 100,
+    "score": 30000
+  },
+  "audit_id": "aud-v2-3b3e8ed644bd33908c7430b4",
+  "explanation": "Fixed offline relevance fixture.",
+  "kind": "ad",
+  "request_id": "v3-r2"
+}

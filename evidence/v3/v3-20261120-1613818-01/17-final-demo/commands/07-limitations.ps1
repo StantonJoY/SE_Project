@@ -1,0 +1,26 @@
+. (Join-Path $PSScriptRoot '_common.ps1')
+
+Write-Section 'V3 FINAL ACCEPTANCE - 07 GATES AND LIMITATIONS'
+
+Write-Host 'Gate 1: DEFERRED / FAIL'
+Write-Host 'Reason: requirement-to-test/evidence mapping gaps and missing TA-0005 human pre-approval.'
+Write-Host 'ADR-006: Proposed'
+Write-Host 'Live model: deepseek-flash over one HTTP provider.'
+Write-Host 'V1 product default: Mock / Offline.'
+Write-Host 'V2 live relevance: PASS_WITH_LIMITATIONS.'
+Write-Host 'V1 live test-only: PASS_WITH_LIMITATIONS.'
+Write-Host 'Demo: final acceptance screenshot package.'
+
+Write-Host ''
+Write-Host 'FINAL DISPLAY'
+Write-Host 'V3 Functional Testing: PASS'
+Write-Host 'V3 Full Regression: PASS (675)'
+Write-Host 'V3 Replay: PASS'
+Write-Host 'V3 Mutation: PASS (33/33)'
+Write-Host 'V3 Static Checks: PASS'
+Write-Host 'V3 Coverage: RECORDED (86%)'
+Write-Host 'V2 Live Prompt: PASS_WITH_LIMITATIONS'
+Write-Host 'V1 Live Prompt (test-only): PASS_WITH_LIMITATIONS'
+Write-Host 'V1 Product Default Path: Mock / Offline'
+Write-Host 'V3 Governance: DEFERRED / FAIL'
+Write-Host 'V3 Course Delivery Readiness: CHANGES REQUIRED'

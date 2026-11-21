@@ -1,0 +1,14 @@
+结构检查通过：28 条 entry
+变更集含 30 个代码/prompt 文件（触发门禁 6）：
+  eval/v3_runner.py
+  scripts/build_bids_v3.py
+  scripts/build_corpus_subset.py
+  scripts/fitness_functions.py
+  scripts/mutation_check.py
+  src/app/cli.py
+  src/app/cli_v2.py
+  src/app/pipeline.py
+  src/app/pipeline_v2.py
+  src/compliance/content_rules.py
+  …… 另有 20 个
+PASS — 同一变更集内已更新 docs/ai-use-log.yaml

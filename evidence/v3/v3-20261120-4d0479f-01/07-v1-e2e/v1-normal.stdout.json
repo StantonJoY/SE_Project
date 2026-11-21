@@ -1,0 +1,13 @@
+{
+  "kind": "ad",
+  "ad": {
+    "ad_id": "ad_16120",
+    "title": "Plant Tycoon",
+    "copy": "A gardening simulation where players grow, prune, and crossbreed plants to discover rare species and solve a genetic puzzle to find the six Magic Plants of Isola, while managing plant health, harvesting seeds, selling creations, and customizing a virtual nursery.",
+    "category": "Simulation"
+  },
+  "explanation": "选择 ad_16120（品类 Simulation）的理由：场景与「ad_16120」的目标标签匹配，且该候选在候选集中排序最前。置信度 0.85。在同一场景下，候选集中还有 ad_351030(Casual)、ad_317470(Massively Multiplayer)、ad_348620(Adventure)、ad_522230(Simulation)、ad_3258290(Adventure) 等 29 条，但它们的品类或目标标签与本场景的匹配度更低。",
+  "explanation_degraded": false,
+  "confidence": 0.85,
+  "audit_id": "aud-699bfd3d8313"
+}

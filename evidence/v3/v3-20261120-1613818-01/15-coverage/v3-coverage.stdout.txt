@@ -1,0 +1,18 @@
+...............................................                          [100%]
+=============================== tests coverage ================================
+______________ coverage: platform win32, python 3.11.18-final-0 _______________
+
+Name                              Stmts   Miss  Cover   Missing
+---------------------------------------------------------------
+src\compliance\content_rules.py      82     12    85%   63-64, 66, 70, 74, 78, 80, 85, 89, 98, 102, 119
+src\corpus\__init__.py                7      0   100%
+src\corpus\config.py                 52      8    85%   42, 46, 69, 73, 82, 85-86, 88
+src\corpus\models.py                 32      0   100%
+src\corpus\pricing.py                13      2    85%   34, 36
+src\corpus\projection.py             33      4    88%   34-37
+src\corpus\repository.py             87     16    82%   46, 49-50, 52, 54-55, 57, 63, 69, 90, 98, 107, 114, 117, 120, 123
+src\corpus\select.py                 23      1    96%   38
+src\selector\context.py             112     17    85%   143, 147-150, 177-178, 182, 190, 200-205, 217, 230-233, 263, 306
+---------------------------------------------------------------
+TOTAL                               441     60    86%
+Coverage XML written to file E:\cityu\SE\project\SE_Project-v3-test\evidence\v3\v3-20261120-1613818-01\15-coverage\v3-coverage.xml

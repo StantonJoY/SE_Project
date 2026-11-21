@@ -1,6 +1,6 @@
 # V3 测试执行记录
 
-> 状态：TEST_EXECUTION_COMPLETE / DEMO_PENDING / GATE1_DEFERRED
+> 状态：TEST_EXECUTION_COMPLETE / SCREENSHOT_DEMO_COMPLETE / EVIDENCE_COMPLETE / GATE1_DEFERRED
 > 初始 Run ID：`v3-20261120-53d37fc-01`
 > 修复后 Run ID：`v3-20261120-15cc289-01`
 > 当前 Run ID：`v3-20261120-1613818-01`
@@ -11,10 +11,12 @@
 > 当前 Commit：`161381887e421a121cd2878fcbf397d42a8ac818`
 > Ruff 修复 Commit：`1613818`
 > Post-Ruff Run ID：`v3-20261120-1613818-01`
+> 截图取证 Commit：`4da29339ae7e150302fe7123422bf78fa8135c04`
 > 来源分支：`origin/v3`
 > 环境：Conda `SEProjectV3`
 > Python：3.11.18
-> 当前结论：最终 commit `1613818` 上功能、回归、replay、mutation、静态检查和覆盖率均已完成；6 场景 live relevance 30/30 结构合法，标题诱导和名作对照均 5/5，人工确认 PASS_WITH_LIMITATIONS；仅 video demo、最终 evidence 封装和 Gate 1 处理未完成
+> Editable Project：`E:\cityu\SE\project\SE_Project-v3-test`
+> 当前结论：最终 commit `1613818` 上功能、回归、replay、mutation、静态检查和覆盖率均已完成；V2 live relevance 30/30 和 V1 test-only live 18/18 均已人工确认 PASS_WITH_LIMITATIONS；10 张最终验收截图和 evidence manifest/checksums 已完成；仅 Gate 1 mapping/approval 未完成
 
 ## 1. 测试范围
 
@@ -26,9 +28,9 @@
 - V1 `--corpus` 与 V2 竞价结算；
 - V1/V2/V3 replay、全量测试、变异验证；
 - static/schema/fitness/safety/repo 检查；
-- video demo 和 evidence 封装。
+- 最终截图演示和 evidence 封装。
 
-本轮已完成环境、数据完整性、V3 核心、全量回归、V1/V2 CLI、三套 replay、mutation、静态检查、覆盖率和 live prompt semantic probe。剩余工作是 video demo、最终 evidence 封装和 Gate 1 治理处理。
+本轮已完成环境、数据完整性、V3 核心、全量回归、V1/V2 CLI、三套 replay、mutation、静态检查、覆盖率、live prompt semantic probe、10 张最终验收截图和 evidence 封装。剩余工作是提交最终材料以及 Gate 1 治理处理。
 
 ## 2. 基线和环境
 
@@ -109,27 +111,13 @@
 | V3-COV-001 | V3 new module coverage | RECORDED，86% total | `15-coverage/v3-coverage.xml` |
 | V3-LIVE-PROMPT-001 | Single-scene live baseline | HISTORICAL PASS | 20/20 structural；5/5 title bait；5/5 known title；由多场景最终结果取代 |
 | V3-LIVE-PROMPT-002 | Multi-scene live semantic probe | PASS_WITH_LIMITATIONS | 6 scenes × 5 runs，30/30 structural；5/5 + 5/5 adversarial；人工确认 |
-| V3-DEMO-001 | video demo | PENDING | 等待测试结束 |
+| V3-LIVE-TOOL-001 | live harness archived | PASS | `test/live/` 4 个文件；仅从环境变量读取凭据 |
+| V3-DEMO-001 | final acceptance screenshots | PASS，10/10 | `17-final-demo/screenshots/` |
+| V3-EVID-001 | run-manifest / README / checksums | PASS | `run-manifest.json`、`README.md`、`checksums.sha256` |
 
-## 4. HANDOVER-V3 对照
 
-| Handover 条目 | 当前状态 | 说明 |
-|---|---|---|
-| 1 V1 corpus 正常路径 | PASS（性能观察） | 返回 `ad_16120`，候选 30；CLI 观测 1.029s，内部处理约 0.24s |
-| 2/3 family/gamer 审计 detail | 部分覆盖 | `test_v3_compliance.py` 覆盖三档规则；尚未单独录制两条 V1 CLI 的 audit detail |
-| 4 非法 `--time-slot day` | PASS | `no_ad / scene_invalid`，audit=1 |
-| 5 V2 auction | PASS | `ad_2993780`，bid=price=300 |
-| 6 request_id 幂等 | PASS | stdout hash 一致，无二次扣费 |
-| 7 新 request_id 跨请求预算 | PASS | total=6000，spent=600，remaining=5400 |
-| 8 同 request_id 换场景 | PASS | `no_ad / request_conflict` |
-| 9 V3 eval | PASS | 14/14，违规 0，p95=3.4ms |
-| 10 full pytest | PASS（数量差异） | 实际 675，不是 handover 的 671；已按实际 commit 记录 |
-| 11 mutation | PASS | 33/33 |
-| 提示词语义质量清单 | V2 PASS_WITH_LIMITATIONS；V1 test-only PASS_WITH_LIMITATIONS | V2 6 场景 live probe；V1 通过测试注入路径完成 6 场景 × 3 次并经人工确认 |
 
-Handover 的主要运行路径和安全边界已遵守；family/gamer 审计 detail 的独立 CLI 录像和真实模型语义质量仍属于未覆盖项，不能声称全部执行。
-
-## 5. 失败详情
+## 4. 失败详情
 
 ### V3-DATA-001 / V3-DATA-002
 
@@ -251,7 +239,7 @@ NameError: name 'data' is not defined
 
 首次命令传递失败后已使用独立 Python 检查脚本完成复核：5,000 / 5,000，空 genres 34，age>=13 715，无重复、无缺失标签、无 `description_clean`。
 
-## 6. 数据文档差异
+## 5. 数据文档差异
 
 `docs/HANDOVER-V3.md` 描述了：
 
@@ -269,7 +257,7 @@ age_gated = 707
 
 复核后确认这不是数据缺失：`32/707` 是“入选原因分类后的计数”，不是原始边界总数。demo 条目优先归入 `demo`，因此总 `34/715` 中有一部分不会再计入 `empty_genres` 或 `age_gated` 原因。实际语料结构为：5,000 条、空 genres 34、age>=13 715、无重复 item_id、无缺失标签、无 `description_clean`。
 
-## 7. 证据目录
+## 6. 证据目录
 
 ```text
 evidence/v3/
@@ -278,17 +266,49 @@ evidence/v3/
 │   ├── 01-source/
 │   ├── 02-collect/
 │   └── 03-data/
+├── v3-20261120-15cc289-01/
+│   ├── 04-v3-core/
+│   └── 06-full-regression/
+├── v3-20261120-4d0479f-01/
+│   ├── 06-full-regression/
+│   ├── 07-v1-e2e/
+│   ├── 08-v2-e2e/
+│   ├── 09-replay/
+│   ├── 10-mutation/
+│   └── 11-static/
 └── v3-20261120-1613818-01/
+    ├── README.md
+    ├── run-manifest.json
+    ├── checksums.sha256
     ├── 12-post-ruff/
     ├── 13-governance/
     ├── 14-final-static/
     ├── 15-coverage/
-    └── 16-live-prompt/
-        ├── live-prompt-results.json
-        └── live-prompt-multi-scene-results.json
+    ├── 16-live-prompt/
+    │   ├── live-prompt-results.json
+    │   └── live-prompt-multi-scene-results.json
+    ├── 16-v1-live-prompt/
+    │   ├── v1-live-semantic-results.json
+    │   └── v1-live.audit.jsonl
+    └── 17-final-demo/
+        ├── commands/
+        ├── screenshots/
+        ├── V3-Demo-Script.md
+        └── V3-Demo-Screenshots.md
 ```
 
 `corpus-summary.json` 首次命令失败，后续已通过独立 Python 检查脚本完成复核。
+
+当前 Run 根目录的 `checksums.sha256` 覆盖除自身以外的全部 evidence 文件，可用以下命令复核：
+
+```powershell
+Set-Location 'E:\cityu\SE\project\SE_Project-v3-test\evidence\v3\v3-20261120-1613818-01'
+$bad = Get-Content .\checksums.sha256 | ForEach-Object {
+    $hash, $path = $_ -split '\s{2}', 2
+    if ((Get-FileHash -Algorithm SHA256 -LiteralPath $path).Hash.ToLower() -ne $hash) { $path }
+}
+if ($bad) { $bad } else { 'CHECKSUMS_OK' }
+```
 
 ### V1 输出编码复核
 
