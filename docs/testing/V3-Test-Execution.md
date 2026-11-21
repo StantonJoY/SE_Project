@@ -14,7 +14,6 @@
 > 来源分支：`origin/v3`
 > 环境：Conda `SEProjectV3`
 > Python：3.11.18
-> Editable Project：`E:\cityu\SE\project\SE_Project-v3-test`
 > 当前结论：最终 commit `1613818` 上功能、回归、replay、mutation、静态检查和覆盖率均已完成；6 场景 live relevance 30/30 结构合法，标题诱导和名作对照均 5/5，人工确认 PASS_WITH_LIMITATIONS；仅 video demo、最终 evidence 封装和 Gate 1 处理未完成
 
 ## 1. 测试范围
@@ -126,7 +125,7 @@
 | 9 V3 eval | PASS | 14/14，违规 0，p95=3.4ms |
 | 10 full pytest | PASS（数量差异） | 实际 675，不是 handover 的 671；已按实际 commit 记录 |
 | 11 mutation | PASS | 33/33 |
-| 提示词语义质量清单 | V2 PASS_WITH_LIMITATIONS；V1 NOT APPLICABLE | V2 已完成 6 场景 live probe；V1 按设计为 offline-only |
+| 提示词语义质量清单 | V2 PASS_WITH_LIMITATIONS；V1 test-only PASS_WITH_LIMITATIONS | V2 6 场景 live probe；V1 通过测试注入路径完成 6 场景 × 3 次并经人工确认 |
 
 Handover 的主要运行路径和安全边界已遵守；family/gamer 审计 detail 的独立 CLI 录像和真实模型语义质量仍属于未覆盖项，不能声称全部执行。
 
@@ -304,10 +303,3 @@ CP936_DECODE=OK
 ```
 
 内部 `load + select + project` 三次分别为 `0.235s / 0.264s / 0.240s`，低于 500ms；CLI 端到端 `1.029s` 包含 Python 启动和 PowerShell 重定向开销。当前阻断点是 stdout 编码，不是内部处理性能。
-
-## 8. 下一步
-
-1. 按当前工作区的 V3 demo 脚本录制 video demo（脚本不在本次文档 commit 中）；
-2. 生成最终 run-manifest、checksums 和 evidence 索引；
-3. 提交测试文档、live prompt 报告和最终证据；
-4. Gate 1 继续保持 `DEFERRED / FAIL`，除非团队补齐 mapping 与 TA-0005。

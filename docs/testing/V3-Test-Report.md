@@ -10,7 +10,7 @@
 > 原始测试 Commit：`53d37fcf933013af46714a7b29c084e4e07a6696`
 > 修复后 Commit：`15cc2895a2ee6c60732a1d8a9a84d384ce009a0d`
 > 当前 Commit：`161381887e421a121cd2878fcbf397d42a8ac818`
-> Handover 对照：核心路径已覆盖；family/gamer 独立审计 detail 尚未单独录制；V2 live semantic 已覆盖，V1 live 为 NOT APPLICABLE
+> Handover 对照：核心路径已覆盖；family/gamer 独立审计 detail 尚未单独录制；V2 live semantic 已覆盖；V1 product CLI 为 offline-only，test-only live 为 PASS_WITH_LIMITATIONS
 
 ## 1. 结论摘要
 
@@ -181,7 +181,7 @@ V3 Core Functional Tests: PASS（49 项）
 V3 Full Regression: PASS（675 项）
 V3 V1 Integration: PASS（功能）
 V3 V1 Output Contract: FAIL（默认）/ PASS（UTF-8 环境）
-V3 V1 Live Prompt: NOT APPLICABLE（V1 offline-only）
+V3 V1 Live Prompt: TEST-ONLY PASS_WITH_LIMITATIONS（product default offline）
 V3 V2 Integration: PASS
 V3 Replay: PASS
 V3 Mutation: PASS（33/33）
@@ -196,6 +196,4 @@ V3 Video Demo: NOT READY
 
 Live prompt evidence is recorded in [V3-Live-Prompt-Semantic-Report.md](V3-Live-Prompt-Semantic-Report.md). Confirmed labels and limitations are in [V3-live-prompt-human-labels.json](V3-live-prompt-human-labels.json).
 
-## 6. 下一步
-
-下一步准备 video demo；Gate 1 保持 DEFERRED / FAIL，录屏中必须明确该限制。
+V1 test-only live evidence is recorded in [V3-V1-Live-Prompt-Semantic-Report.md](V3-V1-Live-Prompt-Semantic-Report.md). Confirmed V1 labels are in [V3-v1-live-prompt-human-labels.json](V3-v1-live-prompt-human-labels.json).

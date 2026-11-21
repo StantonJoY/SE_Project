@@ -32,7 +32,7 @@ The current human reviewer accepted these labels for the documented run and scop
 
 - This is one real-model sample, not a broad human-labeled benchmark.
 - The artificial title-bait and known-title cases use synthetic candidate summaries.
-- V1 is offline-only by design; V1 live prompt testing is `NOT APPLICABLE`, not a missing V3 test.
+- Product V1 CLI is offline-only by design; a separate test-only harness covers V1 `ctx-v1.1` with confirmed `PASS_WITH_LIMITATIONS`.
 - The labels were confirmed by the current human reviewer; the named reviewer should be filled in the matching JSON.
 - It does not replace the fixed offline replay or the full regression suite.
 
@@ -71,7 +71,7 @@ human-labeled Steam corpus.
 - The real-scene sample is `6 scenes × 5 runs`, not a broad statistical sample.
 - Title-bait and known-title cases use synthetic candidate summaries, not a broad human-labeled Steam corpus.
 - `competitive_afternoon` is tag-consistent, but the selected idle game has weaker competitive content specificity.
-- V1 `ctx-v1.1` live semantic quality is not applicable because V1 is intentionally Mock/Offline.
+- The product V1 CLI remains `Mock/Offline`; V1 live semantic evidence is test-harness-only and has been human-confirmed.
 - The direct relevance-client harness does not by itself prove live pipeline audit provenance persistence.
 - This result does not replace fixed offline replay, compliance tests, full regression, or broad human-labeled live quality.
 - Gate 1 test approval remains `DEFERRED / FAIL`.
@@ -92,5 +92,5 @@ Single-scene baseline:
 Live Prompt Structural Validity: PASS
 Live Prompt Semantic Quality: PASS_WITH_LIMITATIONS
 Human Confirmation: CONFIRMED
-V1 Live Prompt Coverage: NOT APPLICABLE（V1 offline-only）
+V1 Live Prompt Coverage: TEST-ONLY PASS_WITH_LIMITATIONS（product default remains offline）
 ```
