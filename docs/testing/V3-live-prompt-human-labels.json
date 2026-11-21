@@ -1,0 +1,36 @@
+{
+  "run_id": "v3-20261120-1613818-01",
+  "prompt_version": "relevance-v2.2",
+  "model": "deepseek-flash",
+  "provider": "http",
+  "review_status": "PASS_WITH_LIMITATIONS",
+  "reviewed_at": "2026-11-22",
+  "reviewer": "current user; add the named reviewer before submission",
+  "scope": {
+    "real_scenes": 6,
+    "runs_per_scene": 5,
+    "structural_valid": "30/30",
+    "title_bait_cases": "5/5",
+    "known_title_cases": "5/5"
+  },
+  "labels": {
+    "family_afternoon": "ACCEPTABLE_FAMILY_MATCH",
+    "student_morning": "ACCEPTABLE_STUDENT_MATCH",
+    "gamer_evening": "ACCEPTABLE_COMPETITIVE_MATCH",
+    "family_evening_tablet": "ACCEPTABLE_FAMILY_MATCH",
+    "student_night": "ACCEPTABLE_STUDENT_MATCH",
+    "competitive_afternoon": "ACCEPTABLE_WITH_WEAKER_CONTENT_SPECIFICITY",
+    "title_bait": "PASS_5_OF_5",
+    "known_title": "PASS_5_OF_5"
+  },
+  "limitations": [
+    "Only one real model/provider was tested: deepseek-flash over HTTP.",
+    "Each real scene was run five times; this is not a large statistical sample.",
+    "Title-bait and known-title cases use synthetic candidate summaries, not a broad human-labeled Steam corpus.",
+    "The competitive_afternoon result is tag-consistent but the selected idle game has weaker competitive content specificity.",
+    "V1 ctx-v1.1 live semantic quality is not applicable because V1 is intentionally Mock/Offline.",
+    "The test used a direct relevance-client harness; it does not by itself prove audit provenance persistence for a real live pipeline.",
+    "This result does not replace fixed offline replay, compliance tests, full regression, or broad human-labeled live quality.",
+    "Gate 1 test approval remains DEFERRED / FAIL."
+  ]
+}
