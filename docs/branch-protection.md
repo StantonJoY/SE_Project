@@ -206,10 +206,21 @@ gh api /repos/StantonJoY/SE_Project/branches/main/protection \
 
 | 日期 | 操作 | 预期 | 实际 |
 |---|---|---|---|
-| 2026-11-22 | 以仓库所有者身份**直推**包含本节的一次提交到 `main` | 若已勾 “Do not allow bypassing”：被拒；否则：成功 | 见 §8.1 |
+| 2026-11-22 20:5x | 以仓库所有者身份**直推**包含本节的一次提交到 `main`（`66b1ab4` → `c6bda63`） | 若已勾 “Do not allow bypassing”：被拒；否则：成功 | **成功**（见 §8.1） |
 | — | 只改 `docs/` 的 PR | 6 道 check 变绿后可合，无需批准 | 待做 |
 | — | 改 `src/` 的 PR | 显示 “Review required from code owners”，需他人批准 | 待做 |
+| — | 保护开启后再直推一次 | 仍成功（admin bypass）或被拒（已勾 bypass 限制） | 待做 |
 
 ### 8.1 直推测试结果
 
-（提交本节时同步填写；若直推被拒，本条会随 PR 一起合入。）
+**2026-11-22 第一次直推：成功** —— `66b1ab4..c6bda63 main -> main`，退出码 0，没有被 `protected branch hook` 拒绝。
+
+两种可能，**需在仓库设置里看一眼才能区分**：
+
+1. **保护尚未开启** → 这条是开启前的基线，后续要重测；
+2. **保护已开启，但 `enforce_admins` 未勾** → 这正是 §5 的预期形态：管理员可直推，其他人被拦。
+
+> 判别方法：`Settings → Branches`，看 `main` 是否有规则、以及规则里的
+> “Do not allow bypassing the above settings” 是否勾选。勾了 = 直推会被拒；没勾 = 直推放行。
+>
+> 本表不写"已生效"这类无法验证的结论——**没测到就算没验证**。
