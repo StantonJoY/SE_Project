@@ -53,7 +53,7 @@ requirements:
     note: "P5 已实现全部降级路径；每条路径均验证「结构化 no_ad + 恰好 1 条审计 + 不抛异常」。"
   - id: "REQ-ADS-FR-004"
     test_backed: true
-    evidence: ["test_render.py（两形态 schema、ad_id 模式反例、confidence 越界反例、空标题反例、**每个降级原因码都在 schema 中**、未登记原因码被拒、metadata 不外泄、序列化确定性）", "test_app_pipeline.py::test_all_results_pass_render_schema"]
+    evidence: ["test_render.py（两形态 schema、ad_id 模式反例、confidence 越界反例、空标题反例、**每个降级原因码都在 schema 中**、未登记原因码被拒、metadata 不外泄、序列化确定性）", "test_app_pipeline.py::test_all_results_pass_render_schema", "test_v3_output_encoding.py::test_write_stdout_emits_utf8_bytes"]
   - id: "REQ-ADS-ARCH-003"
     test_backed: true
     evidence: ["test_selector.py（9 项反例：非 JSON、顶层非对象、缺字段、多余字段、ad_id 空、reason 类型错、bool confidence、越界、非字符串 raw）"]

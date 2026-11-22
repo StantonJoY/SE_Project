@@ -188,7 +188,7 @@ baseline_requirements:
     fit_criterion: "输出符合 render schema，两种形态均通过校验，通过率 100%。"
     verification: ["schema_validation", "unit_test"]
     enforced_by: "render"
-    enforcement: ["render"]
+    enforcement: ["render", "app.cli.write_stdout"]
     asr: false
     legacy_id: "REQ-012"
     source_refs:
