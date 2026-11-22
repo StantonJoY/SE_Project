@@ -32,8 +32,8 @@ aeacee2e82eded106d9498de319b2aab57be3cf235827d86e38287eb0f356712  15-coverage/v3
 efc45c8c52fce38c262c49647a8d099e8ce0746a7ca5c4d06bdbb8c0a5d06573  15-coverage/v3-coverage.xml
 a036e65c2692f7f48fa6e6a41fef52ac795db257eafbf306c8289cf0014ad609  16-live-prompt/live-prompt-multi-scene-results.json
 29684b390f7b7e8a37e02ff6b0f91bce5e9c6714da43dc9d7c6b485c521ca97a  16-live-prompt/live-prompt-results.json
-a7c5aaa6614914ddbf96588dff8c25640d9a8b173b6b82087f5050cb8c9792cc  16-v1-live-prompt/v1-live-semantic-results.json
 e2bfb7629a4e43c53ed98199b69ac84e76497386c0edc423aca4cfe628587a2c  16-v1-live-prompt/v1-live.audit.jsonl
+a7c5aaa6614914ddbf96588dff8c25640d9a8b173b6b82087f5050cb8c9792cc  16-v1-live-prompt/v1-live-semantic-results.json
 17ead932ad15de7ff1a682aa6c3d585fc258ffe290dbe7028ca806ee5d72270e  17-final-demo/commands/_common.ps1
 b51b22d8921a0f23898e58ff1998aaaed75dc0c9321144200f357f8684bb9f5c  17-final-demo/commands/01-baseline.ps1
 69222dfd16cc3d19c68144a7658ee57b5675414417b29013bb4b61bd4ee070f2  17-final-demo/commands/02-corpus.ps1
@@ -44,7 +44,7 @@ d14881f18cd15e6badfc11fe4c660c5fb8e8ae9c0827bc15c2d06073e83b47db  17-final-demo/
 a00601b3958e664a9a5eb97bde7f0470b2f26eeb3ae62bcf7fc878124c4e9925  17-final-demo/commands/07-limitations.ps1
 0094e339500fe9ae9456e3fdff49c564b963944764eaf265ff94946bfb714292  17-final-demo/commands/08-content-safety.ps1
 975c56a99ab09f5bb7f163bff50ee3c4292ee457dff98a9fdd6ae2958e2c7e53  17-final-demo/commands/09-static-coverage.ps1
-167cf7a51720bd7d6cfcf59d670954741a3650ee4241f22c88e3006f42fca06f  17-final-demo/README.md
+159790918f9a10aa89cf20c43ffa0af9bda40525f675546110a890b99016b457  17-final-demo/README.md
 b2fd7b30c7cbb0350e38ac20c2bb7b7778711893f6d57a62406da86a20fa44ca  17-final-demo/screenshots/01-environment.png
 cde93d11897862dd867d6c02edc3622ac99cd46a03b331403584c82b6ab07a16  17-final-demo/screenshots/02-corpus.png
 ee3fc314a75d5e6b9062839312935902261858425955cc66128b651089167296  17-final-demo/screenshots/03-v1-normal.png
@@ -55,14 +55,14 @@ db4ad2621760464335add104844757ff592543aef3303b199701d48176d98168  17-final-demo/
 925379582b932d2619a8ff38acaabafc14d4f85c2c0c2647503b1cf4c591b1c4  17-final-demo/screenshots/08-static-coverage.png
 59258d2720bb8ac13872bba9fceca21e3b4ed01ba5c980b8fc2a8d484e0dbd19  17-final-demo/screenshots/09-live-prompt.png
 8d6c3a1a8d3223372d391be52002341958da2f0c49733ed63faf5e1519b441c9  17-final-demo/screenshots/10-gates-limitations.png
-6b775bc96b8e88697c610ac19a8d3f9c3285c842491004e67a67749c5d5eca52  17-final-demo/v1-invalid-20261122031201.audit.jsonl
 69b049932de2c7c791e7b4748c42ef90af22eaaa1cace5ce382a81749b9eee1c  17-final-demo/v1-invalid.audit.jsonl
 d3adca3cbdbce76bcd3f364b5a746d48af8dcae9393bfe859ac59d94fbcc8296  17-final-demo/v1-invalid.stderr.txt
 66a02216393e4c383a47c0896f2edb619ed8186deb067477f6f8df2b173762fb  17-final-demo/v1-invalid.stdout.txt
-e476402054d5ffeb156a2e297b91e6ea8849b59848ce40dfd8044d0761918879  17-final-demo/v1-normal-20261122031201.audit.jsonl
+6b775bc96b8e88697c610ac19a8d3f9c3285c842491004e67a67749c5d5eca52  17-final-demo/v1-invalid-20261122031201.audit.jsonl
 bf9c81c418f39487070caf364e41de005c0f422fff0fa08363bb8c7d1fd079c4  17-final-demo/v1-normal.audit.jsonl
 9b954ec419eff0eeae9a73e6b997a8f9ab82f852afeb927ce284064d20eaed73  17-final-demo/v1-normal.stderr.txt
 ebca89975061715cd0f7150121ea04be5f4bb8b5da4e3389b51a0f3821f06563  17-final-demo/v1-normal.stdout.txt
+e476402054d5ffeb156a2e297b91e6ea8849b59848ce40dfd8044d0761918879  17-final-demo/v1-normal-20261122031201.audit.jsonl
 283d19add4631312601a1cb772908f1ae2ebc8a503391f09227d33d858af98b6  17-final-demo/v2-20261122023501.sqlite3
 89f8f5811d5fc2d6285d0f10169a05238cfc952284c4cc6d570d3106bf318d26  17-final-demo/v2-20261122023908.sqlite3
 fecddc692cfa5e20ede2686a1f8fd750825b5f3b2977c340dc9b96e854d10963  17-final-demo/v2-20261122030324.sqlite3
@@ -80,5 +80,6 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  17-final-demo/
 977221ae943022a217f5af75eaf9b3abaeecf27e9684aaedc2899840a29c2610  17-final-demo/V3-Demo-Screenshots.md
 4b9add294a4aae0b4ebe9eb799b7621ebca6f508ceb2700878242b2cf66105e9  17-final-demo/V3-Demo-Script.md
 29adf5332b544c9874de8d658a5e6d652c9541c49db59641b8cc5ebb0c700aa4  17-final-demo/V3-Final-Acceptance-Video-Script.md
+f01460d8f07b5f479840ea8ba7ecfff568d9f7e3a1920503030dad500d75daa9  17-final-demo/video demo.mp4
 bfb345c533630b77edaf74929a97ba93278deb078d41365dee15658b9b577232  README.md
-314174b9971d92cf7e086ff5e5458bd7cdafbc7da0a6a25ff9b0c098eb901bce  run-manifest.json
+66338d73a2621cef1e1610763bdd73900b8b578efb7f7c2001811722fdbe9360  run-manifest.json
