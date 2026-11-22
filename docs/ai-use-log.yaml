@@ -439,3 +439,25 @@ entries:
       正式验收仍为 pending：TA-0005 具名人类测试批准未签、ADR-006 仍为 Proposed。
       提示词只做事实性对齐（场景语义、禁用外部知识、HISTORY 去噪），未做效果调优——
       离线 replay 用 MockLLM，不读语义，无法证明"选得更准"；效果调优待真实模型接入后另做。
+
+  - id: "AIU-0029"
+    date: "2026-11-22"
+    agent: "DeepSeek Harness（deepseek-flash）编码 agent"
+    tool: "DSH Desktop + 本地 pytest / 门禁脚本"
+    role: "build"
+    task: "审查并修补文档/流程面缺口：计数过期、blueprint 元素编号漂移、门禁数、断链、缺失的验收状态与复核记录"
+    artifacts:
+      - "architecture-blueprint.md（§4 元素对齐 ①..⑨）"
+      - "docs/README.md（文档索引，新增）"
+      - "docs/v3-approval-status.yaml（新增）"
+      - "docs/review-memo.md（V3 复核记录）"
+      - "docs/debt-register.md（TD-018 处置）"
+      - "test/offline/test_repo_completeness.py（断言 7→9，TA-0007 前置批准）"
+    outcome: "pending"
+    evidence: "本提交的 679 passed / 7 道门禁（Gate 1 仅历史缺口红）"
+    review_kind: "ai_proxy"
+    notes: >-
+      本次为文档与流程面修复，不含产品行为变更。人类指示「只补文档流程面上的缺口」。
+      需要改测试断言一处（元素数 7→9），按门禁 1 的时序先签 TA-0007 再改。
+      未回填任何历史快照（HANDOVER.md / HANDOVER-V2.md / AGENTS V1-V2 段原样保留），
+      也未改写测试报告里当次运行的 675 数字。

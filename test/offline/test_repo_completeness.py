@@ -137,15 +137,21 @@ def test_checker_script_exists() -> None:
     assert (ROOT / "scripts" / "check_repo_completeness.py").exists()
 
 
-def test_checker_parses_seven_elements() -> None:
-    """检查器须能从 blueprint §4 解析出 7 个架构元素（判据单一来源）。"""
+def test_checker_parses_all_elements() -> None:
+    """检查器须从 blueprint §4 解析出全部 9 个架构元素（判据单一来源）。
+
+    V1 为 7 个；V2 引入 `bidding`（⑧）、V3 引入 `corpus`（⑨）后应为 9 个。
+    与 `fitness_functions.ELEMENT_BY_PACKAGE` 的编号保持一致。
+    本断言在改动前已由 TA-0007 批准（2026-11-22T20:40，早于本提交）。
+    """
     sys.path.insert(0, str(ROOT / "scripts"))
     import check_repo_completeness as crc
 
     elements = crc.declared_elements()
-    assert len(elements) == 7, f"应为 7 个元素，实际 {elements}"
+    assert len(elements) == 9, f"应为 9 个元素，实际 {elements}"
     assert set(elements) == {
         "ads", "scene", "compliance", "selector", "render", "audit", "app",
+        "bidding", "corpus",
     }
 
 
