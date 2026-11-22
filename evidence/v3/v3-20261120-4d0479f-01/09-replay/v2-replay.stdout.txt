@@ -1,0 +1,2 @@
+V2 offline replay: PASS; cases=18 positive=4 negative=14 violations=0
+Provider: fixed offline; live_provider_tested=false; latency is local replay only.

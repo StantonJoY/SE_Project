@@ -1,0 +1,324 @@
+I001 [*] Import block is un-sorted or un-formatted
+  --> eval\v3_runner.py:26:1
+   |
+24 |   sys.path.insert(0, str(ROOT / "src"))
+25 |
+26 | / from app import AppConfig, recommend  # noqa: E402
+27 | | from app.cli import CorpusContext, load_corpus_context  # noqa: E402
+28 | | from audit import InMemoryAuditStore  # noqa: E402
+29 | | from ads.banned_words import BannedWords  # noqa: E402
+30 | | from ads.repository import AdRepository  # noqa: E402
+31 | | from compliance.rules import SceneRules  # noqa: E402
+32 | | from corpus import load_corpus_config  # noqa: E402
+33 | | from scene.parser import parse_scene  # noqa: E402
+34 | | from selector import MockLLM  # noqa: E402
+   | |____________________________^
+35 |
+36 |   CASES = ROOT / "eval" / "v3_cases.json"
+   |
+help: Organize imports
+   |
+25 |
+26 + from ads.banned_words import BannedWords  # noqa: E402
+27 + from ads.repository import AdRepository  # noqa: E402
+28 | from app import AppConfig, recommend  # noqa: E402
+29 | from app.cli import CorpusContext, load_corpus_context  # noqa: E402
+30 | from audit import InMemoryAuditStore  # noqa: E402
+   - from ads.banned_words import BannedWords  # noqa: E402
+   - from ads.repository import AdRepository  # noqa: E402
+31 | from compliance.rules import SceneRules  # noqa: E402
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> scripts\build_bids_v3.py:21:1
+   |
+19 | sys.path.insert(0, str(ROOT / "src"))
+20 |
+21 | from corpus.pricing import budget_cents_for, bid_cents_from_price  # noqa: E402
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: Organize imports
+   |
+20 |
+   - from corpus.pricing import budget_cents_for, bid_cents_from_price  # noqa: E402
+21 + from corpus.pricing import bid_cents_from_price, budget_cents_for  # noqa: E402
+22 |
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> src\app\cli.py:15:1
+   |
+13 |   """
+14 |
+15 | / from __future__ import annotations
+16 | |
+17 | | import argparse
+18 | | import json
+19 | | import sys
+20 | | from pathlib import Path
+21 | |
+22 | | from dataclasses import dataclass
+23 | |
+24 | | from ads.banned_words import BannedWords
+25 | | from ads.repository import AdRepository
+26 | | from audit import JsonlAuditStore
+27 | | from compliance.content_rules import ContentPolicy, ContentRules
+28 | | from compliance.rules import SceneRules
+29 | | from corpus import CorpusItem, CorpusRepository, load_corpus_config, project_all, select_candidates
+30 | | from render import to_json
+31 | | from scene.parser import SceneInputError, parse_scene
+32 | | from selector import MockLLM
+33 | |
+34 | | from .config import AppConfig, ConfigError
+35 | | from .pipeline import recommend
+   | |_______________________________^
+36 |
+37 |   DEFAULT_CONFIG = "config.yaml"
+   |
+help: Organize imports
+   |
+19 | import sys
+   - from pathlib import Path
+   -
+20 | from dataclasses import dataclass
+21 + from pathlib import Path
+22 |
+   |
+
+UP035 [*] Import from `collections.abc` instead: `Mapping`
+  --> src\corpus\config.py:14:1
+   |
+12 | from dataclasses import dataclass, field
+13 | from pathlib import Path
+14 | from typing import Any, Mapping
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+15 |
+16 | import yaml
+   |
+help: Import from `collections.abc`
+   |
+13 | from pathlib import Path
+   - from typing import Any, Mapping
+14 + from typing import Any
+15 + from collections.abc import Mapping
+16 |
+   |
+
+UP035 [*] Import from `collections.abc` instead: `Mapping`
+  --> src\corpus\models.py:14:1
+   |
+13 | from dataclasses import dataclass
+14 | from typing import Mapping
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^
+15 |
+16 | #: 七维标签的固定键（与 `demo_steam_30` 的受控词表一致）
+   |
+help: Import from `collections.abc`
+   |
+13 | from dataclasses import dataclass
+   - from typing import Mapping
+14 + from collections.abc import Mapping
+15 |
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> test\offline\test_corpus.py:18:1
+   |
+16 |   """
+17 |
+18 | / from __future__ import annotations
+19 | |
+20 | | import ast
+21 | | import hashlib
+22 | | import io
+23 | | import json
+24 | | from dataclasses import asdict
+25 | | from pathlib import Path
+26 | |
+27 | | import jsonschema
+28 | | import pytest
+29 | | from jsonschema import Draft202012Validator
+30 | |
+31 | | from ads.banned_words import BannedWords
+32 | | from ads.repository import AdLoadError, AdRepository
+33 | | from ads.schema import AD_SCHEMA
+34 | | from app import AppConfig, recommend
+35 | | from app.cli import load_corpus_context
+36 | | from audit import InMemoryAuditStore
+37 | | from compliance.rules import SceneRules
+38 | | from corpus import (
+39 | |     CorpusConfig,
+40 | |     CorpusConfigError,
+41 | |     CorpusItem,
+42 | |     CorpusLoadError,
+43 | |     CorpusRepository,
+44 | |     load_corpus_config,
+45 | |     project_all,
+46 | |     select_candidates,
+47 | | )
+48 | | from corpus import repository as corpus_repository
+49 | | from scene.parser import parse_scene
+50 | | from selector import MockLLM
+51 | | from scripts.build_corpus_subset import select_subset
+   | |_____________________________________________________^
+52 |
+53 |   ROOT = Path(__file__).resolve().parents[2]
+   |
+help: Organize imports
+   |
+49 | from scene.parser import parse_scene
+50 + from scripts.build_corpus_subset import select_subset
+51 | from selector import MockLLM
+   - from scripts.build_corpus_subset import select_subset
+52 |
+   |
+
+B905 `zip()` without an explicit `strict=` parameter
+   --> test\offline\test_corpus.py:266:24
+    |
+264 |     hits = [len(item.match_labels() & targets) for item in picked]
+265 |     assert hits == sorted(hits, reverse=True)
+266 |     for left, right in zip(picked, picked[1:]):
+    |                        ^^^^^^^^^^^^^^^^^^^^^^^
+267 |         if len(left.match_labels() & targets) == len(right.match_labels() & targets):
+268 |             assert left.item_id < right.item_id
+    |
+help: Add explicit value for parameter `strict=`
+    |
+265 |     assert hits == sorted(hits, reverse=True)
+    -     for left, right in zip(picked, picked[1:]):
+266 +     for left, right in zip(picked, picked[1:], strict=False):
+267 |         if len(left.match_labels() & targets) == len(right.match_labels() & targets):
+    |
+note: This is an unsafe fix and may change runtime behavior
+
+SIM101 Multiple `isinstance` calls for `replacement`, merge into a single call
+   --> test\offline\test_mutation_check.py:192:13
+    |
+190 |         assert isinstance(attr, str) and attr
+191 |         assert (
+192 |             callable(replacement) or isinstance(replacement, property) or isinstance(replacement, dict)
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+193 |         ), f"{mutation_id}: {attr} 的替换对象既不可调用、不是 property、也不是常量 dict"
+    |
+help: Merge `isinstance` calls for `replacement`
+    |
+191 |         assert (
+    -             callable(replacement) or isinstance(replacement, property) or isinstance(replacement, dict)
+192 +             callable(replacement) or isinstance(replacement, (property, dict))
+193 |         ), f"{mutation_id}: {attr} 的替换对象既不可调用、不是 property、也不是常量 dict"
+    |
+note: This is an unsafe fix and may change runtime behavior
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> test\offline\test_v3_compliance.py:12:1
+   |
+10 |   """
+11 |
+12 | / from __future__ import annotations
+13 | |
+14 | | from pathlib import Path
+15 | |
+16 | | import pytest
+17 | |
+18 | | from ads.banned_words import BannedWords
+19 | | from compliance.content_rules import ContentPolicy, ContentRules, ContentRulesError
+20 | | from compliance.pipeline import run_compliance
+21 | | from compliance.models import ComplianceVerdict
+22 | | from compliance.rules import SceneRules
+23 | | from corpus import CorpusRepository, project_all
+24 | | from scene.parser import parse_scene
+   | |____________________________________^
+25 |
+26 |   ROOT = Path(__file__).resolve().parents[2]
+   |
+help: Organize imports
+   |
+19 | from compliance.content_rules import ContentPolicy, ContentRules, ContentRulesError
+20 + from compliance.models import ComplianceVerdict
+21 | from compliance.pipeline import run_compliance
+   - from compliance.models import ComplianceVerdict
+22 | from compliance.rules import SceneRules
+   |
+
+SIM300 [*] Yoda condition detected
+   --> test\offline\test_v3_compliance.py:113:12
+    |
+111 |     assert facts[ad.ad_id].required_age == 17
+112 |     # competitive 上限 18：年龄本身不拦（但内容仍按档位判定）
+113 |     assert 17 <= rules.tiers["competitive"].max_age
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+114 |     # campus 上限 13：年龄超限
+115 |     assert 17 > rules.tiers["campus"].max_age
+    |
+help: Rewrite as `rules.tiers["competitive"].max_age >= 17`
+    |
+112 |     # competitive 上限 18：年龄本身不拦（但内容仍按档位判定）
+    -     assert 17 <= rules.tiers["competitive"].max_age
+113 +     assert rules.tiers["competitive"].max_age >= 17
+114 |     # campus 上限 13：年龄超限
+    |
+
+SIM300 [*] Yoda condition detected
+   --> test\offline\test_v3_compliance.py:115:12
+    |
+113 |     assert 17 <= rules.tiers["competitive"].max_age
+114 |     # campus 上限 13：年龄超限
+115 |     assert 17 > rules.tiers["campus"].max_age
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+116 |     detail = _verdict(ad, ads, SCENES["campus"], facts, rules, env).detail_of("scene") or ""
+117 |     assert "17" in detail
+    |
+help: Rewrite as `rules.tiers["campus"].max_age < 17`
+    |
+114 |     # campus 上限 13：年龄超限
+    -     assert 17 > rules.tiers["campus"].max_age
+115 +     assert rules.tiers["campus"].max_age < 17
+116 |     detail = _verdict(ad, ads, SCENES["campus"], facts, rules, env).detail_of("scene") or ""
+    |
+
+F401 [*] `io` imported but unused
+   --> test\offline\test_v3_compliance.py:151:12
+    |
+149 | def test_content_rules_reject_unknown_tier_reference(tmp_path=None):
+150 |     """REQ-ADS-NFR-SAFETY-010：tag_to_tier 指向未知档位必须拒绝。"""
+151 |     import io
+    |            ^^
+152 |     import tempfile
+    |
+help: Remove unused import: `io`
+    |
+150 |     """REQ-ADS-NFR-SAFETY-010：tag_to_tier 指向未知档位必须拒绝。"""
+    -     import io
+151 |     import tempfile
+    |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> test\offline\test_v3_pricing.py:11:1
+   |
+ 9 |   """
+10 |
+11 | / from __future__ import annotations
+12 | |
+13 | | import ast
+14 | | import json
+15 | | from pathlib import Path
+16 | |
+17 | | import pytest
+18 | |
+19 | | from bidding import Bid, InsufficientBudget, Ledger, validate_bids
+20 | | from corpus import CorpusRepository
+21 | | from corpus.pricing import AD_FEE_RATIO, DEFAULT_IMPRESSIONS, budget_cents_for, bid_cents_from_price
+   | |____________________________________________________________________________________________________^
+22 |
+23 |   ROOT = Path(__file__).resolve().parents[2]
+   |
+help: Organize imports
+   |
+20 | from corpus import CorpusRepository
+   - from corpus.pricing import AD_FEE_RATIO, DEFAULT_IMPRESSIONS, budget_cents_for, bid_cents_from_price
+21 + from corpus.pricing import AD_FEE_RATIO, DEFAULT_IMPRESSIONS, bid_cents_from_price, budget_cents_for
+22 |
+   |
+
+Found 13 errors.
+[*] 11 fixable with `--fix` (2 unsafe fixes available with `--fix --unsafe-fixes`).

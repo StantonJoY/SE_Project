@@ -1,0 +1,33 @@
+{
+  "run_id": "v3-20261120-1613818-01",
+  "prompt_version": "ctx-v1.1",
+  "model": "deepseek-flash",
+  "provider": "openai_compatible_http",
+  "review_status": "PASS_WITH_LIMITATIONS",
+  "reviewed_at": "2026-11-22",
+  "reviewer": "current user; add the named reviewer before submission",
+  "scope": {
+    "scenes": 6,
+    "runs_per_scene": 3,
+    "structural_valid": "18/18",
+    "ad_outcomes": "18/18",
+    "no_ad_outcomes": 0
+  },
+  "labels": {
+    "family_afternoon": "ACCEPTABLE_FAMILY_MATCH",
+    "student_morning": "ACCEPTABLE_STUDENT_MATCH",
+    "gamer_evening": "ACCEPTABLE_COMPETITIVE_MATCH",
+    "family_evening_tablet": "ACCEPTABLE_FAMILY_MATCH",
+    "student_night": "ACCEPTABLE_STUDENT_MATCH",
+    "esports_afternoon": "ACCEPTABLE_HIGH_INTENSITY_MATCH"
+  },
+  "limitations": [
+    "The test uses a test-only HTTPSelectorClient injected through app.pipeline.recommend.",
+    "The product V1 CLI remains Mock/Offline and still hardcodes MockLLM.",
+    "Only one real model/provider was tested: deepseek-flash over OpenAI-compatible HTTP.",
+    "Each scene was run three times; this is not a broad statistical sample.",
+    "The real Steam corpus and config-v3 candidate selection were used, but this is not a broad human-labeled gold corpus.",
+    "The result does not replace fixed replay, compliance tests, full regression, or future product-level V1 live integration.",
+    "Gate 1 test approval remains DEFERRED / FAIL."
+  ]
+}

@@ -33,3 +33,27 @@ eval:
   pass_rate_threshold: 0.95
   # p95 延迟是**独立**的硬判据，不参与通过率平均（ADR-003 D6）
   latency_p95_threshold_sec: 5.0
+
+corpus:
+  # V3 真实语料（只读；ADR-006 D2）。与 data/ads.json 的手写素材双源并存。
+  items_path: "data/corpus/items.jsonl"
+  tags_path: "data/corpus/tags.jsonl"
+  # 场景内容分级规则（safety-critical；ADR-006 D4）
+  content_rules_path: "data/scene-content-rules.yaml"
+  # top_k 上限由上下文预算反推：K=30 → 1152 token（预算 2000 的 58%）；K=60 已超预算。
+  top_k: 30
+  # 演示口径：预算 = 出价 × 20 次曝光（ADR-006 D5）
+  budget_impressions: 20
+  # 场景取值 → 语料标签（大小写不敏感，多字段取并集）
+  tag_mapping:
+    morning: ["Relaxing", "Casual", "Indie"]
+    afternoon: ["Casual", "Adventure", "Open World"]
+    evening: ["Story Rich", "Atmospheric", "RPG"]
+    night: ["Relaxing", "Cozy", "Horror"]
+    mobile: ["Casual", "Indie", "2D"]
+    desktop: ["Action", "Strategy", "RPG"]
+    tablet: ["Casual", "Simulation", "Co-op"]
+    student: ["Casual", "Co-op", "Indie", "Free to Play"]
+    gamer: ["Action", "Competitive", "Multiplayer", "Shooter"]
+    family: ["Family-Friendly", "Wholesome", "Cozy"]
+    competitive: ["Competitive", "Esports", "Shooter", "Action"]

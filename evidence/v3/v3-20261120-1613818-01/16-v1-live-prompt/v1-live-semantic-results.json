@@ -1,0 +1,341 @@
+{
+  "prompt_version": "ctx-v1.1",
+  "provider": "http",
+  "model": "deepseek-flash",
+  "real_model_tested": true,
+  "human_labels": null,
+  "label_status": "PENDING_HUMAN_LABELS",
+  "v1_live_note": "This is a test-only LLMClient injection through app.pipeline.recommend; the product V1 CLI still uses MockLLM.",
+  "scenes": [
+    {
+      "scene_id": "family_afternoon",
+      "scene": {
+        "time_slot": "afternoon",
+        "device": "desktop",
+        "user_tags": [
+          "family"
+        ]
+      },
+      "candidate_count": 30,
+      "runs": [
+        {
+          "run": 1,
+          "audit_id": "aud-a3d081d983ee",
+          "kind": "ad",
+          "ad": {
+            "ad_id": "ad_316610",
+            "title": "A Good Snowman Is Hard To Build",
+            "copy": "A monster rolls snowballs to build snowmen in this adorable puzzle game. Players push and stack snow across lovingly crafted levels, accompanied by charming graphics and an original soundtrack, in a gentle, thoughtful experience about assembling snowmen.",
+            "category": "Casual"
+          },
+          "explanation": "选择 ad_316610（品类 Casual）的理由：该候选为 Casual，标签包含 Puzzle-Solving、Combat-Free、Cozy、Relaxing、Wholesome、Family-Friendly，最符合家庭场景下偏好温和、合家欢内容的需求，且适合下午在桌面设备游玩。置信度 0.95。在同一场景下，候选集中还有 ad_24720(Adventure)、ad_276340(Simulation)、ad_634160(RPG)、ad_2993780(RPG)、ad_21130(Action) 等 29 条，但它们的品类或目标标签与本场景的匹配度更低。",
+          "explanation_degraded": false,
+          "confidence": 0.95
+        },
+        {
+          "run": 2,
+          "audit_id": "aud-04164f92cb32",
+          "kind": "ad",
+          "ad": {
+            "ad_id": "ad_316610",
+            "title": "A Good Snowman Is Hard To Build",
+            "copy": "A monster rolls snowballs to build snowmen in this adorable puzzle game. Players push and stack snow across lovingly crafted levels, accompanied by charming graphics and an original soundtrack, in a gentle, thoughtful experience about assembling snowmen.",
+            "category": "Casual"
+          },
+          "explanation": "选择 ad_316610（品类 Casual）的理由：该候选为 Casual，标签包含 Family-Friendly、Combat-Free、Cozy、Relaxing、Wholesome 与 Puzzle-Solving，最贴合家庭场景下午偏好温和、合家欢内容的需求。置信度 0.96。在同一场景下，候选集中还有 ad_24720(Adventure)、ad_276340(Simulation)、ad_634160(RPG)、ad_2993780(RPG)、ad_21130(Action) 等 29 条，但它们的品类或目标标签与本场景的匹配度更低。",
+          "explanation_degraded": false,
+          "confidence": 0.96
+        },
+        {
+          "run": 3,
+          "audit_id": "aud-6b0a1f5d94d8",
+          "kind": "ad",
+          "ad": {
+            "ad_id": "ad_316610",
+            "title": "A Good Snowman Is Hard To Build",
+            "copy": "A monster rolls snowballs to build snowmen in this adorable puzzle game. Players push and stack snow across lovingly crafted levels, accompanied by charming graphics and an original soundtrack, in a gentle, thoughtful experience about assembling snowmen.",
+            "category": "Casual"
+          },
+          "explanation": "选择 ad_316610（品类 Casual）的理由：当前为家庭场景，偏好温和、合家欢内容；该候选标签包含 Family-Friendly、Combat-Free、Cozy、Relaxing、Wholesome 与 Casual，最符合下午家庭休闲且无战斗压力的需求。置信度 0.95。在同一场景下，候选集中还有 ad_24720(Adventure)、ad_276340(Simulation)、ad_634160(RPG)、ad_2993780(RPG)、ad_21130(Action) 等 29 条，但它们的品类或目标标签与本场景的匹配度更低。",
+          "explanation_degraded": false,
+          "confidence": 0.95
+        }
+      ]
+    },
+    {
+      "scene_id": "student_morning",
+      "scene": {
+        "time_slot": "morning",
+        "device": "mobile",
+        "user_tags": [
+          "student"
+        ]
+      },
+      "candidate_count": 30,
+      "runs": [
+        {
+          "run": 1,
+          "audit_id": "aud-0da5b7565f50",
+          "kind": "ad",
+          "ad": {
+            "ad_id": "ad_351030",
+            "title": "Pixel Puzzles Ultimate Jigsaw Puzzles",
+            "copy": "A digital jigsaw puzzle game offering full-size professional puzzles with piece counts from 21 up to 1410, each cut in unique shapes no physical jigsaw could match. Players customize settings and environments, use hints and power-ups, and enjoy a peaceful puzzling atmosphere with autosaving.",
+            "category": "Casual"
+          },
+          "explanation": "选择 ad_351030（品类 Casual）的理由：该候选为 Casual，并带有 Puzzle-Solving、Combat-Free、Relaxing、Cozy、Family-Friendly 等标签，符合上午、手机使用及校园公共场合下对学生群体更友好的短时放松需求。置信度 0.92。在同一场景下，候选集中还有 ad_317470(Massively Multiplayer)、ad_70620(Sports)、ad_95400(Indie)、ad_243780(Strategy)、ad_290730(Strategy) 等 29 条，但它们的品类或目标标签与本场景的匹配度更低。",
+          "explanation_degraded": false,
+          "confidence": 0.92
+        },
+        {
+          "run": 2,
+          "audit_id": "aud-d6f758d71adf",
+          "kind": "ad",
+          "ad": {
+            "ad_id": "ad_351030",
+            "title": "Pixel Puzzles Ultimate Jigsaw Puzzles",
+            "copy": "A digital jigsaw puzzle game offering full-size professional puzzles with piece counts from 21 up to 1410, each cut in unique shapes no physical jigsaw could match. Players customize settings and environments, use hints and power-ups, and enjoy a peaceful puzzling atmosphere with autosaving.",
+            "category": "Casual"
+          },
+          "explanation": "选择 ad_351030（品类 Casual）的理由：该候选为休闲解谜类，标签包含 Combat-Free、Relaxing、Cozy、Casual、Family-Friendly，适合学生上午在校园公共场合进行低压力、内容安全的轻松体验。置信度 0.92。在同一场景下，候选集中还有 ad_317470(Massively Multiplayer)、ad_70620(Sports)、ad_95400(Indie)、ad_243780(Strategy)、ad_290730(Strategy) 等 29 条，但它们的品类或目标标签与本场景的匹配度更低。",
+          "explanation_degraded": false,
+          "confidence": 0.92
+        },
+        {
+          "run": 3,
+          "audit_id": "aud-f2dfbf3531da",
+          "kind": "ad",
+          "ad": {
+            "ad_id": "ad_351030",
+            "title": "Pixel Puzzles Ultimate Jigsaw Puzzles",
+            "copy": "A digital jigsaw puzzle game offering full-size professional puzzles with piece counts from 21 up to 1410, each cut in unique shapes no physical jigsaw could match. Players customize settings and environments, use hints and power-ups, and enjoy a peaceful puzzling atmosphere with autosaving.",
+            "category": "Casual"
+          },
+          "explanation": "选择 ad_351030（品类 Casual）的理由：该候选为 Casual，标签包含 Puzzle-Solving、Combat-Free、Relaxing、Cozy、Casual、Family-Friendly，适合学生上午在校园公共场合进行轻松、无战斗且内容友好的短暂游玩。置信度 0.92。在同一场景下，候选集中还有 ad_317470(Massively Multiplayer)、ad_70620(Sports)、ad_95400(Indie)、ad_243780(Strategy)、ad_290730(Strategy) 等 29 条，但它们的品类或目标标签与本场景的匹配度更低。",
+          "explanation_degraded": false,
+          "confidence": 0.92
+        }
+      ]
+    },
+    {
+      "scene_id": "gamer_evening",
+      "scene": {
+        "time_slot": "evening",
+        "device": "desktop",
+        "user_tags": [
+          "gamer"
+        ]
+      },
+      "candidate_count": 30,
+      "runs": [
+        {
+          "run": 1,
+          "audit_id": "aud-2f3120f19a06",
+          "kind": "ad",
+          "ad": {
+            "ad_id": "ad_2630",
+            "title": "Call of Duty® 2",
+            "copy": "Players fight through WWII campaigns as ordinary Allied soldiers across North Africa, Normandy and Russia, relying on squadmates and choosing mission order. The shooter emphasizes cinematic battles, tanks and large-scale combat, with team-based Axis versus Allies multiplayer.",
+            "category": "Action"
+          },
+          "explanation": "选择 ad_2630（品类 Action）的理由：候选标签同时包含 Hardcore、Competitive、Tense，并具备 Shooting 与 Real-Time Combat，最贴合竞技/硬核玩家场景及可接受高强度内容的需求。置信度 0.92。在同一场景下，候选集中还有 ad_6020(Action)、ad_6030(Action)、ad_10180(Action)、ad_108800(Action)、ad_235600(Action) 等 29 条，但它们的品类或目标标签与本场景的匹配度更低。",
+          "explanation_degraded": false,
+          "confidence": 0.92
+        },
+        {
+          "run": 2,
+          "audit_id": "aud-da767cdc9f27",
+          "kind": "ad",
+          "ad": {
+            "ad_id": "ad_2630",
+            "title": "Call of Duty® 2",
+            "copy": "Players fight through WWII campaigns as ordinary Allied soldiers across North Africa, Normandy and Russia, relying on squadmates and choosing mission order. The shooter emphasizes cinematic battles, tanks and large-scale combat, with team-based Axis versus Allies multiplayer.",
+            "category": "Action"
+          },
+          "explanation": "选择 ad_2630（品类 Action）的理由：该候选为 Action，且标签包含 Competitive、Hardcore、Tense、Shooting、Real-Time Combat，直接匹配竞技/硬核玩家与可接受高强度内容的场景。置信度 0.92。在同一场景下，候选集中还有 ad_6020(Action)、ad_6030(Action)、ad_10180(Action)、ad_108800(Action)、ad_235600(Action) 等 29 条，但它们的品类或目标标签与本场景的匹配度更低。",
+          "explanation_degraded": false,
+          "confidence": 0.92
+        },
+        {
+          "run": 3,
+          "audit_id": "aud-6a9f7e27b3a5",
+          "kind": "ad",
+          "ad": {
+            "ad_id": "ad_2630",
+            "title": "Call of Duty® 2",
+            "copy": "Players fight through WWII campaigns as ordinary Allied soldiers across North Africa, Normandy and Russia, relying on squadmates and choosing mission order. The shooter emphasizes cinematic battles, tanks and large-scale combat, with team-based Axis versus Allies multiplayer.",
+            "category": "Action"
+          },
+          "explanation": "选择 ad_2630（品类 Action）的理由：候选品类为 Action，标签同时包含 Hardcore、Competitive、War、Shooting、Real-Time Combat、Tense、Epic；最贴合竞技/硬核玩家且可接受高强度内容的场景。置信度 0.92。在同一场景下，候选集中还有 ad_6020(Action)、ad_6030(Action)、ad_10180(Action)、ad_108800(Action)、ad_235600(Action) 等 29 条，但它们的品类或目标标签与本场景的匹配度更低。",
+          "explanation_degraded": false,
+          "confidence": 0.92
+        }
+      ]
+    },
+    {
+      "scene_id": "family_evening_tablet",
+      "scene": {
+        "time_slot": "evening",
+        "device": "tablet",
+        "user_tags": [
+          "family"
+        ]
+      },
+      "candidate_count": 30,
+      "runs": [
+        {
+          "run": 1,
+          "audit_id": "aud-37cdde0eae22",
+          "kind": "ad",
+          "ad": {
+            "ad_id": "ad_96000",
+            "title": "The Tiny Bang Story",
+            "copy": "After a meteor shatters Tiny Planet, players restore the world and help its inhabitants by fixing machines and solving puzzles across five chapters. The hand-drawn, text-free point-and-click adventure offers over thirty brain teasers and simple navigation suitable for the whole family.",
+            "category": "Casual"
+          },
+          "explanation": "选择 ad_96000（品类 Casual）的理由：该候选为Casual，并带有Puzzle-Solving、Point & Click、Combat-Free、Relaxing、Cheerful、Wholesome等标签，贴合傍晚平板家庭场景对温和、合家欢与低压力体验的偏好。置信度 0.93。在同一场景下，候选集中还有 ad_259550(Adventure)、ad_346560(Adventure)、ad_3258290(Adventure)、ad_256290(RPG)、ad_331750(Adventure) 等 29 条，但它们的品类或目标标签与本场景的匹配度更低。",
+          "explanation_degraded": false,
+          "confidence": 0.93
+        },
+        {
+          "run": 2,
+          "audit_id": "aud-84f357aad1c7",
+          "kind": "ad",
+          "ad": {
+            "ad_id": "ad_96000",
+            "title": "The Tiny Bang Story",
+            "copy": "After a meteor shatters Tiny Planet, players restore the world and help its inhabitants by fixing machines and solving puzzles across five chapters. The hand-drawn, text-free point-and-click adventure offers over thirty brain teasers and simple navigation suitable for the whole family.",
+            "category": "Casual"
+          },
+          "explanation": "选择 ad_96000（品类 Casual）的理由：该候选为 Casual 品类，标签包含 Puzzle-Solving、Point & Click、Combat-Free、Relaxing、Cheerful、Wholesome，符合傍晚在平板上进行温和、合家欢、轻松解谜的场景偏好。置信度 0.88。在同一场景下，候选集中还有 ad_259550(Adventure)、ad_346560(Adventure)、ad_3258290(Adventure)、ad_256290(RPG)、ad_331750(Adventure) 等 29 条，但它们的品类或目标标签与本场景的匹配度更低。",
+          "explanation_degraded": false,
+          "confidence": 0.88
+        },
+        {
+          "run": 3,
+          "audit_id": "aud-6df417e965f6",
+          "kind": "ad",
+          "ad": {
+            "ad_id": "ad_96000",
+            "title": "The Tiny Bang Story",
+            "copy": "After a meteor shatters Tiny Planet, players restore the world and help its inhabitants by fixing machines and solving puzzles across five chapters. The hand-drawn, text-free point-and-click adventure offers over thirty brain teasers and simple navigation suitable for the whole family.",
+            "category": "Casual"
+          },
+          "explanation": "选择 ad_96000（品类 Casual）的理由：该候选标签包含 Casual、Puzzle-Solving、Point & Click、Combat-Free、Relaxing、Cheerful、Wholesome，契合家庭场景、平板使用及傍晚偏温和合家欢内容的偏好；无战斗且兼具休闲解谜与轻松愉快属性。置信度 0.90。在同一场景下，候选集中还有 ad_259550(Adventure)、ad_346560(Adventure)、ad_3258290(Adventure)、ad_256290(RPG)、ad_331750(Adventure) 等 29 条，但它们的品类或目标标签与本场景的匹配度更低。",
+          "explanation_degraded": false,
+          "confidence": 0.9
+        }
+      ]
+    },
+    {
+      "scene_id": "student_night",
+      "scene": {
+        "time_slot": "night",
+        "device": "mobile",
+        "user_tags": [
+          "student"
+        ]
+      },
+      "candidate_count": 30,
+      "runs": [
+        {
+          "run": 1,
+          "audit_id": "aud-3c065942c9de",
+          "kind": "ad",
+          "ad": {
+            "ad_id": "ad_316610",
+            "title": "A Good Snowman Is Hard To Build",
+            "copy": "A monster rolls snowballs to build snowmen in this adorable puzzle game. Players push and stack snow across lovingly crafted levels, accompanied by charming graphics and an original soundtrack, in a gentle, thoughtful experience about assembling snowmen.",
+            "category": "Casual"
+          },
+          "explanation": "选择 ad_316610（品类 Casual）的理由：该候选为 Casual 品类，标签包含 Puzzle-Solving、Combat-Free、Cozy、Relaxing、Wholesome、Family-Friendly；在夜间、手机使用及校园公共场合下，更符合轻松、温和、适合学生群体的内容需求。置信度 0.86。在同一场景下，候选集中还有 ad_351030(Casual)、ad_317470(Massively Multiplayer)、ad_348620(Adventure)、ad_522230(Simulation)、ad_3258290(Adventure) 等 29 条，但它们的品类或目标标签与本场景的匹配度更低。",
+          "explanation_degraded": false,
+          "confidence": 0.86
+        },
+        {
+          "run": 2,
+          "audit_id": "aud-117061e105f3",
+          "kind": "ad",
+          "ad": {
+            "ad_id": "ad_316610",
+            "title": "A Good Snowman Is Hard To Build",
+            "copy": "A monster rolls snowballs to build snowmen in this adorable puzzle game. Players push and stack snow across lovingly crafted levels, accompanied by charming graphics and an original soundtrack, in a gentle, thoughtful experience about assembling snowmen.",
+            "category": "Casual"
+          },
+          "explanation": "选择 ad_316610（品类 Casual）的理由：该候选为 Casual 品类，标签包含 Puzzle-Solving、Combat-Free、Cozy、Relaxing、Wholesome、Family-Friendly。夜间手机场景下更适合轻量放松、无战斗且适合学生公共场合使用的条目，因此匹配度最高。置信度 0.92。在同一场景下，候选集中还有 ad_351030(Casual)、ad_317470(Massively Multiplayer)、ad_348620(Adventure)、ad_522230(Simulation)、ad_3258290(Adventure) 等 29 条，但它们的品类或目标标签与本场景的匹配度更低。",
+          "explanation_degraded": false,
+          "confidence": 0.92
+        },
+        {
+          "run": 3,
+          "audit_id": "aud-48fbe1254f7f",
+          "kind": "ad",
+          "ad": {
+            "ad_id": "ad_351030",
+            "title": "Pixel Puzzles Ultimate Jigsaw Puzzles",
+            "copy": "A digital jigsaw puzzle game offering full-size professional puzzles with piece counts from 21 up to 1410, each cut in unique shapes no physical jigsaw could match. Players customize settings and environments, use hints and power-ups, and enjoy a peaceful puzzling atmosphere with autosaving.",
+            "category": "Casual"
+          },
+          "explanation": "选择 ad_351030（品类 Casual）的理由：该候选为 Casual 品类，标签包含 Puzzle-Solving、Combat-Free、Relaxing、Cozy、Family-Friendly，适合夜间、手机公共场合及学生群体，低压力且内容友好。置信度 0.86。在同一场景下，候选集中还有 ad_317470(Massively Multiplayer)、ad_348620(Adventure)、ad_522230(Simulation)、ad_3258290(Adventure)、ad_16120(Simulation) 等 29 条，但它们的品类或目标标签与本场景的匹配度更低。",
+          "explanation_degraded": false,
+          "confidence": 0.86
+        }
+      ]
+    },
+    {
+      "scene_id": "esports_afternoon",
+      "scene": {
+        "time_slot": "afternoon",
+        "device": "desktop",
+        "user_tags": [
+          "esports"
+        ]
+      },
+      "candidate_count": 30,
+      "runs": [
+        {
+          "run": 1,
+          "audit_id": "aud-0cf280d6ac73",
+          "kind": "ad",
+          "ad": {
+            "ad_id": "ad_218230",
+            "title": "PlanetSide 2",
+            "copy": "The player joins one of three warring empires in a persistent free-to-play massively multiplayer first-person shooter, fighting in huge battles across four continents with infantry, vehicles, and aircraft while capturing territories and customizing a class-based soldier.",
+            "category": "Free To Play"
+          },
+          "explanation": "选择 ad_218230（品类 Free To Play）的理由：依据候选行标签，该条目包含 Shooting、Combat、War、Open World、Epic，最贴近 esports 用户可接受的高强度竞技场景，且桌面设备适配度较高。置信度 0.87。在同一场景下，候选集中还有 ad_24720(Adventure)、ad_223490(Simulation)、ad_225260(Action)、ad_389430(Massively Multiplayer)、ad_6880(Action) 等 29 条，但它们的品类或目标标签与本场景的匹配度更低。",
+          "explanation_degraded": false,
+          "confidence": 0.87
+        },
+        {
+          "run": 2,
+          "audit_id": "aud-6f4938e9c40c",
+          "kind": "ad",
+          "ad": {
+            "ad_id": "ad_218230",
+            "title": "PlanetSide 2",
+            "copy": "The player joins one of three warring empires in a persistent free-to-play massively multiplayer first-person shooter, fighting in huge battles across four continents with infantry, vehicles, and aircraft while capturing territories and customizing a class-based soldier.",
+            "category": "Free To Play"
+          },
+          "explanation": "选择 ad_218230（品类 Free To Play）的理由：候选标签包含 War、Shooting、Combat、Open World、Leveling、Epic，符合下午桌面端可接受高强度内容的竞技场景；其中射击与战争对抗标签最贴近 esports 场景需求。置信度 0.86。在同一场景下，候选集中还有 ad_24720(Adventure)、ad_223490(Simulation)、ad_225260(Action)、ad_389430(Massively Multiplayer)、ad_6880(Action) 等 29 条，但它们的品类或目标标签与本场景的匹配度更低。",
+          "explanation_degraded": false,
+          "confidence": 0.86
+        },
+        {
+          "run": 3,
+          "audit_id": "aud-8855732426e6",
+          "kind": "ad",
+          "ad": {
+            "ad_id": "ad_218230",
+            "title": "PlanetSide 2",
+            "copy": "The player joins one of three warring empires in a persistent free-to-play massively multiplayer first-person shooter, fighting in huge battles across four continents with infantry, vehicles, and aircraft while capturing territories and customizing a class-based soldier.",
+            "category": "Free To Play"
+          },
+          "explanation": "选择 ad_218230（品类 Free To Play）的理由：候选标签包含 Sci-Fi、War、Shooting、Combat、Open World、Leveling、Epic，属于高强度对抗与成长型多人射击场景，最契合下午桌面端可接受高强度内容的竞技需求。置信度 0.72。在同一场景下，候选集中还有 ad_24720(Adventure)、ad_223490(Simulation)、ad_225260(Action)、ad_389430(Massively Multiplayer)、ad_6880(Action) 等 29 条，但它们的品类或目标标签与本场景的匹配度更低。",
+          "explanation_degraded": false,
+          "confidence": 0.72
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+对比基线: origin/main
+变更文件 146 个
+
+触及的受保护路径：
+  [仅只读] docs/architecture/invariants.md ← ['docs/architecture/invariants.md']
+  [须 ADR] docs/code-governance/acceptance-coverage-map.yaml ← ['docs/code-governance/acceptance-coverage-map.yaml']
+  [须 ADR] docs/req/requirements.yaml ← ['docs/req/requirements.yaml']
+  [须 ADR] scripts/fitness_functions.py ← ['scripts/fitness_functions.py']
+  [须 ADR] scripts/mutation_check.py ← ['scripts/mutation_check.py']
+  [须 ADR] src/app/pipeline_v2.py ← ['src/app/pipeline_v2.py']
+  [须 ADR] src/compliance/ ← ['src/compliance/content_rules.py', 'src/compliance/pipeline.py']
+  [须 ADR] src/selector/ ← ['src/selector/__init__.py', 'src/selector/context.py', 'src/selector/relevance.py']
+  [须 ADR] src/selector/relevance.py ← ['src/selector/relevance.py']
+  [仅只读] test/offline/ ← ['test/offline/test_corpus.py', 'test/offline/test_mutation_check.py', 'test/offline/test_requirements_registry.py', 'test/offline/test_v2_governance.py', 'test/offline/test_v2_mutation.py', 'test/offline/test_v3_compliance.py', 'test/offline/test_v3_eval.py', 'test/offline/test_v3_pricing.py', 'test/offline/test_v3_prompt.py']
+
+架构决策伴随检查: 通过 — 变更集含 ADR 文件: ['docs/architecture/adr-006-v3-corpus-boundary.md']
+PASS — 触及须 ADR 的路径且伴随架构决策

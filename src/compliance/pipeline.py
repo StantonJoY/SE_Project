@@ -15,6 +15,7 @@ from __future__ import annotations
 from ads.banned_words import BannedWords
 from ads.models import Ad
 
+from .content_rules import ContentPolicy
 from .models import CheckResult, ComplianceVerdict
 from .rules import SceneRules
 
@@ -68,12 +69,18 @@ def check_category(ad: Ad, rules: SceneRules) -> CheckResult:
     )
 
 
-def check_scene(ad: Ad, scene, rules: SceneRules) -> CheckResult:
-    """REQ-009：广告不得违反场景硬约束。
+def check_scene(
+    ad: Ad, scene, rules: SceneRules, policy: ContentPolicy | None = None,
+) -> CheckResult:
+    """REQ-009 + REQ-ADS-NFR-SAFETY-008/009：广告不得违反场景硬约束与内容分级。
 
     两层检查：
       1. 素材自身声明（not_night / not_campus / allowed_devices）
       2. 规则级（night_blocked_categories / campus_blocked_categories）
+
+    第三层（V3，可选）：`policy` 提供时追加**场景内容分级**——
+    `content_warnings ∪ descriptor 映射` 与档位禁项求交；年龄超上限同样拒绝。
+    `policy=None` 时行为与 V1 **完全一致**（旧测试即为证据）。
 
     scene 使用 duck-typing：须有 time_slot / device / user_tags。
     校园信号 = user_tags 包含 "student"。
@@ -96,6 +103,19 @@ def check_scene(ad: Ad, scene, rules: SceneRules) -> CheckResult:
     if is_campus and ad.category in rules.campus_blocked_categories:
         problems.append(f"品类 {ad.category!r} 校园禁展示")
 
+    # 内容分级（V3）：并集判据 + 年龄兜底
+    if policy is not None:
+        facts = policy.facts.get(ad.ad_id)
+        if facts is not None:
+            tier = policy.rules.tier_for(scene)
+            hit = policy.rules.labels_for(facts) & tier.block_labels
+            if hit:
+                problems.append(f"档位 {tier.name} 禁止的内容 {sorted(hit)}")
+            if facts.required_age > tier.max_age:
+                problems.append(
+                    f"年龄分级 {facts.required_age} 超过档位 {tier.name} 上限 {tier.max_age}"
+                )
+
     return CheckResult(
         ok=not problems,
         rule="scene",
@@ -109,16 +129,19 @@ def run_compliance(
     candidates: list[Ad],
     banned_words: BannedWords,
     rules: SceneRules,
+    policy: ContentPolicy | None = None,
 ) -> ComplianceVerdict:
     """合规管道（REQ-ADS-NFR-SAFETY-001）：任一检查失败 → REJECT。
 
     顺序：output_exists → banned_words → banned_check → category → scene。
+    **V3 没有增加第六步**：内容分级通过 `policy` 注入到既有的 `scene` 步骤内部
+    （REQ-ADS-ARCH-015）。
     """
     results = (
         check_output(ad, candidates),
         check_banned_words(ad, banned_words),
         check_banned_check(ad),
         check_category(ad, rules),
-        check_scene(ad, scene, rules),
+        check_scene(ad, scene, rules, policy),
     )
     return ComplianceVerdict(approved=all(r.ok for r in results), results=results)

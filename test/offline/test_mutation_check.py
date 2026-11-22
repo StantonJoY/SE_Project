@@ -63,7 +63,7 @@ def test_no_mutation_for_undeclared_invariant() -> None:
 
     text = (ROOT / "docs" / "architecture" / "invariants.md").read_text(encoding="utf-8")
     # V2 规格迁移：只接受同一登记册中真实编号，不以任意前缀替代登记证据。
-    known = set(re.findall(r"`(INV-(?:ADS|V2)-\d{3})`", text))
+    known = set(re.findall(r"`(INV-(?:ADS|V2|V3)-\d{3})`", text))
     for m in mc.MUTATIONS:
         assert m.invariant in known, f"{m.mutation_id} 引用了不存在的不变量 {m.invariant}"
 
@@ -163,7 +163,7 @@ def test_declared_invariants_reads_coverage_map() -> None:
     assert declared, "覆盖表应至少声明一条 negative_test_backed"
     assert len(declared) == len(set(declared)), "不变量声明不得重复"
     assert set(declared) == set(expected), "不变量声明必须精确来自覆盖表"
-    assert all(re.fullmatch(r"INV-(?:ADS|V2)-\d{3}", invariant) for invariant in declared)
+    assert all(re.fullmatch(r"INV-(?:ADS|V2|V3)-\d{3}", invariant) for invariant in declared)
 
 
 def test_list_mode_lists_all_mutations(capsys) -> None:
@@ -179,14 +179,16 @@ def test_list_mode_lists_all_mutations(capsys) -> None:
 def test_every_replacement_entry_is_well_formed(mutation_id: str) -> None:
     """INV-ADS-011：替换表每项必须是 (模块, 属性, 可注入对象) 三元组。
 
-    "可注入对象"包括：普通函数/方法（callable），以及 **property**
-    （替换类属性时必需 —— `property` 本身不可调用，故不能用 `callable()` 判）。
+    "可注入对象"包括：普通函数/方法（callable）、**property**（替换类属性时必需，
+    `property` 本身不可调用），以及**数据常量**（如 `AD_SCHEMA` 这种 dict —
+    V3 的 INV-V3-001 就是把它换成放开 additionalProperties 的版本）。
     """
     for entry in mc.REPLACEMENTS[mutation_id]:
         assert len(entry) == 3
         mod_name, attr, replacement = entry
         assert isinstance(mod_name, str) and mod_name
         assert isinstance(attr, str) and attr
-        assert callable(replacement) or isinstance(replacement, property), (
-            f"{mutation_id}: {attr} 的替换对象既不可调用也不是 property"
-        )
+        assert (
+            callable(replacement)
+            or isinstance(replacement, (property, dict))
+        ), f"{mutation_id}: {attr} 的替换对象既不可调用、不是 property、也不是常量 dict"

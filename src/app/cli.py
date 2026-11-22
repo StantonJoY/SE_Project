@@ -17,19 +17,84 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 
 from ads.banned_words import BannedWords
 from ads.repository import AdRepository
 from audit import JsonlAuditStore
+from compliance.content_rules import ContentPolicy, ContentRules
 from compliance.rules import SceneRules
+from corpus import CorpusItem, CorpusRepository, load_corpus_config, project_all, select_candidates
 from render import to_json
+from scene.parser import SceneInputError, parse_scene
 from selector import MockLLM
 
 from .config import AppConfig, ConfigError
 from .pipeline import recommend
 
 DEFAULT_CONFIG = "config.yaml"
+
+
+@dataclass(frozen=True)
+class CorpusContext:
+    """V3 语料模式的接线结果：候选仓库 + 合规事实 + 原始语料条目（供 top-K 复算）。"""
+
+    repository: AdRepository
+    policy: ContentPolicy | None
+    corpus_items: tuple[CorpusItem, ...] = ()
+
+
+def load_corpus_context(
+    scene_raw: object, config_path: str | Path, root: Path, *, all_items: bool = False,
+) -> CorpusContext:
+    """V3 接线：场景 → 语料 top-K → 投影成 Ad → 连同内容事实交给既有管道（REQ-ADS-FR-014）。
+
+    **不改 `pipeline.recommend` 的权威链**：语料只是换了候选来源，
+    合规仍是 FINAL AUTHORITY；内容分级通过 `ContentPolicy` 注入到既有的
+    `scene` 步骤内部，五步顺序不变（REQ-ADS-ARCH-015）。
+    场景非法时返回空仓库与空事实——让管道自己走 `scene_invalid`，不在接线层吞掉。
+
+    Args:
+        all_items: V1 用 top-K（只有 30 条进 prompt，受 token 预算约束）；
+            V2 竞价需要**全量** Ad 入库（账本要一次 seed 全部报价，否则换场景即种子冲突），
+            再由调用方用 `candidate_ids` 把候选收窄到 top-K。
+    """
+    corpus_config = load_corpus_config(config_path)
+    corpus = CorpusRepository.load(root / corpus_config.items_path, root / corpus_config.tags_path)
+    rules = ContentRules.load(root / corpus_config.content_rules_path)
+    try:
+        scene = parse_scene(scene_raw)
+    except SceneInputError:
+        return CorpusContext(repository=AdRepository([]), policy=None)
+
+    if all_items:
+        ads, facts = project_all(corpus.all())
+    else:
+        picked = select_candidates(scene, corpus.all(), corpus_config.tag_mapping, corpus_config.top_k)
+        ads, facts = project_all(picked)
+    return CorpusContext(
+        repository=AdRepository(ads),
+        policy=ContentPolicy(rules=rules, facts=facts),
+        corpus_items=tuple(corpus.all()),
+    )
+
+
+def write_stdout(text: str) -> None:
+    """把 JSON 输出按 **UTF-8 字节**写出（F-006 / REQ-ADS-FR-004）。
+
+    Windows 下 `sys.stdout` 默认编码是 GBK/CP936，重定向到文件后得到的是 GBK 字节，
+    按 UTF-8 解析即失败——机器读不了。JSON 按 RFC 8259 必须是 UTF-8，
+    所以这里绕过文本层直接写 `sys.stdout.buffer`；没有缓冲区（如某些测试替身）时
+    退回普通写入，行为不变。
+    """
+    buffer = getattr(sys.stdout, "buffer", None)
+    if buffer is None:
+        sys.stdout.write(text)
+        sys.stdout.flush()
+        return
+    buffer.write(text.encode("utf-8"))
+    buffer.flush()
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -46,6 +111,11 @@ def build_parser() -> argparse.ArgumentParser:
     src.add_argument("--time-slot", help="时段：morning/afternoon/evening/night")
     p.add_argument("--device", help="设备：mobile/tablet/desktop")
     p.add_argument("--tag", action="append", default=[], help="用户标签（可重复）")
+    p.add_argument(
+        "--corpus",
+        action="store_true",
+        help="候选来源改为真实语料（V3）：按场景选 top-K 后投影成 Ad",
+    )
     p.add_argument("--audit", help="审计日志路径（覆盖配置）")
     p.add_argument("--indent", type=int, default=2, help="输出 JSON 缩进（0 = 单行）")
     return p
@@ -89,13 +159,20 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     # ---- ③ 只读数据源 ----
+    policy = None
     try:
-        repo = AdRepository.load(root / config.data.ads_path)
+        if args.corpus:
+            ctx = load_corpus_context(scene_raw, root / args.config, root)
+            repo, policy = ctx.repository, ctx.policy
+        else:
+            repo = AdRepository.load(root / config.data.ads_path)
         banned = BannedWords.load(root / config.data.banned_words_path)
         rules = SceneRules.load(root / config.data.scene_rules_path)
     except Exception as e:  # noqa: BLE001 —— 启动期数据问题须明确报告后退出（fail loudly）
         print(f"数据加载失败：{e}", file=sys.stderr)
         return 2
+    if args.corpus:
+        print(f"[corpus] 候选 {repo.count} 条（top_k 截断后投影）", file=sys.stderr)
 
     audit_path = Path(args.audit) if args.audit else (root / config.audit.log_path)
     store = JsonlAuditStore(audit_path)
@@ -109,10 +186,11 @@ def main(argv: list[str] | None = None) -> int:
         client=MockLLM(),
         audit_store=store,
         config=config,
+        content_policy=policy,
     )
 
     indent = None if args.indent == 0 else args.indent
-    print(to_json(rec.result, indent=indent))
+    write_stdout(to_json(rec.result, indent=indent) + chr(10))
     # 审计 ID 走 stderr，保持 stdout 只含渲染结果（便于管道化消费）
     print(f"[audit_id] {rec.audit_id or '(审计失败)'}", file=sys.stderr)
     return 0

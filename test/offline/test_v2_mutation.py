@@ -29,8 +29,9 @@ def _output(**changes):
 def test_all_thirteen_original_and_twelve_v2_semantic_mutations_are_retained():
     expected_v1 = {f"INV-ADS-{n:03}" for n in [1, 2, 3, 4, 5, 6, 7, 8, 12, 13, 14, 15, 16]}
     expected_v2 = {f"INV-V2-{n:03}" for n in range(1, 13)}
-    assert {m.invariant for m in mc.MUTATIONS} == expected_v1 | expected_v2
-    assert set(mc._declared_invariants()) == expected_v1 | expected_v2
+    expected_v3 = {f"INV-V3-{n:03}" for n in range(1, 9)}
+    assert {m.invariant for m in mc.MUTATIONS} == expected_v1 | expected_v2 | expected_v3
+    assert set(mc._declared_invariants()) == expected_v1 | expected_v2 | expected_v3
 
 
 @pytest.mark.parametrize("phase", ["setup", "teardown"])

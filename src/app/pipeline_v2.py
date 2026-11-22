@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from collections.abc import Mapping
+from collections.abc import Collection, Mapping
 from dataclasses import asdict, is_dataclass
 from typing import Any
 
@@ -18,6 +18,7 @@ from ads.banned_words import BannedWords
 from ads.repository import AdRepository
 from app.sanitize import scan_for_injection
 from bidding import Bid, BidError, InsufficientBudget, Ledger, RequestConflict, choose_winner, validate_bids
+from compliance.content_rules import ContentPolicy
 from compliance.pipeline import run_compliance
 from compliance.rules import SceneRules
 from render.schema_v2 import validate_v2_result
@@ -72,6 +73,8 @@ def recommend_v2(
     client: RelevanceClient, ledger: Ledger, banned_words: BannedWords, rules: SceneRules,
     model_version: str = "fixed-v2", policy_version: str = "pay-as-bid-v1",
     context_budget_tokens: int = 2000,
+    candidate_ids: Collection[str] | None = None,
+    content_policy: ContentPolicy | None = None,
 ) -> dict:
     """REQ-ADS-ARCH-007/FR-008: replay once, with compliance strictly before debit.
 
@@ -161,6 +164,10 @@ def recommend_v2(
     except Exception:  # noqa: BLE001 - no reliable budget observation
         return _unknown(request_id)
     candidates = repo.filter_by_scene(scene)
+    if candidate_ids is not None:
+        # V3：候选先由语料按场景选 top-K（确定性标签匹配），竞价只在这批里进行。
+        allowed = set(candidate_ids)
+        candidates = [ad for ad in candidates if ad.ad_id in allowed]
     evidence["prefilter_candidate_ids"] = [ad.ad_id for ad in candidates]
     eligible = []
     for ad in candidates:
@@ -217,7 +224,7 @@ def recommend_v2(
     if choice is None or choice.relevance == 0:
         return no_ad("no_relevant_candidates", "No eligible candidate has positive relevance advice.")
     chosen = next(ad for ad in eligible if ad.ad_id == choice.ad_id)
-    verdict = run_compliance(chosen, scene, eligible, banned_words, rules)
+    verdict = run_compliance(chosen, scene, eligible, banned_words, rules, content_policy)
     evidence["compliance"] = {"approved": verdict.approved, "executed": True,
                               "results": [asdict(check) for check in verdict.results]}
     evidence["auction_choice"] = asdict(choice)

@@ -1,0 +1,20 @@
+Semantic changes: ['config.yaml', 'src/app/cli_v2.py', 'src/app/pipeline.py', 'src/app/pipeline_v2.py', 'src/selector/context.py', 'src/selector/relevance.py']
+--- eval_runner.py ---
+==========================================================================
+评估集 replay 报告（ADR-003：分母分离 + 违规独立判据）
+==========================================================================
+MUST_PASS 11/11  达成率 1.0000（阈值 0.95）
+MUST_FAIL 14/14  （预期降级，**不计入通过率分母**）
+MUST_FAIL_ON_REPLAY 0 条（已知并接受）
+p95 延迟 0.0030s（阈值 5.0s）
+
+违规 0 项（合规逃逸 / 集外选择 / 审计条数 / schema / 解释隔离 全部为 0）
+
+==========================================================================
+判定：通过
+==========================================================================
+--- v2_runner.py ---
+V2 offline replay: PASS; cases=18 positive=4 negative=14 violations=0
+Provider: fixed offline; live_provider_tested=false; latency is local replay only.
+
+PASS — prompt/model 变更已通过固定评估集 replay 与质量阈值

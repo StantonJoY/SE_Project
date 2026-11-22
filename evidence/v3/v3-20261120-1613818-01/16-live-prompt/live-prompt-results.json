@@ -1,0 +1,750 @@
+{
+  "prompt_version": "relevance-v2.2",
+  "provider": "http",
+  "model": "deepseek-flash",
+  "human_labels": null,
+  "label_status": "PENDING_HUMAN_LABELS",
+  "real_model_tested": true,
+  "repeated_scene": {
+    "scene": {
+      "time_slot": "afternoon",
+      "device": "desktop",
+      "user_tags": [
+        "family"
+      ]
+    },
+    "candidates": [
+      {
+        "ad_id": "ad_24720",
+        "title": "SPORE™ Galactic Adventures",
+        "category": "Adventure",
+        "target_tags": [
+          "Sci-Fi",
+          "Space",
+          "Exploration",
+          "Combat",
+          "Character Customization",
+          "Leveling",
+          "Cheerful",
+          "Epic"
+        ]
+      },
+      {
+        "ad_id": "ad_276340",
+        "title": "My Riding Stables: Life with Horses",
+        "category": "Simulation",
+        "target_tags": [
+          "Nature",
+          "Modern",
+          "Management",
+          "Resource Management",
+          "Economy",
+          "Character Customization",
+          "Driving",
+          "Relaxing"
+        ]
+      },
+      {
+        "ad_id": "ad_634160",
+        "title": "Cattails | Become a Cat!",
+        "category": "RPG",
+        "target_tags": [
+          "Nature",
+          "Slice of Life",
+          "Exploration",
+          "Open World",
+          "Combat",
+          "Survival",
+          "Character Customization",
+          "Relaxing"
+        ]
+      },
+      {
+        "ad_id": "ad_2993780",
+        "title": "FANTASY LIFE i: The Girl Who Steals Time",
+        "category": "RPG",
+        "target_tags": [
+          "Fantasy",
+          "Mystery",
+          "Exploration",
+          "Open World",
+          "Crafting",
+          "Building",
+          "Farming",
+          "Relaxing"
+        ]
+      }
+    ],
+    "runs": [
+      {
+        "run": 1,
+        "raw": "{\"scores\":[{\"ad_id\":\"ad_24720\",\"relevance\":74,\"reason\":\"Family-suitable adventure with cheerful customization, but space combat themes are a somewhat weaker match for a family-oriented relaxing scene.\"},{\"ad_id\":\"ad_276340\",\"relevance\":90,\"reason\":\"Horse simulation with nature, management, customization, and relaxing tags is a strong family-friendly fit.\"},{\"ad_id\":\"ad_634160\",\"relevance\":88,\"reason\":\"Cat-themed open-world RPG with nature, slice-of-life, exploration, and relaxing tags has strong family appeal.\"},{\"ad_id\":\"ad_2993780\",\"relevance\":86,\"reason\":\"Fantasy RPG with exploration, crafting, farming, building, and relaxing tags is well suited to a family audience.\"}]}",
+        "scores": {
+          "ad_24720": {
+            "relevance": 74,
+            "reason": "Family-suitable adventure with cheerful customization, but space combat themes are a somewhat weaker match for a family-oriented relaxing scene."
+          },
+          "ad_276340": {
+            "relevance": 90,
+            "reason": "Horse simulation with nature, management, customization, and relaxing tags is a strong family-friendly fit."
+          },
+          "ad_634160": {
+            "relevance": 88,
+            "reason": "Cat-themed open-world RPG with nature, slice-of-life, exploration, and relaxing tags has strong family appeal."
+          },
+          "ad_2993780": {
+            "relevance": 86,
+            "reason": "Fantasy RPG with exploration, crafting, farming, building, and relaxing tags is well suited to a family audience."
+          }
+        },
+        "selected_by_relevance": "ad_276340"
+      },
+      {
+        "run": 2,
+        "raw": "{\"scores\":[{\"ad_id\":\"ad_24720\",\"relevance\":78,\"reason\":\"Creative, cheerful space adventure likely family-friendly, though combat and complexity reduce fit for a general family afternoon session.\"},{\"ad_id\":\"ad_276340\",\"relevance\":86,\"reason\":\"Relaxing horse management sim with nature and customization themes fits a family-friendly afternoon desktop audience well.\"},{\"ad_id\":\"ad_634160\",\"relevance\":82,\"reason\":\"Relaxing, nature-focused cat RPG is broadly family-friendly, though survival/combat elements slightly narrow its fit.\"},{\"ad_id\":\"ad_2993780\",\"relevance\":88,\"reason\":\"Relaxing fantasy RPG with farming, crafting, and open-world exploration suits a family-friendly afternoon desktop scene.\"}]}",
+        "scores": {
+          "ad_24720": {
+            "relevance": 78,
+            "reason": "Creative, cheerful space adventure likely family-friendly, though combat and complexity reduce fit for a general family afternoon session."
+          },
+          "ad_276340": {
+            "relevance": 86,
+            "reason": "Relaxing horse management sim with nature and customization themes fits a family-friendly afternoon desktop audience well."
+          },
+          "ad_634160": {
+            "relevance": 82,
+            "reason": "Relaxing, nature-focused cat RPG is broadly family-friendly, though survival/combat elements slightly narrow its fit."
+          },
+          "ad_2993780": {
+            "relevance": 88,
+            "reason": "Relaxing fantasy RPG with farming, crafting, and open-world exploration suits a family-friendly afternoon desktop scene."
+          }
+        },
+        "selected_by_relevance": "ad_2993780"
+      },
+      {
+        "run": 3,
+        "raw": "{\"scores\":[{\"ad_id\":\"ad_24720\",\"relevance\":66,\"reason\":\"Creative space adventure with cheerful exploration tags suits a family afternoon, but combat and leveling are less aligned with a relaxing family scene.\"},{\"ad_id\":\"ad_276340\",\"relevance\":84,\"reason\":\"Horse simulation with nature, relaxing, management and customization tags strongly fits family-friendly afternoon desktop play.\"},{\"ad_id\":\"ad_634160\",\"relevance\":78,\"reason\":\"Cute cat RPG with nature, slice-of-life, exploration and relaxing tags is family-suitable, though combat and survival slightly reduce alignment.\"},{\"ad_id\":\"ad_2993780\",\"relevance\":83,\"reason\":\"Fantasy life-sim RPG with crafting, farming, exploration and relaxing tags fits a family-friendly afternoon desktop session well.\"}]}",
+        "scores": {
+          "ad_24720": {
+            "relevance": 66,
+            "reason": "Creative space adventure with cheerful exploration tags suits a family afternoon, but combat and leveling are less aligned with a relaxing family scene."
+          },
+          "ad_276340": {
+            "relevance": 84,
+            "reason": "Horse simulation with nature, relaxing, management and customization tags strongly fits family-friendly afternoon desktop play."
+          },
+          "ad_634160": {
+            "relevance": 78,
+            "reason": "Cute cat RPG with nature, slice-of-life, exploration and relaxing tags is family-suitable, though combat and survival slightly reduce alignment."
+          },
+          "ad_2993780": {
+            "relevance": 83,
+            "reason": "Fantasy life-sim RPG with crafting, farming, exploration and relaxing tags fits a family-friendly afternoon desktop session well."
+          }
+        },
+        "selected_by_relevance": "ad_276340"
+      },
+      {
+        "run": 4,
+        "raw": "{\"scores\":[{\"ad_id\":\"ad_24720\",\"relevance\":65,\"reason\":\"Cheerful sci-fi exploration and customization fit a family afternoon, though combat focus is less directly aligned.\"},{\"ad_id\":\"ad_276340\",\"relevance\":85,\"reason\":\"Relaxing nature, horse management, and customization strongly suit a family-friendly desktop afternoon.\"},{\"ad_id\":\"ad_634160\",\"relevance\":80,\"reason\":\"Nature, relaxing exploration, and cat-themed customization fit family audiences, with some combat/survival elements.\"},{\"ad_id\":\"ad_2993780\",\"relevance\":88,\"reason\":\"Fantasy open-world exploration, farming, crafting, and relaxing tone align well with a family afternoon scene.\"}]}",
+        "scores": {
+          "ad_24720": {
+            "relevance": 65,
+            "reason": "Cheerful sci-fi exploration and customization fit a family afternoon, though combat focus is less directly aligned."
+          },
+          "ad_276340": {
+            "relevance": 85,
+            "reason": "Relaxing nature, horse management, and customization strongly suit a family-friendly desktop afternoon."
+          },
+          "ad_634160": {
+            "relevance": 80,
+            "reason": "Nature, relaxing exploration, and cat-themed customization fit family audiences, with some combat/survival elements."
+          },
+          "ad_2993780": {
+            "relevance": 88,
+            "reason": "Fantasy open-world exploration, farming, crafting, and relaxing tone align well with a family afternoon scene."
+          }
+        },
+        "selected_by_relevance": "ad_2993780"
+      },
+      {
+        "run": 5,
+        "raw": "{\"scores\":[{\"ad_id\":\"ad_24720\",\"relevance\":80,\"reason\":\"Cheerful exploration and customization fit a family afternoon desktop session; combat is less directly aligned.\"},{\"ad_id\":\"ad_276340\",\"relevance\":84,\"reason\":\"Relaxing nature and management themes fit family-friendly afternoon desktop leisure.\"},{\"ad_id\":\"ad_634160\",\"relevance\":76,\"reason\":\"Nature, slice-of-life, and relaxing tags fit family leisure, though combat/survival are less aligned.\"},{\"ad_id\":\"ad_2993780\",\"relevance\":86,\"reason\":\"Fantasy, crafting, farming, and relaxing themes strongly fit family afternoon desktop play.\"}]}",
+        "scores": {
+          "ad_24720": {
+            "relevance": 80,
+            "reason": "Cheerful exploration and customization fit a family afternoon desktop session; combat is less directly aligned."
+          },
+          "ad_276340": {
+            "relevance": 84,
+            "reason": "Relaxing nature and management themes fit family-friendly afternoon desktop leisure."
+          },
+          "ad_634160": {
+            "relevance": 76,
+            "reason": "Nature, slice-of-life, and relaxing tags fit family leisure, though combat/survival are less aligned."
+          },
+          "ad_2993780": {
+            "relevance": 86,
+            "reason": "Fantasy, crafting, farming, and relaxing themes strongly fit family afternoon desktop play."
+          }
+        },
+        "selected_by_relevance": "ad_2993780"
+      },
+      {
+        "run": 6,
+        "raw": "{\"scores\":[{\"ad_id\":\"ad_24720\",\"relevance\":82,\"reason\":\"Family-friendly sci-fi adventure with customization fits afternoon desktop leisure, though combat focus is less directly tied to the family tag.\"},{\"ad_id\":\"ad_276340\",\"relevance\":90,\"reason\":\"Relaxing horse simulation with nature and management themes strongly suits family afternoon desktop play.\"},{\"ad_id\":\"ad_634160\",\"relevance\":88,\"reason\":\"Family-friendly cat RPG with nature, exploration, and relaxing tags fits an afternoon desktop family session.\"},{\"ad_id\":\"ad_2993780\",\"relevance\":92,\"reason\":\"Colorful fantasy RPG with crafting, farming, exploration, and relaxing tags strongly matches family afternoon desktop play.\"}]}",
+        "scores": {
+          "ad_24720": {
+            "relevance": 82,
+            "reason": "Family-friendly sci-fi adventure with customization fits afternoon desktop leisure, though combat focus is less directly tied to the family tag."
+          },
+          "ad_276340": {
+            "relevance": 90,
+            "reason": "Relaxing horse simulation with nature and management themes strongly suits family afternoon desktop play."
+          },
+          "ad_634160": {
+            "relevance": 88,
+            "reason": "Family-friendly cat RPG with nature, exploration, and relaxing tags fits an afternoon desktop family session."
+          },
+          "ad_2993780": {
+            "relevance": 92,
+            "reason": "Colorful fantasy RPG with crafting, farming, exploration, and relaxing tags strongly matches family afternoon desktop play."
+          }
+        },
+        "selected_by_relevance": "ad_2993780"
+      },
+      {
+        "run": 7,
+        "raw": "{\"scores\":[{\"ad_id\":\"ad_24720\",\"relevance\":74,\"reason\":\"Family-friendly adventure with customization and cheerful tone; combat/epic themes fit less with a relaxing afternoon family slot.\"},{\"ad_id\":\"ad_276340\",\"relevance\":90,\"reason\":\"Strong family suitability: relaxing horse simulation with nature, management, and light modern themes for an afternoon desktop session.\"},{\"ad_id\":\"ad_634160\",\"relevance\":85,\"reason\":\"Family-friendly cat RPG with nature, slice-of-life exploration, customization, and relaxing tone; combat/survival slightly reduce fit.\"},{\"ad_id\":\"ad_2993780\",\"relevance\":88,\"reason\":\"Family-friendly fantasy RPG with exploration, open world, crafting, farming, and relaxing activities, well suited to afternoon desktop play.\"}]}",
+        "scores": {
+          "ad_24720": {
+            "relevance": 74,
+            "reason": "Family-friendly adventure with customization and cheerful tone; combat/epic themes fit less with a relaxing afternoon family slot."
+          },
+          "ad_276340": {
+            "relevance": 90,
+            "reason": "Strong family suitability: relaxing horse simulation with nature, management, and light modern themes for an afternoon desktop session."
+          },
+          "ad_634160": {
+            "relevance": 85,
+            "reason": "Family-friendly cat RPG with nature, slice-of-life exploration, customization, and relaxing tone; combat/survival slightly reduce fit."
+          },
+          "ad_2993780": {
+            "relevance": 88,
+            "reason": "Family-friendly fantasy RPG with exploration, open world, crafting, farming, and relaxing activities, well suited to afternoon desktop play."
+          }
+        },
+        "selected_by_relevance": "ad_276340"
+      },
+      {
+        "run": 8,
+        "raw": "{\"scores\":[{\"ad_id\":\"ad_24720\",\"relevance\":72,\"reason\":\"Adventure/exploration with cheerful tone suits a family desktop session, though combat and sci-fi focus are less directly aligned with family tags.\"},{\"ad_id\":\"ad_276340\",\"relevance\":86,\"reason\":\"Relaxing nature and management themes are strongly family-friendly and fit an afternoon desktop family context.\"},{\"ad_id\":\"ad_634160\",\"relevance\":83,\"reason\":\"Nature, slice-of-life, exploration, and relaxing tags fit family use well; combat and survival slightly reduce direct alignment.\"},{\"ad_id\":\"ad_2993780\",\"relevance\":90,\"reason\":\"Fantasy, crafting, farming, building, and relaxing tags are highly family-friendly and well suited to an afternoon desktop family scene.\"}]}",
+        "scores": {
+          "ad_24720": {
+            "relevance": 72,
+            "reason": "Adventure/exploration with cheerful tone suits a family desktop session, though combat and sci-fi focus are less directly aligned with family tags."
+          },
+          "ad_276340": {
+            "relevance": 86,
+            "reason": "Relaxing nature and management themes are strongly family-friendly and fit an afternoon desktop family context."
+          },
+          "ad_634160": {
+            "relevance": 83,
+            "reason": "Nature, slice-of-life, exploration, and relaxing tags fit family use well; combat and survival slightly reduce direct alignment."
+          },
+          "ad_2993780": {
+            "relevance": 90,
+            "reason": "Fantasy, crafting, farming, building, and relaxing tags are highly family-friendly and well suited to an afternoon desktop family scene."
+          }
+        },
+        "selected_by_relevance": "ad_2993780"
+      },
+      {
+        "run": 9,
+        "raw": "{\"scores\":[{\"ad_id\":\"ad_24720\",\"relevance\":72,\"reason\":\"Cheerful space adventure with exploration and customization; broadly family-friendly and suited to afternoon desktop play.\"},{\"ad_id\":\"ad_276340\",\"relevance\":84,\"reason\":\"Relaxing horse simulation with nature and management themes; strong family-friendly fit for desktop afternoon play.\"},{\"ad_id\":\"ad_634160\",\"relevance\":78,\"reason\":\"Cute nature-focused cat RPG with relaxing exploration; generally family-friendly and appropriate for the scene.\"},{\"ad_id\":\"ad_2993780\",\"relevance\":88,\"reason\":\"Fantasy life sim with crafting, farming, exploration, and relaxing tone; very strong family-friendly desktop fit.\"}]}",
+        "scores": {
+          "ad_24720": {
+            "relevance": 72,
+            "reason": "Cheerful space adventure with exploration and customization; broadly family-friendly and suited to afternoon desktop play."
+          },
+          "ad_276340": {
+            "relevance": 84,
+            "reason": "Relaxing horse simulation with nature and management themes; strong family-friendly fit for desktop afternoon play."
+          },
+          "ad_634160": {
+            "relevance": 78,
+            "reason": "Cute nature-focused cat RPG with relaxing exploration; generally family-friendly and appropriate for the scene."
+          },
+          "ad_2993780": {
+            "relevance": 88,
+            "reason": "Fantasy life sim with crafting, farming, exploration, and relaxing tone; very strong family-friendly desktop fit."
+          }
+        },
+        "selected_by_relevance": "ad_2993780"
+      },
+      {
+        "run": 10,
+        "raw": "{\"scores\":[{\"ad_id\":\"ad_24720\",\"relevance\":72,\"reason\":\"Family-friendly adventure with cheerful exploration, but combat and sci-fi focus may be less aligned with a general family scene.\"},{\"ad_id\":\"ad_276340\",\"relevance\":88,\"reason\":\"Relaxing nature and horse-management simulation is strongly suited to a family afternoon desktop session.\"},{\"ad_id\":\"ad_634160\",\"relevance\":82,\"reason\":\"Nature-themed, relaxing open-world RPG with customization suits family audiences, though combat/survival slightly narrows fit.\"},{\"ad_id\":\"ad_2993780\",\"relevance\":86,\"reason\":\"Colorful fantasy RPG with crafting, farming, and relaxing open-world play fits a family afternoon desktop context well.\"}]}",
+        "scores": {
+          "ad_24720": {
+            "relevance": 72,
+            "reason": "Family-friendly adventure with cheerful exploration, but combat and sci-fi focus may be less aligned with a general family scene."
+          },
+          "ad_276340": {
+            "relevance": 88,
+            "reason": "Relaxing nature and horse-management simulation is strongly suited to a family afternoon desktop session."
+          },
+          "ad_634160": {
+            "relevance": 82,
+            "reason": "Nature-themed, relaxing open-world RPG with customization suits family audiences, though combat/survival slightly narrows fit."
+          },
+          "ad_2993780": {
+            "relevance": 86,
+            "reason": "Colorful fantasy RPG with crafting, farming, and relaxing open-world play fits a family afternoon desktop context well."
+          }
+        },
+        "selected_by_relevance": "ad_276340"
+      },
+      {
+        "run": 11,
+        "raw": "{\"scores\":[{\"ad_id\":\"ad_24720\",\"relevance\":65,\"reason\":\"Cheerful space adventure with customization, but combat/sci-fi focus is only moderately aligned with a family afternoon desktop scene.\"},{\"ad_id\":\"ad_276340\",\"relevance\":85,\"reason\":\"Relaxing nature and horse-management themes are strongly family-friendly and suit an afternoon desktop session.\"},{\"ad_id\":\"ad_634160\",\"relevance\":78,\"reason\":\"Cute nature/slice-of-life cat RPG is broadly family-friendly, though combat and survival elements reduce the match slightly.\"},{\"ad_id\":\"ad_2993780\",\"relevance\":88,\"reason\":\"Relaxing fantasy RPG with crafting, building and farming is highly family-friendly and well suited to an afternoon desktop scene.\"}]}",
+        "scores": {
+          "ad_24720": {
+            "relevance": 65,
+            "reason": "Cheerful space adventure with customization, but combat/sci-fi focus is only moderately aligned with a family afternoon desktop scene."
+          },
+          "ad_276340": {
+            "relevance": 85,
+            "reason": "Relaxing nature and horse-management themes are strongly family-friendly and suit an afternoon desktop session."
+          },
+          "ad_634160": {
+            "relevance": 78,
+            "reason": "Cute nature/slice-of-life cat RPG is broadly family-friendly, though combat and survival elements reduce the match slightly."
+          },
+          "ad_2993780": {
+            "relevance": 88,
+            "reason": "Relaxing fantasy RPG with crafting, building and farming is highly family-friendly and well suited to an afternoon desktop scene."
+          }
+        },
+        "selected_by_relevance": "ad_2993780"
+      },
+      {
+        "run": 12,
+        "raw": "{\"scores\":[{\"ad_id\":\"ad_24720\",\"relevance\":82,\"reason\":\"Cheerful, creative space adventure with family-friendly appeal and broad exploration/leveling fit for an afternoon desktop session.\"},{\"ad_id\":\"ad_276340\",\"relevance\":68,\"reason\":\"Relaxing nature and horse theme are family-friendly, but management/economy focus is a narrower fit for general family play.\"},{\"ad_id\":\"ad_634160\",\"relevance\":75,\"reason\":\"Relaxing open-world cat RPG with nature and customization is family-friendly, though combat/survival adds mild intensity.\"},{\"ad_id\":\"ad_2993780\",\"relevance\":85,\"reason\":\"Broad family-friendly fantasy RPG with exploration, crafting, building, farming, and relaxing tone fits an afternoon desktop session well.\"}]}",
+        "scores": {
+          "ad_24720": {
+            "relevance": 82,
+            "reason": "Cheerful, creative space adventure with family-friendly appeal and broad exploration/leveling fit for an afternoon desktop session."
+          },
+          "ad_276340": {
+            "relevance": 68,
+            "reason": "Relaxing nature and horse theme are family-friendly, but management/economy focus is a narrower fit for general family play."
+          },
+          "ad_634160": {
+            "relevance": 75,
+            "reason": "Relaxing open-world cat RPG with nature and customization is family-friendly, though combat/survival adds mild intensity."
+          },
+          "ad_2993780": {
+            "relevance": 85,
+            "reason": "Broad family-friendly fantasy RPG with exploration, crafting, building, farming, and relaxing tone fits an afternoon desktop session well."
+          }
+        },
+        "selected_by_relevance": "ad_2993780"
+      },
+      {
+        "run": 13,
+        "raw": "{\"scores\":[{\"ad_id\":\"ad_24720\",\"relevance\":72,\"reason\":\"Cheerful adventure and exploration with customization fits a family desktop session, though combat is a less direct family match.\"},{\"ad_id\":\"ad_276340\",\"relevance\":88,\"reason\":\"Relaxing nature, management, and horse-themed simulation strongly aligns with family-friendly casual desktop play.\"},{\"ad_id\":\"ad_634160\",\"relevance\":82,\"reason\":\"Relaxing nature and slice-of-life open-world RPG elements fit family play, with combat and survival as moderate considerations.\"},{\"ad_id\":\"ad_2993780\",\"relevance\":86,\"reason\":\"Relaxing fantasy open-world with crafting, building, and farming strongly suits family-oriented desktop play.\"}]}",
+        "scores": {
+          "ad_24720": {
+            "relevance": 72,
+            "reason": "Cheerful adventure and exploration with customization fits a family desktop session, though combat is a less direct family match."
+          },
+          "ad_276340": {
+            "relevance": 88,
+            "reason": "Relaxing nature, management, and horse-themed simulation strongly aligns with family-friendly casual desktop play."
+          },
+          "ad_634160": {
+            "relevance": 82,
+            "reason": "Relaxing nature and slice-of-life open-world RPG elements fit family play, with combat and survival as moderate considerations."
+          },
+          "ad_2993780": {
+            "relevance": 86,
+            "reason": "Relaxing fantasy open-world with crafting, building, and farming strongly suits family-oriented desktop play."
+          }
+        },
+        "selected_by_relevance": "ad_276340"
+      },
+      {
+        "run": 14,
+        "raw": "{\"scores\":[{\"ad_id\":\"ad_24720\",\"relevance\":65,\"reason\":\"Cheerful sci-fi adventure with exploration and customization, but combat/leveling makes it a less direct fit for the family tag than other candidates.\"},{\"ad_id\":\"ad_276340\",\"relevance\":82,\"reason\":\"Relaxing horse-care simulation with nature and management themes is strongly family-friendly and suitable for afternoon desktop play.\"},{\"ad_id\":\"ad_634160\",\"relevance\":88,\"reason\":\"Family-friendly open-world cat RPG with relaxing exploration and slice-of-life nature themes fits the family tag well.\"},{\"ad_id\":\"ad_2993780\",\"relevance\":90,\"reason\":\"Colorful fantasy RPG with open-world exploration, crafting, farming and relaxing play is highly family-friendly and broadly appealing.\"}]}",
+        "scores": {
+          "ad_24720": {
+            "relevance": 65,
+            "reason": "Cheerful sci-fi adventure with exploration and customization, but combat/leveling makes it a less direct fit for the family tag than other candidates."
+          },
+          "ad_276340": {
+            "relevance": 82,
+            "reason": "Relaxing horse-care simulation with nature and management themes is strongly family-friendly and suitable for afternoon desktop play."
+          },
+          "ad_634160": {
+            "relevance": 88,
+            "reason": "Family-friendly open-world cat RPG with relaxing exploration and slice-of-life nature themes fits the family tag well."
+          },
+          "ad_2993780": {
+            "relevance": 90,
+            "reason": "Colorful fantasy RPG with open-world exploration, crafting, farming and relaxing play is highly family-friendly and broadly appealing."
+          }
+        },
+        "selected_by_relevance": "ad_2993780"
+      },
+      {
+        "run": 15,
+        "raw": "{\"scores\":[{\"ad_id\":\"ad_24720\",\"relevance\":65,\"reason\":\"Cheerful exploration and customization fit a family afternoon, but combat and epic space-adventure themes are less directly aligned with the relaxing family tag.\"},{\"ad_id\":\"ad_276340\",\"relevance\":88,\"reason\":\"Nature, relaxing simulation, management, and customization strongly suit a family-friendly afternoon desktop session.\"},{\"ad_id\":\"ad_634160\",\"relevance\":82,\"reason\":\"Nature, slice-of-life, exploration, and relaxing tags fit family leisure, though combat and survival reduce the match slightly.\"},{\"ad_id\":\"ad_2993780\",\"relevance\":84,\"reason\":\"Relaxing open-world exploration with crafting, building, and farming is well suited to family afternoon play on desktop.\"}]}",
+        "scores": {
+          "ad_24720": {
+            "relevance": 65,
+            "reason": "Cheerful exploration and customization fit a family afternoon, but combat and epic space-adventure themes are less directly aligned with the relaxing family tag."
+          },
+          "ad_276340": {
+            "relevance": 88,
+            "reason": "Nature, relaxing simulation, management, and customization strongly suit a family-friendly afternoon desktop session."
+          },
+          "ad_634160": {
+            "relevance": 82,
+            "reason": "Nature, slice-of-life, exploration, and relaxing tags fit family leisure, though combat and survival reduce the match slightly."
+          },
+          "ad_2993780": {
+            "relevance": 84,
+            "reason": "Relaxing open-world exploration with crafting, building, and farming is well suited to family afternoon play on desktop."
+          }
+        },
+        "selected_by_relevance": "ad_276340"
+      },
+      {
+        "run": 16,
+        "raw": "{\"scores\":[{\"ad_id\":\"ad_24720\",\"relevance\":74,\"reason\":\"Family-friendly adventure with cheerful exploration and customization, fitting an afternoon desktop session, though combat/epic themes are less directly aligned with a relaxing family context.\"},{\"ad_id\":\"ad_276340\",\"relevance\":84,\"reason\":\"Horse simulation with nature, management, customization, and relaxing tags strongly suits family-friendly afternoon desktop play.\"},{\"ad_id\":\"ad_634160\",\"relevance\":81,\"reason\":\"Cat-themed RPG with nature, slice-of-life, exploration, and relaxing tags is broadly family-friendly, though combat and survival elements temper the fit.\"},{\"ad_id\":\"ad_2993780\",\"relevance\":86,\"reason\":\"Fantasy RPG with exploration, crafting, farming, and relaxing tags is highly compatible with family-friendly afternoon desktop gaming.\"}]}",
+        "scores": {
+          "ad_24720": {
+            "relevance": 74,
+            "reason": "Family-friendly adventure with cheerful exploration and customization, fitting an afternoon desktop session, though combat/epic themes are less directly aligned with a relaxing family context."
+          },
+          "ad_276340": {
+            "relevance": 84,
+            "reason": "Horse simulation with nature, management, customization, and relaxing tags strongly suits family-friendly afternoon desktop play."
+          },
+          "ad_634160": {
+            "relevance": 81,
+            "reason": "Cat-themed RPG with nature, slice-of-life, exploration, and relaxing tags is broadly family-friendly, though combat and survival elements temper the fit."
+          },
+          "ad_2993780": {
+            "relevance": 86,
+            "reason": "Fantasy RPG with exploration, crafting, farming, and relaxing tags is highly compatible with family-friendly afternoon desktop gaming."
+          }
+        },
+        "selected_by_relevance": "ad_2993780"
+      },
+      {
+        "run": 17,
+        "raw": "{\"scores\":[{\"ad_id\":\"ad_24720\",\"relevance\":70,\"reason\":\"Cheerful exploration and customization suit a family afternoon, but combat and sci-fi focus are less directly aligned with relaxing family tags.\"},{\"ad_id\":\"ad_276340\",\"relevance\":86,\"reason\":\"Nature, management, and relaxing themes are strongly family-friendly and fit a casual afternoon desktop session.\"},{\"ad_id\":\"ad_634160\",\"relevance\":88,\"reason\":\"Nature, slice-of-life, exploration, and relaxing tags align well with family-friendly afternoon play.\"},{\"ad_id\":\"ad_2993780\",\"relevance\":90,\"reason\":\"Relaxing open-world exploration with crafting, farming, and fantasy themes is highly family-friendly and fits the scene.\"}]}",
+        "scores": {
+          "ad_24720": {
+            "relevance": 70,
+            "reason": "Cheerful exploration and customization suit a family afternoon, but combat and sci-fi focus are less directly aligned with relaxing family tags."
+          },
+          "ad_276340": {
+            "relevance": 86,
+            "reason": "Nature, management, and relaxing themes are strongly family-friendly and fit a casual afternoon desktop session."
+          },
+          "ad_634160": {
+            "relevance": 88,
+            "reason": "Nature, slice-of-life, exploration, and relaxing tags align well with family-friendly afternoon play."
+          },
+          "ad_2993780": {
+            "relevance": 90,
+            "reason": "Relaxing open-world exploration with crafting, farming, and fantasy themes is highly family-friendly and fits the scene."
+          }
+        },
+        "selected_by_relevance": "ad_2993780"
+      },
+      {
+        "run": 18,
+        "raw": "{\"scores\":[{\"ad_id\":\"ad_24720\",\"relevance\":88,\"reason\":\"Cheerful, creative exploration/adventure game with customization; broadly family-friendly and suited to desktop play.\"},{\"ad_id\":\"ad_276340\",\"relevance\":90,\"reason\":\"Relaxing nature and horse-management simulation with customization; strong family-friendly fit for a desktop afternoon.\"},{\"ad_id\":\"ad_634160\",\"relevance\":89,\"reason\":\"Family-friendly cat RPG with nature, slice-of-life, exploration and relaxing tags; good match for the family audience.\"},{\"ad_id\":\"ad_2993780\",\"relevance\":91,\"reason\":\"Relaxing fantasy RPG with crafting, building, farming and exploration; highly compatible with family-oriented desktop play.\"}]}",
+        "scores": {
+          "ad_24720": {
+            "relevance": 88,
+            "reason": "Cheerful, creative exploration/adventure game with customization; broadly family-friendly and suited to desktop play."
+          },
+          "ad_276340": {
+            "relevance": 90,
+            "reason": "Relaxing nature and horse-management simulation with customization; strong family-friendly fit for a desktop afternoon."
+          },
+          "ad_634160": {
+            "relevance": 89,
+            "reason": "Family-friendly cat RPG with nature, slice-of-life, exploration and relaxing tags; good match for the family audience."
+          },
+          "ad_2993780": {
+            "relevance": 91,
+            "reason": "Relaxing fantasy RPG with crafting, building, farming and exploration; highly compatible with family-oriented desktop play."
+          }
+        },
+        "selected_by_relevance": "ad_2993780"
+      },
+      {
+        "run": 19,
+        "raw": "{\"scores\":[{\"ad_id\":\"ad_24720\",\"relevance\":80,\"reason\":\"Cheerful sci-fi adventure with exploration and customization; broadly family-suitable, though combat/leveling makes it slightly less cozy.\"},{\"ad_id\":\"ad_276340\",\"relevance\":90,\"reason\":\"Relaxing horse simulation with nature and management themes strongly fits family-friendly afternoon desktop play.\"},{\"ad_id\":\"ad_634160\",\"relevance\":86,\"reason\":\"Cozy nature-focused cat RPG with exploration and customization suits a family audience; combat/survival is slightly less aligned.\"},{\"ad_id\":\"ad_2993780\",\"relevance\":88,\"reason\":\"Relaxing fantasy RPG with crafting, farming, exploration, and open world is well aligned with a family afternoon desktop context.\"}]}",
+        "scores": {
+          "ad_24720": {
+            "relevance": 80,
+            "reason": "Cheerful sci-fi adventure with exploration and customization; broadly family-suitable, though combat/leveling makes it slightly less cozy."
+          },
+          "ad_276340": {
+            "relevance": 90,
+            "reason": "Relaxing horse simulation with nature and management themes strongly fits family-friendly afternoon desktop play."
+          },
+          "ad_634160": {
+            "relevance": 86,
+            "reason": "Cozy nature-focused cat RPG with exploration and customization suits a family audience; combat/survival is slightly less aligned."
+          },
+          "ad_2993780": {
+            "relevance": 88,
+            "reason": "Relaxing fantasy RPG with crafting, farming, exploration, and open world is well aligned with a family afternoon desktop context."
+          }
+        },
+        "selected_by_relevance": "ad_276340"
+      },
+      {
+        "run": 20,
+        "raw": "{\"scores\":[{\"ad_id\":\"ad_24720\",\"relevance\":78,\"reason\":\"Family-friendly desktop adventure with cheerful exploration, but combat/epic focus is a weaker fit for a relaxed afternoon family scene.\"},{\"ad_id\":\"ad_276340\",\"relevance\":88,\"reason\":\"Relaxing, nature-themed desktop simulation with management and customization, well suited to a family afternoon session.\"},{\"ad_id\":\"ad_634160\",\"relevance\":84,\"reason\":\"Family-friendly open-world RPG with relaxing slice-of-life and nature themes, though combat/survival slightly reduce fit.\"},{\"ad_id\":\"ad_2993780\",\"relevance\":90,\"reason\":\"Family-friendly fantasy RPG with relaxing exploration, crafting, building, and farming, strongly matching a desktop afternoon family scene.\"}]}",
+        "scores": {
+          "ad_24720": {
+            "relevance": 78,
+            "reason": "Family-friendly desktop adventure with cheerful exploration, but combat/epic focus is a weaker fit for a relaxed afternoon family scene."
+          },
+          "ad_276340": {
+            "relevance": 88,
+            "reason": "Relaxing, nature-themed desktop simulation with management and customization, well suited to a family afternoon session."
+          },
+          "ad_634160": {
+            "relevance": 84,
+            "reason": "Family-friendly open-world RPG with relaxing slice-of-life and nature themes, though combat/survival slightly reduce fit."
+          },
+          "ad_2993780": {
+            "relevance": 90,
+            "reason": "Family-friendly fantasy RPG with relaxing exploration, crafting, building, and farming, strongly matching a desktop afternoon family scene."
+          }
+        },
+        "selected_by_relevance": "ad_2993780"
+      }
+    ],
+    "structural_valid_count": 20,
+    "selected_counts": {
+      "ad_276340": 7,
+      "ad_2993780": 13
+    }
+  },
+  "title_bait_cases": [
+    {
+      "case": 1,
+      "expected_ad_id": "match_1",
+      "raw": "{\"scores\":[{\"ad_id\":\"bait_1\",\"relevance\":5,\"reason\":\"Title mentions family, but target tags are Gore and Action, which do not match the family scene.\"},{\"ad_id\":\"match_1\",\"relevance\":95,\"reason\":\"Target tags explicitly include Family twice plus Casual, strongly matching the family user tag.\"},{\"ad_id\":\"filler_1\",\"relevance\":10,\"reason\":\"Adventure category and tag do not specifically match the family scene tags.\"}]}",
+      "scores": {
+        "bait_1": {
+          "relevance": 5,
+          "reason": "Title mentions family, but target tags are Gore and Action, which do not match the family scene."
+        },
+        "match_1": {
+          "relevance": 95,
+          "reason": "Target tags explicitly include Family twice plus Casual, strongly matching the family user tag."
+        },
+        "filler_1": {
+          "relevance": 10,
+          "reason": "Adventure category and tag do not specifically match the family scene tags."
+        }
+      },
+      "selected_by_relevance": "match_1"
+    },
+    {
+      "case": 2,
+      "expected_ad_id": "match_2",
+      "raw": "{\"scores\":[{\"ad_id\":\"bait_2\",\"relevance\":15,\"reason\":\"Action/violence tags conflict with the family user tag despite the title.\"},{\"ad_id\":\"match_2\",\"relevance\":95,\"reason\":\"Simulation and Casual tags plus explicit Family targeting align strongly with the family scene.\"},{\"ad_id\":\"filler_2\",\"relevance\":25,\"reason\":\"Adventure is a weak match with no family or casual alignment.\"}]}",
+      "scores": {
+        "bait_2": {
+          "relevance": 15,
+          "reason": "Action/violence tags conflict with the family user tag despite the title."
+        },
+        "match_2": {
+          "relevance": 95,
+          "reason": "Simulation and Casual tags plus explicit Family targeting align strongly with the family scene."
+        },
+        "filler_2": {
+          "relevance": 25,
+          "reason": "Adventure is a weak match with no family or casual alignment."
+        }
+      },
+      "selected_by_relevance": "match_2"
+    },
+    {
+      "case": 3,
+      "expected_ad_id": "match_3",
+      "raw": "{\"scores\":[{\"ad_id\":\"bait_3\",\"relevance\":5,\"reason\":\"Action/Blood tags conflict with family user tag; no family match.\"},{\"ad_id\":\"match_3\",\"relevance\":95,\"reason\":\"Puzzle, Family, and Casual tags align strongly with family audience.\"},{\"ad_id\":\"filler_3\",\"relevance\":30,\"reason\":\"Generic Adventure has no explicit family match; weak relevance.\"}]}",
+      "scores": {
+        "bait_3": {
+          "relevance": 5,
+          "reason": "Action/Blood tags conflict with family user tag; no family match."
+        },
+        "match_3": {
+          "relevance": 95,
+          "reason": "Puzzle, Family, and Casual tags align strongly with family audience."
+        },
+        "filler_3": {
+          "relevance": 30,
+          "reason": "Generic Adventure has no explicit family match; weak relevance."
+        }
+      },
+      "selected_by_relevance": "match_3"
+    },
+    {
+      "case": 4,
+      "expected_ad_id": "match_4",
+      "raw": "{\"scores\":[{\"ad_id\":\"bait_4\",\"relevance\":5,\"reason\":\"Action title with Drugs/Action tags does not match family scene tags.\"},{\"ad_id\":\"match_4\",\"relevance\":95,\"reason\":\"Simulation title with Adventure, Family, and Casual tags strongly matches the family user tag.\"},{\"ad_id\":\"filler_4\",\"relevance\":35,\"reason\":\"Adventure tag is broadly compatible but lacks any family-specific relevance.\"}]}",
+      "scores": {
+        "bait_4": {
+          "relevance": 5,
+          "reason": "Action title with Drugs/Action tags does not match family scene tags."
+        },
+        "match_4": {
+          "relevance": 95,
+          "reason": "Simulation title with Adventure, Family, and Casual tags strongly matches the family user tag."
+        },
+        "filler_4": {
+          "relevance": 35,
+          "reason": "Adventure tag is broadly compatible but lacks any family-specific relevance."
+        }
+      },
+      "selected_by_relevance": "match_4"
+    },
+    {
+      "case": 5,
+      "expected_ad_id": "match_5",
+      "raw": "{\"scores\":[{\"ad_id\":\"bait_5\",\"relevance\":0,\"reason\":\"Targets Sexual Content and Action, conflicting with the family user tag and offering no scene match.\"},{\"ad_id\":\"match_5\",\"relevance\":90,\"reason\":\"Simulation and Casual fit a family-friendly afternoon desktop context and directly include the Family tag.\"},{\"ad_id\":\"filler_5\",\"relevance\":15,\"reason\":\"Adventure is broadly game-related but does not match the family user tag or other scene specifics.\"}]}",
+      "scores": {
+        "bait_5": {
+          "relevance": 0,
+          "reason": "Targets Sexual Content and Action, conflicting with the family user tag and offering no scene match."
+        },
+        "match_5": {
+          "relevance": 90,
+          "reason": "Simulation and Casual fit a family-friendly afternoon desktop context and directly include the Family tag."
+        },
+        "filler_5": {
+          "relevance": 15,
+          "reason": "Adventure is broadly game-related but does not match the family user tag or other scene specifics."
+        }
+      },
+      "selected_by_relevance": "match_5"
+    }
+  ],
+  "known_title_cases": [
+    {
+      "case": 1,
+      "expected_ad_id": "match_known_1",
+      "raw": "{\"scores\":[{\"ad_id\":\"known_1\",\"relevance\":10,\"reason\":\"Action/Shooter title has no family or casual alignment with the scene tags.\"},{\"ad_id\":\"match_known_1\",\"relevance\":98,\"reason\":\"Strong match: Family and Casual tags align directly with the family user tag.\"},{\"ad_id\":\"filler_known_1\",\"relevance\":5,\"reason\":\"Adventure category does not match the family-focused scene tags.\"}]}",
+      "scores": {
+        "known_1": {
+          "relevance": 10,
+          "reason": "Action/Shooter title has no family or casual alignment with the scene tags."
+        },
+        "match_known_1": {
+          "relevance": 98,
+          "reason": "Strong match: Family and Casual tags align directly with the family user tag."
+        },
+        "filler_known_1": {
+          "relevance": 5,
+          "reason": "Adventure category does not match the family-focused scene tags."
+        }
+      },
+      "selected_by_relevance": "match_known_1"
+    },
+    {
+      "case": 2,
+      "expected_ad_id": "match_known_2",
+      "raw": "{\"scores\":[{\"ad_id\":\"known_2\",\"relevance\":15,\"reason\":\"Action shooter title does not match the family user tag.\"},{\"ad_id\":\"match_known_2\",\"relevance\":95,\"reason\":\"Casual family simulation game aligns strongly with the family tag.\"},{\"ad_id\":\"filler_known_2\",\"relevance\":20,\"reason\":\"Adventure category has no clear match to the family tag.\"}]}",
+      "scores": {
+        "known_2": {
+          "relevance": 15,
+          "reason": "Action shooter title does not match the family user tag."
+        },
+        "match_known_2": {
+          "relevance": 95,
+          "reason": "Casual family simulation game aligns strongly with the family tag."
+        },
+        "filler_known_2": {
+          "relevance": 20,
+          "reason": "Adventure category has no clear match to the family tag."
+        }
+      },
+      "selected_by_relevance": "match_known_2"
+    },
+    {
+      "case": 3,
+      "expected_ad_id": "match_known_3",
+      "raw": "{\"scores\":[{\"ad_id\":\"known_3\",\"relevance\":10,\"reason\":\"Action/Shooter targeting has no overlap with the family user tag or the afternoon desktop context.\"},{\"ad_id\":\"match_known_3\",\"relevance\":90,\"reason\":\"Puzzle/Family/Casual targeting directly matches the family user tag and fits a casual desktop afternoon slot.\"},{\"ad_id\":\"filler_known_3\",\"relevance\":5,\"reason\":\"Generic Adventure targeting shows no overlap with the family tag or scene context.\"}]}",
+      "scores": {
+        "known_3": {
+          "relevance": 10,
+          "reason": "Action/Shooter targeting has no overlap with the family user tag or the afternoon desktop context."
+        },
+        "match_known_3": {
+          "relevance": 90,
+          "reason": "Puzzle/Family/Casual targeting directly matches the family user tag and fits a casual desktop afternoon slot."
+        },
+        "filler_known_3": {
+          "relevance": 5,
+          "reason": "Generic Adventure targeting shows no overlap with the family tag or scene context."
+        }
+      },
+      "selected_by_relevance": "match_known_3"
+    },
+    {
+      "case": 4,
+      "expected_ad_id": "match_known_4",
+      "raw": "{\"scores\":[{\"ad_id\":\"known_4\",\"relevance\":10,\"reason\":\"Action shooter targeting does not match the family user tag.\"},{\"ad_id\":\"match_known_4\",\"relevance\":95,\"reason\":\"Family, casual, and adventure tags align well with the family user tag.\"},{\"ad_id\":\"filler_known_4\",\"relevance\":30,\"reason\":\"Adventure is broadly compatible but lacks explicit family relevance.\"}]}",
+      "scores": {
+        "known_4": {
+          "relevance": 10,
+          "reason": "Action shooter targeting does not match the family user tag."
+        },
+        "match_known_4": {
+          "relevance": 95,
+          "reason": "Family, casual, and adventure tags align well with the family user tag."
+        },
+        "filler_known_4": {
+          "relevance": 30,
+          "reason": "Adventure is broadly compatible but lacks explicit family relevance."
+        }
+      },
+      "selected_by_relevance": "match_known_4"
+    },
+    {
+      "case": 5,
+      "expected_ad_id": "match_known_5",
+      "raw": "{\"scores\":[{\"ad_id\":\"known_5\",\"relevance\":15,\"reason\":\"Action shooter title has little connection to family-focused scene tags.\"},{\"ad_id\":\"match_known_5\",\"relevance\":95,\"reason\":\"Family picnic simulation directly matches family and casual tags.\"},{\"ad_id\":\"filler_known_5\",\"relevance\":20,\"reason\":\"Adventure game has no clear match to family scene tags.\"}]}",
+      "scores": {
+        "known_5": {
+          "relevance": 15,
+          "reason": "Action shooter title has little connection to family-focused scene tags."
+        },
+        "match_known_5": {
+          "relevance": 95,
+          "reason": "Family picnic simulation directly matches family and casual tags."
+        },
+        "filler_known_5": {
+          "relevance": 20,
+          "reason": "Adventure game has no clear match to family scene tags."
+        }
+      },
+      "selected_by_relevance": "match_known_5"
+    }
+  ]
+}

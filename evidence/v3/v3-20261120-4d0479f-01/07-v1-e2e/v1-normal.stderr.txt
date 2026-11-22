@@ -1,0 +1,2 @@
+[corpus] 候选 30 条（top_k 截断后投影）
+[audit_id] aud-699bfd3d8313

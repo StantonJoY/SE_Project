@@ -1,0 +1,1383 @@
+{
+  "prompt_version": "relevance-v2.2",
+  "provider": "http",
+  "model": "deepseek-flash",
+  "human_labels": null,
+  "label_status": "PENDING_HUMAN_LABELS",
+  "real_model_tested": true,
+  "scene_count": 6,
+  "runs_per_scene": 5,
+  "scenes": [
+    {
+      "scene_id": "family_afternoon",
+      "expected_style": "family_friendly",
+      "scene": {
+        "time_slot": "afternoon",
+        "device": "desktop",
+        "user_tags": [
+          "family"
+        ]
+      },
+      "candidates": [
+        {
+          "ad_id": "ad_24720",
+          "title": "SPORE™ Galactic Adventures",
+          "category": "Adventure",
+          "target_tags": [
+            "Sci-Fi",
+            "Space",
+            "Exploration",
+            "Combat",
+            "Character Customization",
+            "Leveling",
+            "Cheerful",
+            "Epic"
+          ]
+        },
+        {
+          "ad_id": "ad_276340",
+          "title": "My Riding Stables: Life with Horses",
+          "category": "Simulation",
+          "target_tags": [
+            "Nature",
+            "Modern",
+            "Management",
+            "Resource Management",
+            "Economy",
+            "Character Customization",
+            "Driving",
+            "Relaxing"
+          ]
+        },
+        {
+          "ad_id": "ad_634160",
+          "title": "Cattails | Become a Cat!",
+          "category": "RPG",
+          "target_tags": [
+            "Nature",
+            "Slice of Life",
+            "Exploration",
+            "Open World",
+            "Combat",
+            "Survival",
+            "Character Customization",
+            "Relaxing"
+          ]
+        },
+        {
+          "ad_id": "ad_2993780",
+          "title": "FANTASY LIFE i: The Girl Who Steals Time",
+          "category": "RPG",
+          "target_tags": [
+            "Fantasy",
+            "Mystery",
+            "Exploration",
+            "Open World",
+            "Crafting",
+            "Building",
+            "Farming",
+            "Relaxing"
+          ]
+        }
+      ],
+      "runs": [
+        {
+          "run": 1,
+          "raw": "{\"scores\":[{\"ad_id\":\"ad_24720\",\"relevance\":84,\"reason\":\"Family-friendly adventure with cheerful exploration and customization; fits desktop afternoon play, though combat may be mildly intense for some families.\"},{\"ad_id\":\"ad_276340\",\"relevance\":90,\"reason\":\"Relaxing horse-care simulation with nature and management themes, strongly suitable for a family audience on desktop.\"},{\"ad_id\":\"ad_634160\",\"relevance\":85,\"reason\":\"Family-friendly cat RPG with nature, exploration, and relaxing elements; some combat/survival may be mildly intense.\"},{\"ad_id\":\"ad_2993780\",\"relevance\":92,\"reason\":\"Fantasy RPG with crafting, building, farming, and relaxing themes, very well suited to family desktop play.\"}]}",
+          "scores": {
+            "ad_24720": {
+              "relevance": 84,
+              "reason": "Family-friendly adventure with cheerful exploration and customization; fits desktop afternoon play, though combat may be mildly intense for some families."
+            },
+            "ad_276340": {
+              "relevance": 90,
+              "reason": "Relaxing horse-care simulation with nature and management themes, strongly suitable for a family audience on desktop."
+            },
+            "ad_634160": {
+              "relevance": 85,
+              "reason": "Family-friendly cat RPG with nature, exploration, and relaxing elements; some combat/survival may be mildly intense."
+            },
+            "ad_2993780": {
+              "relevance": 92,
+              "reason": "Fantasy RPG with crafting, building, farming, and relaxing themes, very well suited to family desktop play."
+            }
+          },
+          "selected_by_relevance": "ad_2993780"
+        },
+        {
+          "run": 2,
+          "raw": "{\"scores\":[{\"ad_id\":\"ad_24720\",\"relevance\":68,\"reason\":\"Sci-fi adventure with combat and epic themes is less aligned with a relaxing family afternoon, though desktop play and customization fit.\"},{\"ad_id\":\"ad_276340\",\"relevance\":90,\"reason\":\"Horse-themed simulation with nature, management, and relaxing tags strongly suits a family afternoon on desktop.\"},{\"ad_id\":\"ad_634160\",\"relevance\":84,\"reason\":\"Cozy nature RPG with slice-of-life, exploration, and relaxing tags is family-friendly and fits afternoon desktop play.\"},{\"ad_id\":\"ad_2993780\",\"relevance\":86,\"reason\":\"Fantasy RPG with crafting, farming, exploration, and relaxing tags is well suited to family afternoon desktop gaming.\"}]}",
+          "scores": {
+            "ad_24720": {
+              "relevance": 68,
+              "reason": "Sci-fi adventure with combat and epic themes is less aligned with a relaxing family afternoon, though desktop play and customization fit."
+            },
+            "ad_276340": {
+              "relevance": 90,
+              "reason": "Horse-themed simulation with nature, management, and relaxing tags strongly suits a family afternoon on desktop."
+            },
+            "ad_634160": {
+              "relevance": 84,
+              "reason": "Cozy nature RPG with slice-of-life, exploration, and relaxing tags is family-friendly and fits afternoon desktop play."
+            },
+            "ad_2993780": {
+              "relevance": 86,
+              "reason": "Fantasy RPG with crafting, farming, exploration, and relaxing tags is well suited to family afternoon desktop gaming."
+            }
+          },
+          "selected_by_relevance": "ad_276340"
+        },
+        {
+          "run": 3,
+          "raw": "{\"scores\":[{\"ad_id\":\"ad_24720\",\"relevance\":72,\"reason\":\"Cheerful exploration and customization fit family desktop play, but combat and epic leveling are somewhat less aligned with a relaxed family afternoon.\"},{\"ad_id\":\"ad_276340\",\"relevance\":88,\"reason\":\"Relaxing nature and management themes with no combat strongly fit a family-friendly afternoon desktop session.\"},{\"ad_id\":\"ad_634160\",\"relevance\":82,\"reason\":\"Nature, slice-of-life, exploration, and relaxing tags suit family play, though combat and survival slightly reduce alignment.\"},{\"ad_id\":\"ad_2993780\",\"relevance\":85,\"reason\":\"Family-friendly fantasy RPG with relaxing farming, crafting, building, and open-world exploration fits the scene well.\"}]}",
+          "scores": {
+            "ad_24720": {
+              "relevance": 72,
+              "reason": "Cheerful exploration and customization fit family desktop play, but combat and epic leveling are somewhat less aligned with a relaxed family afternoon."
+            },
+            "ad_276340": {
+              "relevance": 88,
+              "reason": "Relaxing nature and management themes with no combat strongly fit a family-friendly afternoon desktop session."
+            },
+            "ad_634160": {
+              "relevance": 82,
+              "reason": "Nature, slice-of-life, exploration, and relaxing tags suit family play, though combat and survival slightly reduce alignment."
+            },
+            "ad_2993780": {
+              "relevance": 85,
+              "reason": "Family-friendly fantasy RPG with relaxing farming, crafting, building, and open-world exploration fits the scene well."
+            }
+          },
+          "selected_by_relevance": "ad_276340"
+        },
+        {
+          "run": 4,
+          "raw": "{\"scores\":[{\"ad_id\":\"ad_24720\",\"relevance\":78,\"reason\":\"Desktop-friendly adventure with cheerful, creative exploration; broadly family-suitable, though combat/epic tags are a slightly weaker fit for a family context.\"},{\"ad_id\":\"ad_276340\",\"relevance\":86,\"reason\":\"Relaxing nature and management simulation with customization; strong family-friendly afternoon desktop fit.\"},{\"ad_id\":\"ad_634160\",\"relevance\":84,\"reason\":\"Cozy open-world cat RPG with nature, exploration, and relaxing tags; good family-oriented desktop fit despite combat/survival elements.\"},{\"ad_id\":\"ad_2993780\",\"relevance\":87,\"reason\":\"Fantasy open-world RPG with crafting, building, farming, and relaxing tags; very strong family-friendly desktop match for an afternoon session.\"}]}",
+          "scores": {
+            "ad_24720": {
+              "relevance": 78,
+              "reason": "Desktop-friendly adventure with cheerful, creative exploration; broadly family-suitable, though combat/epic tags are a slightly weaker fit for a family context."
+            },
+            "ad_276340": {
+              "relevance": 86,
+              "reason": "Relaxing nature and management simulation with customization; strong family-friendly afternoon desktop fit."
+            },
+            "ad_634160": {
+              "relevance": 84,
+              "reason": "Cozy open-world cat RPG with nature, exploration, and relaxing tags; good family-oriented desktop fit despite combat/survival elements."
+            },
+            "ad_2993780": {
+              "relevance": 87,
+              "reason": "Fantasy open-world RPG with crafting, building, farming, and relaxing tags; very strong family-friendly desktop match for an afternoon session."
+            }
+          },
+          "selected_by_relevance": "ad_2993780"
+        },
+        {
+          "run": 5,
+          "raw": "{\"scores\":[{\"ad_id\":\"ad_24720\",\"relevance\":80,\"reason\":\"Family-friendly creative space adventure fits desktop afternoon play, though combat and leveling are somewhat less relaxing.\"},{\"ad_id\":\"ad_276340\",\"relevance\":88,\"reason\":\"Relaxing horse-care simulation is strongly family-oriented and well suited to afternoon desktop play.\"},{\"ad_id\":\"ad_634160\",\"relevance\":84,\"reason\":\"Family-friendly relaxing open-world cat RPG fits the scene, with some combat/survival elements reducing fit slightly.\"},{\"ad_id\":\"ad_2993780\",\"relevance\":90,\"reason\":\"Family-friendly relaxing RPG with crafting, farming, and exploration strongly matches afternoon desktop family play.\"}]}",
+          "scores": {
+            "ad_24720": {
+              "relevance": 80,
+              "reason": "Family-friendly creative space adventure fits desktop afternoon play, though combat and leveling are somewhat less relaxing."
+            },
+            "ad_276340": {
+              "relevance": 88,
+              "reason": "Relaxing horse-care simulation is strongly family-oriented and well suited to afternoon desktop play."
+            },
+            "ad_634160": {
+              "relevance": 84,
+              "reason": "Family-friendly relaxing open-world cat RPG fits the scene, with some combat/survival elements reducing fit slightly."
+            },
+            "ad_2993780": {
+              "relevance": 90,
+              "reason": "Family-friendly relaxing RPG with crafting, farming, and exploration strongly matches afternoon desktop family play."
+            }
+          },
+          "selected_by_relevance": "ad_2993780"
+        }
+      ],
+      "structural_valid_count": 5,
+      "selected_counts": {
+        "ad_2993780": 3,
+        "ad_276340": 2
+      }
+    },
+    {
+      "scene_id": "student_morning",
+      "expected_style": "student_appropriate",
+      "scene": {
+        "time_slot": "morning",
+        "device": "mobile",
+        "user_tags": [
+          "student"
+        ]
+      },
+      "candidates": [
+        {
+          "ad_id": "ad_317470",
+          "title": "Cubic Castles",
+          "category": "Massively Multiplayer",
+          "target_tags": [
+            "Fantasy",
+            "Building",
+            "Sandbox",
+            "Crafting",
+            "Exploration",
+            "Platforming",
+            "Cheerful",
+            "Relaxing"
+          ]
+        },
+        {
+          "ad_id": "ad_351030",
+          "title": "Pixel Puzzles Ultimate Jigsaw Puzzles",
+          "category": "Casual",
+          "target_tags": [
+            "Other",
+            "Puzzle-Solving",
+            "Combat-Free",
+            "Relaxing",
+            "Cozy",
+            "Casual",
+            "Family-Friendly"
+          ]
+        },
+        {
+          "ad_id": "ad_70620",
+          "title": "Worms Crazy Golf",
+          "category": "Sports",
+          "target_tags": [
+            "Comedy",
+            "Physics-Based",
+            "Puzzle-Solving",
+            "Character Customization",
+            "Funny",
+            "Cheerful",
+            "Relaxing",
+            "Casual"
+          ]
+        },
+        {
+          "ad_id": "ad_95400",
+          "title": "ibb & obb",
+          "category": "Indie",
+          "target_tags": [
+            "Fantasy",
+            "Surreal",
+            "Platforming",
+            "Puzzle-Solving",
+            "Combat-Free",
+            "Relaxing",
+            "Cheerful",
+            "Casual"
+          ]
+        }
+      ],
+      "runs": [
+        {
+          "run": 1,
+          "raw": "{\"scores\":[{\"ad_id\":\"ad_317470\",\"relevance\":65,\"reason\":\"Cheerful, relaxing sandbox/build game may appeal to students, but MMO/crafting focus is less ideal for a quick morning mobile session.\"},{\"ad_id\":\"ad_351030\",\"relevance\":82,\"reason\":\"Casual, cozy, combat-free puzzle game strongly fits a relaxing morning mobile break for a student.\"},{\"ad_id\":\"ad_70620\",\"relevance\":76,\"reason\":\"Lighthearted casual sports/puzzle title with cheerful and relaxing tags suits a morning student mobile audience.\"},{\"ad_id\":\"ad_95400\",\"relevance\":72,\"reason\":\"Combat-free relaxing puzzle-platformer is student-friendly and casual, though gameplay may demand more focus than a quick morning session.\"}]}",
+          "scores": {
+            "ad_317470": {
+              "relevance": 65,
+              "reason": "Cheerful, relaxing sandbox/build game may appeal to students, but MMO/crafting focus is less ideal for a quick morning mobile session."
+            },
+            "ad_351030": {
+              "relevance": 82,
+              "reason": "Casual, cozy, combat-free puzzle game strongly fits a relaxing morning mobile break for a student."
+            },
+            "ad_70620": {
+              "relevance": 76,
+              "reason": "Lighthearted casual sports/puzzle title with cheerful and relaxing tags suits a morning student mobile audience."
+            },
+            "ad_95400": {
+              "relevance": 72,
+              "reason": "Combat-free relaxing puzzle-platformer is student-friendly and casual, though gameplay may demand more focus than a quick morning session."
+            }
+          },
+          "selected_by_relevance": "ad_351030"
+        },
+        {
+          "run": 2,
+          "raw": "{\"scores\":[{\"ad_id\":\"ad_317470\",\"relevance\":62,\"reason\":\"Cheerful, relaxing sandbox/exploration tags are a fair fit, but MMO-style play may be less suited to a short morning mobile session for a student.\"},{\"ad_id\":\"ad_351030\",\"relevance\":86,\"reason\":\"Casual, relaxing, cozy puzzle-solving tags align well with a low-pressure morning mobile session for a student.\"},{\"ad_id\":\"ad_70620\",\"relevance\":74,\"reason\":\"Casual, cheerful, relaxing physics-puzzle golf tags are reasonably aligned with a light morning mobile session.\"},{\"ad_id\":\"ad_95400\",\"relevance\":80,\"reason\":\"Combat-free, relaxing, cheerful puzzle-platforming tags fit a casual morning mobile session for a student.\"}]}",
+          "scores": {
+            "ad_317470": {
+              "relevance": 62,
+              "reason": "Cheerful, relaxing sandbox/exploration tags are a fair fit, but MMO-style play may be less suited to a short morning mobile session for a student."
+            },
+            "ad_351030": {
+              "relevance": 86,
+              "reason": "Casual, relaxing, cozy puzzle-solving tags align well with a low-pressure morning mobile session for a student."
+            },
+            "ad_70620": {
+              "relevance": 74,
+              "reason": "Casual, cheerful, relaxing physics-puzzle golf tags are reasonably aligned with a light morning mobile session."
+            },
+            "ad_95400": {
+              "relevance": 80,
+              "reason": "Combat-free, relaxing, cheerful puzzle-platforming tags fit a casual morning mobile session for a student."
+            }
+          },
+          "selected_by_relevance": "ad_351030"
+        },
+        {
+          "run": 3,
+          "raw": "{\"scores\":[{\"ad_id\":\"ad_317470\",\"relevance\":65,\"reason\":\"Relaxing, cheerful sandbox/exploration elements fit a student's casual morning use, but MMO/building focus is less aligned with quick mobile play.\"},{\"ad_id\":\"ad_351030\",\"relevance\":90,\"reason\":\"Strongly matches a morning mobile student scene with casual, relaxing, combat-free puzzle-solving and cozy family-friendly tags.\"},{\"ad_id\":\"ad_70620\",\"relevance\":82,\"reason\":\"Casual, relaxing, cheerful puzzle and comedy tags suit morning mobile downtime, though sports/golf focus is somewhat narrower.\"},{\"ad_id\":\"ad_95400\",\"relevance\":86,\"reason\":\"Combat-free puzzle platforming with relaxing, cheerful, casual tags aligns well with a student's morning mobile session.\"}]}",
+          "scores": {
+            "ad_317470": {
+              "relevance": 65,
+              "reason": "Relaxing, cheerful sandbox/exploration elements fit a student's casual morning use, but MMO/building focus is less aligned with quick mobile play."
+            },
+            "ad_351030": {
+              "relevance": 90,
+              "reason": "Strongly matches a morning mobile student scene with casual, relaxing, combat-free puzzle-solving and cozy family-friendly tags."
+            },
+            "ad_70620": {
+              "relevance": 82,
+              "reason": "Casual, relaxing, cheerful puzzle and comedy tags suit morning mobile downtime, though sports/golf focus is somewhat narrower."
+            },
+            "ad_95400": {
+              "relevance": 86,
+              "reason": "Combat-free puzzle platforming with relaxing, cheerful, casual tags aligns well with a student's morning mobile session."
+            }
+          },
+          "selected_by_relevance": "ad_351030"
+        },
+        {
+          "run": 4,
+          "raw": "{\"scores\":[{\"ad_id\":\"ad_317470\",\"relevance\":65,\"reason\":\"Cheerful and relaxing sandbox/MMO tags fit casual play, but the MMO and platforming focus is less clearly suited to a quick morning mobile student session.\"},{\"ad_id\":\"ad_351030\",\"relevance\":92,\"reason\":\"Casual, relaxing, combat-free puzzle-solving matches a student's morning mobile downtime very well.\"},{\"ad_id\":\"ad_70620\",\"relevance\":82,\"reason\":\"Cheerful, relaxing, casual puzzle-sports mix fits morning mobile play, though the sports theme is less directly aligned.\"},{\"ad_id\":\"ad_95400\",\"relevance\":88,\"reason\":\"Relaxing, cheerful, combat-free puzzle-platforming suits casual morning mobile play for a student.\"}]}",
+          "scores": {
+            "ad_317470": {
+              "relevance": 65,
+              "reason": "Cheerful and relaxing sandbox/MMO tags fit casual play, but the MMO and platforming focus is less clearly suited to a quick morning mobile student session."
+            },
+            "ad_351030": {
+              "relevance": 92,
+              "reason": "Casual, relaxing, combat-free puzzle-solving matches a student's morning mobile downtime very well."
+            },
+            "ad_70620": {
+              "relevance": 82,
+              "reason": "Cheerful, relaxing, casual puzzle-sports mix fits morning mobile play, though the sports theme is less directly aligned."
+            },
+            "ad_95400": {
+              "relevance": 88,
+              "reason": "Relaxing, cheerful, combat-free puzzle-platforming suits casual morning mobile play for a student."
+            }
+          },
+          "selected_by_relevance": "ad_351030"
+        },
+        {
+          "run": 5,
+          "raw": "{\"scores\":[{\"ad_id\":\"ad_317470\",\"relevance\":70,\"reason\":\"Relaxing, cheerful sandbox/exploration may suit a student, but MMO/building could be less ideal for a short morning mobile session.\"},{\"ad_id\":\"ad_351030\",\"relevance\":90,\"reason\":\"Casual, cozy, combat-free puzzle play fits a relaxing morning mobile session for a student very well.\"},{\"ad_id\":\"ad_70620\",\"relevance\":85,\"reason\":\"Cheerful, funny, casual physics/puzzle golf is a strong low-pressure fit for morning mobile use.\"},{\"ad_id\":\"ad_95400\",\"relevance\":82,\"reason\":\"Combat-free, relaxing puzzle-platforming with cheerful casual tags aligns well with a morning mobile student context.\"}]}",
+          "scores": {
+            "ad_317470": {
+              "relevance": 70,
+              "reason": "Relaxing, cheerful sandbox/exploration may suit a student, but MMO/building could be less ideal for a short morning mobile session."
+            },
+            "ad_351030": {
+              "relevance": 90,
+              "reason": "Casual, cozy, combat-free puzzle play fits a relaxing morning mobile session for a student very well."
+            },
+            "ad_70620": {
+              "relevance": 85,
+              "reason": "Cheerful, funny, casual physics/puzzle golf is a strong low-pressure fit for morning mobile use."
+            },
+            "ad_95400": {
+              "relevance": 82,
+              "reason": "Combat-free, relaxing puzzle-platforming with cheerful casual tags aligns well with a morning mobile student context."
+            }
+          },
+          "selected_by_relevance": "ad_351030"
+        }
+      ],
+      "structural_valid_count": 5,
+      "selected_counts": {
+        "ad_351030": 5
+      }
+    },
+    {
+      "scene_id": "gamer_evening",
+      "expected_style": "competitive_appropriate",
+      "scene": {
+        "time_slot": "evening",
+        "device": "desktop",
+        "user_tags": [
+          "gamer"
+        ]
+      },
+      "candidates": [
+        {
+          "ad_id": "ad_6020",
+          "title": "STAR WARS™ Jedi Knight - Jedi Academy™",
+          "category": "Action",
+          "target_tags": [
+            "Sci-Fi",
+            "Space",
+            "War",
+            "Combat",
+            "Real-Time Combat",
+            "Character Customization",
+            "Leveling",
+            "Epic"
+          ]
+        },
+        {
+          "ad_id": "ad_6030",
+          "title": "STAR WARS™ Jedi Knight II - Jedi Outcast™",
+          "category": "Action",
+          "target_tags": [
+            "Sci-Fi",
+            "Space",
+            "War",
+            "Shooting",
+            "Combat",
+            "Character Customization",
+            "Leveling",
+            "Epic"
+          ]
+        },
+        {
+          "ad_id": "ad_10180",
+          "title": "Call of Duty®: Modern Warfare® 2 (2009)",
+          "category": "Action",
+          "target_tags": [
+            "Modern",
+            "War",
+            "Shooting",
+            "Combat",
+            "Character Customization",
+            "Leveling",
+            "Tense",
+            "Epic"
+          ]
+        },
+        {
+          "ad_id": "ad_108800",
+          "title": "Crysis 2 - Maximum Edition",
+          "category": "Action",
+          "target_tags": [
+            "Sci-Fi",
+            "Urban",
+            "War",
+            "Real-Time Combat",
+            "Shooting",
+            "Stealth",
+            "Character Customization",
+            "Tense"
+          ]
+        }
+      ],
+      "runs": [
+        {
+          "run": 1,
+          "raw": "{\"scores\":[{\"ad_id\":\"ad_6020\",\"relevance\":90,\"reason\":\"Action game matches the gamer tag and fits desktop evening play.\"},{\"ad_id\":\"ad_6030\",\"relevance\":90,\"reason\":\"Action game matches the gamer tag and fits desktop evening play.\"},{\"ad_id\":\"ad_10180\",\"relevance\":90,\"reason\":\"Action shooter matches the gamer tag and fits desktop evening play.\"},{\"ad_id\":\"ad_108800\",\"relevance\":90,\"reason\":\"Action shooter matches the gamer tag and fits desktop evening play.\"}]}",
+          "scores": {
+            "ad_6020": {
+              "relevance": 90,
+              "reason": "Action game matches the gamer tag and fits desktop evening play."
+            },
+            "ad_6030": {
+              "relevance": 90,
+              "reason": "Action game matches the gamer tag and fits desktop evening play."
+            },
+            "ad_10180": {
+              "relevance": 90,
+              "reason": "Action shooter matches the gamer tag and fits desktop evening play."
+            },
+            "ad_108800": {
+              "relevance": 90,
+              "reason": "Action shooter matches the gamer tag and fits desktop evening play."
+            }
+          },
+          "selected_by_relevance": "ad_6030"
+        },
+        {
+          "run": 2,
+          "raw": "{\"scores\":[{\"ad_id\":\"ad_6020\",\"relevance\":90,\"reason\":\"Action game with combat and customization; strong fit for a gamer using desktop in the evening.\"},{\"ad_id\":\"ad_6030\",\"relevance\":90,\"reason\":\"Action game with shooting and combat; strong fit for a gamer using desktop in the evening.\"},{\"ad_id\":\"ad_10180\",\"relevance\":92,\"reason\":\"Action shooter with combat and leveling; strong fit for a gamer using desktop in the evening.\"},{\"ad_id\":\"ad_108800\",\"relevance\":92,\"reason\":\"Sci-fi action shooter with combat and customization; strong fit for a gamer using desktop in the evening.\"}]}",
+          "scores": {
+            "ad_6020": {
+              "relevance": 90,
+              "reason": "Action game with combat and customization; strong fit for a gamer using desktop in the evening."
+            },
+            "ad_6030": {
+              "relevance": 90,
+              "reason": "Action game with shooting and combat; strong fit for a gamer using desktop in the evening."
+            },
+            "ad_10180": {
+              "relevance": 92,
+              "reason": "Action shooter with combat and leveling; strong fit for a gamer using desktop in the evening."
+            },
+            "ad_108800": {
+              "relevance": 92,
+              "reason": "Sci-fi action shooter with combat and customization; strong fit for a gamer using desktop in the evening."
+            }
+          },
+          "selected_by_relevance": "ad_108800"
+        },
+        {
+          "run": 3,
+          "raw": "{\"scores\":[{\"ad_id\":\"ad_6020\",\"relevance\":88,\"reason\":\"Action sci-fi game with combat and leveling, well suited to a gamer on desktop in the evening.\"},{\"ad_id\":\"ad_6030\",\"relevance\":88,\"reason\":\"Action sci-fi shooter with combat and progression, matching the gamer scene tags.\"},{\"ad_id\":\"ad_10180\",\"relevance\":90,\"reason\":\"Popular action shooter with war combat and leveling, strongly aligned with a gamer audience.\"},{\"ad_id\":\"ad_108800\",\"relevance\":89,\"reason\":\"Sci-fi action shooter with combat and customization, relevant to the gamer scene.\"}]}",
+          "scores": {
+            "ad_6020": {
+              "relevance": 88,
+              "reason": "Action sci-fi game with combat and leveling, well suited to a gamer on desktop in the evening."
+            },
+            "ad_6030": {
+              "relevance": 88,
+              "reason": "Action sci-fi shooter with combat and progression, matching the gamer scene tags."
+            },
+            "ad_10180": {
+              "relevance": 90,
+              "reason": "Popular action shooter with war combat and leveling, strongly aligned with a gamer audience."
+            },
+            "ad_108800": {
+              "relevance": 89,
+              "reason": "Sci-fi action shooter with combat and customization, relevant to the gamer scene."
+            }
+          },
+          "selected_by_relevance": "ad_10180"
+        },
+        {
+          "run": 4,
+          "raw": "{\"scores\":[{\"ad_id\":\"ad_6020\",\"relevance\":88,\"reason\":\"Action game with combat and progression, fitting a gamer on desktop in the evening.\"},{\"ad_id\":\"ad_6030\",\"relevance\":88,\"reason\":\"Action game with shooting, combat, and progression, fitting a gamer on desktop in the evening.\"},{\"ad_id\":\"ad_10180\",\"relevance\":90,\"reason\":\"Action shooter with combat and progression, strongly fitting a gamer on desktop in the evening.\"},{\"ad_id\":\"ad_108800\",\"relevance\":89,\"reason\":\"Action shooter with combat and customization, fitting a gamer on desktop in the evening.\"}]}",
+          "scores": {
+            "ad_6020": {
+              "relevance": 88,
+              "reason": "Action game with combat and progression, fitting a gamer on desktop in the evening."
+            },
+            "ad_6030": {
+              "relevance": 88,
+              "reason": "Action game with shooting, combat, and progression, fitting a gamer on desktop in the evening."
+            },
+            "ad_10180": {
+              "relevance": 90,
+              "reason": "Action shooter with combat and progression, strongly fitting a gamer on desktop in the evening."
+            },
+            "ad_108800": {
+              "relevance": 89,
+              "reason": "Action shooter with combat and customization, fitting a gamer on desktop in the evening."
+            }
+          },
+          "selected_by_relevance": "ad_10180"
+        },
+        {
+          "run": 5,
+          "raw": "{\"scores\":[{\"ad_id\":\"ad_6020\",\"relevance\":90,\"reason\":\"Action game matching broad gamer interest and desktop play.\"},{\"ad_id\":\"ad_6030\",\"relevance\":90,\"reason\":\"Action game matching broad gamer interest and desktop play.\"},{\"ad_id\":\"ad_10180\",\"relevance\":90,\"reason\":\"Action shooter matching broad gamer interest and desktop play.\"},{\"ad_id\":\"ad_108800\",\"relevance\":90,\"reason\":\"Action shooter matching broad gamer interest and desktop play.\"}]}",
+          "scores": {
+            "ad_6020": {
+              "relevance": 90,
+              "reason": "Action game matching broad gamer interest and desktop play."
+            },
+            "ad_6030": {
+              "relevance": 90,
+              "reason": "Action game matching broad gamer interest and desktop play."
+            },
+            "ad_10180": {
+              "relevance": 90,
+              "reason": "Action shooter matching broad gamer interest and desktop play."
+            },
+            "ad_108800": {
+              "relevance": 90,
+              "reason": "Action shooter matching broad gamer interest and desktop play."
+            }
+          },
+          "selected_by_relevance": "ad_6030"
+        }
+      ],
+      "structural_valid_count": 5,
+      "selected_counts": {
+        "ad_6030": 2,
+        "ad_108800": 1,
+        "ad_10180": 2
+      }
+    },
+    {
+      "scene_id": "family_evening_tablet",
+      "expected_style": "family_friendly",
+      "scene": {
+        "time_slot": "evening",
+        "device": "tablet",
+        "user_tags": [
+          "family"
+        ]
+      },
+      "candidates": [
+        {
+          "ad_id": "ad_259550",
+          "title": "Hero of the Kingdom",
+          "category": "Adventure",
+          "target_tags": [
+            "Fantasy",
+            "Medieval",
+            "Point & Click",
+            "Exploration",
+            "Resource Management",
+            "Combat-Free",
+            "Relaxing",
+            "Wholesome"
+          ]
+        },
+        {
+          "ad_id": "ad_346560",
+          "title": "Hero of the Kingdom II",
+          "category": "Adventure",
+          "target_tags": [
+            "Fantasy",
+            "Pirates",
+            "Point & Click",
+            "Exploration",
+            "Combat-Free",
+            "Resource Management",
+            "Relaxing",
+            "Cozy"
+          ]
+        },
+        {
+          "ad_id": "ad_3258290",
+          "title": "Equinox: Homecoming",
+          "category": "Adventure",
+          "target_tags": [
+            "Modern",
+            "Mystery",
+            "Exploration",
+            "Open World",
+            "Driving",
+            "Character Customization",
+            "Other",
+            "Mysterious"
+          ]
+        },
+        {
+          "ad_id": "ad_256290",
+          "title": "Child of Light",
+          "category": "RPG",
+          "target_tags": [
+            "Fantasy",
+            "Mythology",
+            "Turn-Based Combat",
+            "Leveling",
+            "Exploration",
+            "Combat",
+            "Atmospheric",
+            "Emotional"
+          ]
+        }
+      ],
+      "runs": [
+        {
+          "run": 1,
+          "raw": "{\"scores\":[{\"ad_id\":\"ad_259550\",\"relevance\":86,\"reason\":\"Combat-free, relaxing, wholesome adventure with fantasy/exploration tags fits a family evening tablet session well.\"},{\"ad_id\":\"ad_346560\",\"relevance\":84,\"reason\":\"Relaxing, cozy, combat-free point-and-click adventure aligns strongly with family-oriented casual play.\"},{\"ad_id\":\"ad_3258290\",\"relevance\":42,\"reason\":\"Mystery/open-world driving adventure has no explicit family, relaxing, or cozy tags, so it is only loosely relevant.\"},{\"ad_id\":\"ad_256290\",\"relevance\":58,\"reason\":\"Fantasy exploration and atmospheric RPG elements may appeal, but turn-based combat and emotional themes make family fit less certain.\"}]}",
+          "scores": {
+            "ad_259550": {
+              "relevance": 86,
+              "reason": "Combat-free, relaxing, wholesome adventure with fantasy/exploration tags fits a family evening tablet session well."
+            },
+            "ad_346560": {
+              "relevance": 84,
+              "reason": "Relaxing, cozy, combat-free point-and-click adventure aligns strongly with family-oriented casual play."
+            },
+            "ad_3258290": {
+              "relevance": 42,
+              "reason": "Mystery/open-world driving adventure has no explicit family, relaxing, or cozy tags, so it is only loosely relevant."
+            },
+            "ad_256290": {
+              "relevance": 58,
+              "reason": "Fantasy exploration and atmospheric RPG elements may appeal, but turn-based combat and emotional themes make family fit less certain."
+            }
+          },
+          "selected_by_relevance": "ad_259550"
+        },
+        {
+          "run": 2,
+          "raw": "{\"scores\":[{\"ad_id\":\"ad_259550\",\"relevance\":90,\"reason\":\"Combat-free, relaxing, wholesome fantasy adventure fits a family evening tablet session well.\"},{\"ad_id\":\"ad_346560\",\"relevance\":92,\"reason\":\"Combat-free, cozy, relaxing point-and-click adventure is strongly aligned with family tablet use.\"},{\"ad_id\":\"ad_3258290\",\"relevance\":35,\"reason\":\"Open-world mystery and driving themes have little direct alignment with the family-oriented evening tablet scene.\"},{\"ad_id\":\"ad_256290\",\"relevance\":50,\"reason\":\"Fantasy exploration fits, but turn-based combat and emotional RPG themes are less aligned with relaxed family tablet use.\"}]}",
+          "scores": {
+            "ad_259550": {
+              "relevance": 90,
+              "reason": "Combat-free, relaxing, wholesome fantasy adventure fits a family evening tablet session well."
+            },
+            "ad_346560": {
+              "relevance": 92,
+              "reason": "Combat-free, cozy, relaxing point-and-click adventure is strongly aligned with family tablet use."
+            },
+            "ad_3258290": {
+              "relevance": 35,
+              "reason": "Open-world mystery and driving themes have little direct alignment with the family-oriented evening tablet scene."
+            },
+            "ad_256290": {
+              "relevance": 50,
+              "reason": "Fantasy exploration fits, but turn-based combat and emotional RPG themes are less aligned with relaxed family tablet use."
+            }
+          },
+          "selected_by_relevance": "ad_346560"
+        },
+        {
+          "run": 3,
+          "raw": "{\"scores\":[{\"ad_id\":\"ad_259550\",\"relevance\":92,\"reason\":\"Combat-free, relaxing, wholesome adventure with exploration and point-and-click play fits a family tablet evening well.\"},{\"ad_id\":\"ad_346560\",\"relevance\":90,\"reason\":\"Cozy, relaxing, combat-free point-and-click adventure is strongly aligned with family-friendly evening tablet use.\"},{\"ad_id\":\"ad_3258290\",\"relevance\":55,\"reason\":\"Mystery exploration and driving are engaging, but the open-world/modern themes are less explicitly aligned with family and relaxing evening tags.\"},{\"ad_id\":\"ad_256290\",\"relevance\":64,\"reason\":\"Atmospheric fantasy RPG with exploration and turn-based combat may appeal to families, but combat and emotional themes fit less closely than relaxing combat-free options.\"}]}",
+          "scores": {
+            "ad_259550": {
+              "relevance": 92,
+              "reason": "Combat-free, relaxing, wholesome adventure with exploration and point-and-click play fits a family tablet evening well."
+            },
+            "ad_346560": {
+              "relevance": 90,
+              "reason": "Cozy, relaxing, combat-free point-and-click adventure is strongly aligned with family-friendly evening tablet use."
+            },
+            "ad_3258290": {
+              "relevance": 55,
+              "reason": "Mystery exploration and driving are engaging, but the open-world/modern themes are less explicitly aligned with family and relaxing evening tags."
+            },
+            "ad_256290": {
+              "relevance": 64,
+              "reason": "Atmospheric fantasy RPG with exploration and turn-based combat may appeal to families, but combat and emotional themes fit less closely than relaxing combat-free options."
+            }
+          },
+          "selected_by_relevance": "ad_259550"
+        },
+        {
+          "run": 4,
+          "raw": "{\"scores\":[{\"ad_id\":\"ad_259550\",\"relevance\":88,\"reason\":\"Combat-free, relaxing, wholesome adventure suits family tablet use in the evening.\"},{\"ad_id\":\"ad_346560\",\"relevance\":87,\"reason\":\"Cozy, relaxing, combat-free exploration is a strong fit for family evening tablet play.\"},{\"ad_id\":\"ad_3258290\",\"relevance\":45,\"reason\":\"Open-world mystery and driving may appeal less to a family-focused evening tablet session.\"},{\"ad_id\":\"ad_256290\",\"relevance\":58,\"reason\":\"Atmospheric fantasy RPG exploration fits evening tablet use, but combat and emotional themes are less clearly family-oriented.\"}]}",
+          "scores": {
+            "ad_259550": {
+              "relevance": 88,
+              "reason": "Combat-free, relaxing, wholesome adventure suits family tablet use in the evening."
+            },
+            "ad_346560": {
+              "relevance": 87,
+              "reason": "Cozy, relaxing, combat-free exploration is a strong fit for family evening tablet play."
+            },
+            "ad_3258290": {
+              "relevance": 45,
+              "reason": "Open-world mystery and driving may appeal less to a family-focused evening tablet session."
+            },
+            "ad_256290": {
+              "relevance": 58,
+              "reason": "Atmospheric fantasy RPG exploration fits evening tablet use, but combat and emotional themes are less clearly family-oriented."
+            }
+          },
+          "selected_by_relevance": "ad_259550"
+        },
+        {
+          "run": 5,
+          "raw": "{\"scores\":[{\"ad_id\":\"ad_259550\",\"relevance\":90,\"reason\":\"Combat-free, relaxing, wholesome, and point-and-click; strong fit for a family tablet session in the evening.\"},{\"ad_id\":\"ad_346560\",\"relevance\":90,\"reason\":\"Cozy, combat-free, relaxing point-and-click adventure; highly suitable for family evening tablet use.\"},{\"ad_id\":\"ad_3258290\",\"relevance\":45,\"reason\":\"Mystery/open-world driving themes are less clearly family-oriented or relaxing for this scene.\"},{\"ad_id\":\"ad_256290\",\"relevance\":65,\"reason\":\"Fantasy exploration and turn-based play can suit tablet use, but combat and emotional themes are less directly family/relaxation aligned.\"}]}",
+          "scores": {
+            "ad_259550": {
+              "relevance": 90,
+              "reason": "Combat-free, relaxing, wholesome, and point-and-click; strong fit for a family tablet session in the evening."
+            },
+            "ad_346560": {
+              "relevance": 90,
+              "reason": "Cozy, combat-free, relaxing point-and-click adventure; highly suitable for family evening tablet use."
+            },
+            "ad_3258290": {
+              "relevance": 45,
+              "reason": "Mystery/open-world driving themes are less clearly family-oriented or relaxing for this scene."
+            },
+            "ad_256290": {
+              "relevance": 65,
+              "reason": "Fantasy exploration and turn-based play can suit tablet use, but combat and emotional themes are less directly family/relaxation aligned."
+            }
+          },
+          "selected_by_relevance": "ad_346560"
+        }
+      ],
+      "structural_valid_count": 5,
+      "selected_counts": {
+        "ad_259550": 3,
+        "ad_346560": 2
+      }
+    },
+    {
+      "scene_id": "student_night",
+      "expected_style": "student_appropriate",
+      "scene": {
+        "time_slot": "night",
+        "device": "mobile",
+        "user_tags": [
+          "student"
+        ]
+      },
+      "candidates": [
+        {
+          "ad_id": "ad_351030",
+          "title": "Pixel Puzzles Ultimate Jigsaw Puzzles",
+          "category": "Casual",
+          "target_tags": [
+            "Other",
+            "Puzzle-Solving",
+            "Combat-Free",
+            "Relaxing",
+            "Cozy",
+            "Casual",
+            "Family-Friendly"
+          ]
+        },
+        {
+          "ad_id": "ad_317470",
+          "title": "Cubic Castles",
+          "category": "Massively Multiplayer",
+          "target_tags": [
+            "Fantasy",
+            "Building",
+            "Sandbox",
+            "Crafting",
+            "Exploration",
+            "Platforming",
+            "Cheerful",
+            "Relaxing"
+          ]
+        },
+        {
+          "ad_id": "ad_348620",
+          "title": "Voices from the Sea",
+          "category": "Adventure",
+          "target_tags": [
+            "Slice of Life",
+            "Mystery",
+            "Romance",
+            "Visual Novel",
+            "Point & Click",
+            "Combat-Free",
+            "Relaxing",
+            "Cozy"
+          ]
+        },
+        {
+          "ad_id": "ad_522230",
+          "title": "The Fishing Club 3D: Co-op Sport Angling",
+          "category": "Simulation",
+          "target_tags": [
+            "Nature",
+            "Modern",
+            "Fishing",
+            "Crafting",
+            "Exploration",
+            "Character Customization",
+            "Relaxing",
+            "Cheerful"
+          ]
+        }
+      ],
+      "runs": [
+        {
+          "run": 1,
+          "raw": "{\"scores\":[{\"ad_id\":\"ad_351030\",\"relevance\":85,\"reason\":\"Casual puzzle with relaxing, cozy, combat-free tags fits a nighttime mobile session for a student.\"},{\"ad_id\":\"ad_317470\",\"relevance\":60,\"reason\":\"Sandbox/MMO building and exploration can suit students, but it is less clearly relaxing or night-oriented and has no explicit mobile signal.\"},{\"ad_id\":\"ad_348620\",\"relevance\":88,\"reason\":\"Combat-free visual novel with relaxing, cozy, slice-of-life tags is well suited to nighttime mobile play for a student.\"},{\"ad_id\":\"ad_522230\",\"relevance\":70,\"reason\":\"Relaxing fishing simulation with cheerful nature tags fits casual nighttime play, though student and mobile fit are less explicit.\"}]}",
+          "scores": {
+            "ad_351030": {
+              "relevance": 85,
+              "reason": "Casual puzzle with relaxing, cozy, combat-free tags fits a nighttime mobile session for a student."
+            },
+            "ad_317470": {
+              "relevance": 60,
+              "reason": "Sandbox/MMO building and exploration can suit students, but it is less clearly relaxing or night-oriented and has no explicit mobile signal."
+            },
+            "ad_348620": {
+              "relevance": 88,
+              "reason": "Combat-free visual novel with relaxing, cozy, slice-of-life tags is well suited to nighttime mobile play for a student."
+            },
+            "ad_522230": {
+              "relevance": 70,
+              "reason": "Relaxing fishing simulation with cheerful nature tags fits casual nighttime play, though student and mobile fit are less explicit."
+            }
+          },
+          "selected_by_relevance": "ad_348620"
+        },
+        {
+          "run": 2,
+          "raw": "{\"scores\":[{\"ad_id\":\"ad_351030\",\"relevance\":78,\"reason\":\"Casual, relaxing, combat-free puzzle game fits a nighttime mobile session for a student, though it lacks explicit student or mobile tags.\"},{\"ad_id\":\"ad_317470\",\"relevance\":48,\"reason\":\"Relaxing sandbox and building elements can suit casual play, but the massively multiplayer category is less clearly aligned with a nighttime mobile student context.\"},{\"ad_id\":\"ad_348620\",\"relevance\":68,\"reason\":\"Combat-free, cozy visual novel with relaxing adventure elements is a good fit for nighttime mobile play, but student relevance is only indirect.\"},{\"ad_id\":\"ad_522230\",\"relevance\":54,\"reason\":\"Relaxing and cheerful fishing simulation may appeal for casual nighttime play, though co-op simulation has weaker direct alignment with the mobile student scene.\"}]}",
+          "scores": {
+            "ad_351030": {
+              "relevance": 78,
+              "reason": "Casual, relaxing, combat-free puzzle game fits a nighttime mobile session for a student, though it lacks explicit student or mobile tags."
+            },
+            "ad_317470": {
+              "relevance": 48,
+              "reason": "Relaxing sandbox and building elements can suit casual play, but the massively multiplayer category is less clearly aligned with a nighttime mobile student context."
+            },
+            "ad_348620": {
+              "relevance": 68,
+              "reason": "Combat-free, cozy visual novel with relaxing adventure elements is a good fit for nighttime mobile play, but student relevance is only indirect."
+            },
+            "ad_522230": {
+              "relevance": 54,
+              "reason": "Relaxing and cheerful fishing simulation may appeal for casual nighttime play, though co-op simulation has weaker direct alignment with the mobile student scene."
+            }
+          },
+          "selected_by_relevance": "ad_351030"
+        },
+        {
+          "run": 3,
+          "raw": "{\"scores\":[{\"ad_id\":\"ad_351030\",\"relevance\":72,\"reason\":\"Casual, relaxing puzzle game fits a student's low-pressure nighttime mobile play; explicit mobile/student match is absent but tone aligns well.\"},{\"ad_id\":\"ad_317470\",\"relevance\":50,\"reason\":\"Sandbox/MMO building game may appeal to students, but it has less clear alignment with nighttime casual mobile use.\"},{\"ad_id\":\"ad_348620\",\"relevance\":68,\"reason\":\"Relaxing, cozy, combat-free visual novel is well suited to nighttime mobile leisure for a student audience.\"},{\"ad_id\":\"ad_522230\",\"relevance\":42,\"reason\":\"Relaxing fishing sim has some leisure appeal, but co-op sports angling is less strongly aligned with student nighttime mobile context.\"}]}",
+          "scores": {
+            "ad_351030": {
+              "relevance": 72,
+              "reason": "Casual, relaxing puzzle game fits a student's low-pressure nighttime mobile play; explicit mobile/student match is absent but tone aligns well."
+            },
+            "ad_317470": {
+              "relevance": 50,
+              "reason": "Sandbox/MMO building game may appeal to students, but it has less clear alignment with nighttime casual mobile use."
+            },
+            "ad_348620": {
+              "relevance": 68,
+              "reason": "Relaxing, cozy, combat-free visual novel is well suited to nighttime mobile leisure for a student audience."
+            },
+            "ad_522230": {
+              "relevance": 42,
+              "reason": "Relaxing fishing sim has some leisure appeal, but co-op sports angling is less strongly aligned with student nighttime mobile context."
+            }
+          },
+          "selected_by_relevance": "ad_351030"
+        },
+        {
+          "run": 4,
+          "raw": "{\"scores\":[{\"ad_id\":\"ad_351030\",\"relevance\":88,\"reason\":\"Casual, relaxing, combat-free puzzle game fits a student's night-time mobile session well.\"},{\"ad_id\":\"ad_317470\",\"relevance\":58,\"reason\":\"Building/sandbox MMO is less clearly suited to a short, relaxing night mobile session for a student.\"},{\"ad_id\":\"ad_348620\",\"relevance\":82,\"reason\":\"Combat-free, cozy visual novel with slice-of-life and relaxing tags suits night-time mobile play.\"},{\"ad_id\":\"ad_522230\",\"relevance\":70,\"reason\":\"Relaxing and cheerful fishing simulation has some fit, but exploration/crafting may be less casual for the scene.\"}]}",
+          "scores": {
+            "ad_351030": {
+              "relevance": 88,
+              "reason": "Casual, relaxing, combat-free puzzle game fits a student's night-time mobile session well."
+            },
+            "ad_317470": {
+              "relevance": 58,
+              "reason": "Building/sandbox MMO is less clearly suited to a short, relaxing night mobile session for a student."
+            },
+            "ad_348620": {
+              "relevance": 82,
+              "reason": "Combat-free, cozy visual novel with slice-of-life and relaxing tags suits night-time mobile play."
+            },
+            "ad_522230": {
+              "relevance": 70,
+              "reason": "Relaxing and cheerful fishing simulation has some fit, but exploration/crafting may be less casual for the scene."
+            }
+          },
+          "selected_by_relevance": "ad_351030"
+        },
+        {
+          "run": 5,
+          "raw": "{\"scores\":[{\"ad_id\":\"ad_351030\",\"relevance\":82,\"reason\":\"Casual, combat-free puzzle game with relaxing/cozy tags fits a student winding down at night on mobile.\"},{\"ad_id\":\"ad_317470\",\"relevance\":58,\"reason\":\"Sandbox/crafting/exploration may appeal to students, but MMO/platforming is less clearly suited to a relaxing night mobile session.\"},{\"ad_id\":\"ad_348620\",\"relevance\":76,\"reason\":\"Cozy, relaxing visual novel with mystery/romance suits nighttime leisure and likely student interest.\"},{\"ad_id\":\"ad_522230\",\"relevance\":68,\"reason\":\"Relaxing, cheerful fishing simulation with co-op and customization fits casual nighttime student leisure, though mobile fit is not explicit.\"}]}",
+          "scores": {
+            "ad_351030": {
+              "relevance": 82,
+              "reason": "Casual, combat-free puzzle game with relaxing/cozy tags fits a student winding down at night on mobile."
+            },
+            "ad_317470": {
+              "relevance": 58,
+              "reason": "Sandbox/crafting/exploration may appeal to students, but MMO/platforming is less clearly suited to a relaxing night mobile session."
+            },
+            "ad_348620": {
+              "relevance": 76,
+              "reason": "Cozy, relaxing visual novel with mystery/romance suits nighttime leisure and likely student interest."
+            },
+            "ad_522230": {
+              "relevance": 68,
+              "reason": "Relaxing, cheerful fishing simulation with co-op and customization fits casual nighttime student leisure, though mobile fit is not explicit."
+            }
+          },
+          "selected_by_relevance": "ad_351030"
+        }
+      ],
+      "structural_valid_count": 5,
+      "selected_counts": {
+        "ad_348620": 1,
+        "ad_351030": 4
+      }
+    },
+    {
+      "scene_id": "esports_afternoon",
+      "expected_style": "competitive_appropriate",
+      "scene": {
+        "time_slot": "afternoon",
+        "device": "desktop",
+        "user_tags": [
+          "esports"
+        ]
+      },
+      "candidates": [
+        {
+          "ad_id": "ad_24720",
+          "title": "SPORE™ Galactic Adventures",
+          "category": "Adventure",
+          "target_tags": [
+            "Sci-Fi",
+            "Space",
+            "Exploration",
+            "Combat",
+            "Character Customization",
+            "Leveling",
+            "Cheerful",
+            "Epic"
+          ]
+        },
+        {
+          "ad_id": "ad_223490",
+          "title": "Blockscape",
+          "category": "Simulation",
+          "target_tags": [
+            "Fantasy",
+            "Building",
+            "Crafting",
+            "Exploration",
+            "Survival",
+            "Base-Building",
+            "Relaxing",
+            "Challenging"
+          ]
+        },
+        {
+          "ad_id": "ad_225260",
+          "title": "Brutal Legend",
+          "category": "Action",
+          "target_tags": [
+            "Fantasy",
+            "Comedy",
+            "Other",
+            "Combat",
+            "Open World",
+            "Driving",
+            "Real-Time Combat",
+            "Hack and Slash"
+          ]
+        },
+        {
+          "ad_id": "ad_389430",
+          "title": "Knight Online",
+          "category": "Massively Multiplayer",
+          "target_tags": [
+            "Fantasy",
+            "War",
+            "Combat",
+            "Loot",
+            "Leveling",
+            "Character Customization",
+            "Epic",
+            "Tense"
+          ]
+        }
+      ],
+      "runs": [
+        {
+          "run": 1,
+          "raw": "{\"scores\":[{\"ad_id\":\"ad_24720\",\"relevance\":5,\"reason\":\"Adventure/exploration game with no esports-related tags; weak match to esports scene.\"},{\"ad_id\":\"ad_223490\",\"relevance\":0,\"reason\":\"Building/survival simulation tags do not match the esports user tag.\"},{\"ad_id\":\"ad_225260\",\"relevance\":5,\"reason\":\"Action/combat game but no esports or competitive tags; minimal match.\"},{\"ad_id\":\"ad_389430\",\"relevance\":15,\"reason\":\"Combat/war/tense MMO tags are somewhat adjacent to competitive gaming, but no explicit esports tag.\"}]}",
+          "scores": {
+            "ad_24720": {
+              "relevance": 5,
+              "reason": "Adventure/exploration game with no esports-related tags; weak match to esports scene."
+            },
+            "ad_223490": {
+              "relevance": 0,
+              "reason": "Building/survival simulation tags do not match the esports user tag."
+            },
+            "ad_225260": {
+              "relevance": 5,
+              "reason": "Action/combat game but no esports or competitive tags; minimal match."
+            },
+            "ad_389430": {
+              "relevance": 15,
+              "reason": "Combat/war/tense MMO tags are somewhat adjacent to competitive gaming, but no explicit esports tag."
+            }
+          },
+          "selected_by_relevance": "ad_389430"
+        },
+        {
+          "run": 2,
+          "raw": "{\"scores\":[{\"ad_id\":\"ad_24720\",\"relevance\":5,\"reason\":\"Adventure/exploration game with no esports or competitive multiplayer tags.\"},{\"ad_id\":\"ad_223490\",\"relevance\":5,\"reason\":\"Simulation/building game with no esports or competitive multiplayer tags.\"},{\"ad_id\":\"ad_225260\",\"relevance\":10,\"reason\":\"Action combat game but lacks esports or competitive multiplayer alignment.\"},{\"ad_id\":\"ad_389430\",\"relevance\":25,\"reason\":\"Massively multiplayer combat and war tags partially align with competitive gaming, but no explicit esports tags.\"}]}",
+          "scores": {
+            "ad_24720": {
+              "relevance": 5,
+              "reason": "Adventure/exploration game with no esports or competitive multiplayer tags."
+            },
+            "ad_223490": {
+              "relevance": 5,
+              "reason": "Simulation/building game with no esports or competitive multiplayer tags."
+            },
+            "ad_225260": {
+              "relevance": 10,
+              "reason": "Action combat game but lacks esports or competitive multiplayer alignment."
+            },
+            "ad_389430": {
+              "relevance": 25,
+              "reason": "Massively multiplayer combat and war tags partially align with competitive gaming, but no explicit esports tags."
+            }
+          },
+          "selected_by_relevance": "ad_389430"
+        },
+        {
+          "run": 3,
+          "raw": "{\"scores\":[{\"ad_id\":\"ad_24720\",\"relevance\":5,\"reason\":\"No esports-related tags such as multiplayer, competitive, or real-time combat.\"},{\"ad_id\":\"ad_223490\",\"relevance\":5,\"reason\":\"Simulation/building/survival tags do not align with the esports scene tag.\"},{\"ad_id\":\"ad_225260\",\"relevance\":15,\"reason\":\"Has real-time combat and action tags, but no explicit multiplayer or competitive esports alignment.\"},{\"ad_id\":\"ad_389430\",\"relevance\":30,\"reason\":\"Massively Multiplayer with combat, tense, and leveling tags is the closest supplied candidate to esports, though no explicit competitive/esports tag is present.\"}]}",
+          "scores": {
+            "ad_24720": {
+              "relevance": 5,
+              "reason": "No esports-related tags such as multiplayer, competitive, or real-time combat."
+            },
+            "ad_223490": {
+              "relevance": 5,
+              "reason": "Simulation/building/survival tags do not align with the esports scene tag."
+            },
+            "ad_225260": {
+              "relevance": 15,
+              "reason": "Has real-time combat and action tags, but no explicit multiplayer or competitive esports alignment."
+            },
+            "ad_389430": {
+              "relevance": 30,
+              "reason": "Massively Multiplayer with combat, tense, and leveling tags is the closest supplied candidate to esports, though no explicit competitive/esports tag is present."
+            }
+          },
+          "selected_by_relevance": "ad_389430"
+        },
+        {
+          "run": 4,
+          "raw": "{\"scores\":[{\"ad_id\":\"ad_24720\",\"relevance\":15,\"reason\":\"Space adventure with combat and leveling, but no clear competitive or esports-focused elements.\"},{\"ad_id\":\"ad_223490\",\"relevance\":5,\"reason\":\"Relaxing building/survival simulation; minimal connection to esports.\"},{\"ad_id\":\"ad_225260\",\"relevance\":10,\"reason\":\"Action hack-and-slash with combat, but not framed around competitive esports.\"},{\"ad_id\":\"ad_389430\",\"relevance\":45,\"reason\":\"Massively multiplayer war/combat game with PvP-adjacent tags, making it the closest fit to an esports audience.\"}]}",
+          "scores": {
+            "ad_24720": {
+              "relevance": 15,
+              "reason": "Space adventure with combat and leveling, but no clear competitive or esports-focused elements."
+            },
+            "ad_223490": {
+              "relevance": 5,
+              "reason": "Relaxing building/survival simulation; minimal connection to esports."
+            },
+            "ad_225260": {
+              "relevance": 10,
+              "reason": "Action hack-and-slash with combat, but not framed around competitive esports."
+            },
+            "ad_389430": {
+              "relevance": 45,
+              "reason": "Massively multiplayer war/combat game with PvP-adjacent tags, making it the closest fit to an esports audience."
+            }
+          },
+          "selected_by_relevance": "ad_389430"
+        },
+        {
+          "run": 5,
+          "raw": "{\"scores\":[{\"ad_id\":\"ad_24720\",\"relevance\":12,\"reason\":\"Single-player space adventure with combat and leveling, but no competitive multiplayer or esports focus.\"},{\"ad_id\":\"ad_223490\",\"relevance\":5,\"reason\":\"Relaxing building/survival simulation with no competitive or esports-oriented elements.\"},{\"ad_id\":\"ad_225260\",\"relevance\":8,\"reason\":\"Single-player action/hack-and-slash game; lacks competitive multiplayer or esports relevance.\"},{\"ad_id\":\"ad_389430\",\"relevance\":55,\"reason\":\"Massively multiplayer combat game with leveling, loot, and tense competition, making it the closest fit to an esports audience.\"}]}",
+          "scores": {
+            "ad_24720": {
+              "relevance": 12,
+              "reason": "Single-player space adventure with combat and leveling, but no competitive multiplayer or esports focus."
+            },
+            "ad_223490": {
+              "relevance": 5,
+              "reason": "Relaxing building/survival simulation with no competitive or esports-oriented elements."
+            },
+            "ad_225260": {
+              "relevance": 8,
+              "reason": "Single-player action/hack-and-slash game; lacks competitive multiplayer or esports relevance."
+            },
+            "ad_389430": {
+              "relevance": 55,
+              "reason": "Massively multiplayer combat game with leveling, loot, and tense competition, making it the closest fit to an esports audience."
+            }
+          },
+          "selected_by_relevance": "ad_389430"
+        }
+      ],
+      "structural_valid_count": 5,
+      "selected_counts": {
+        "ad_389430": 5
+      }
+    }
+  ],
+  "title_bait_cases": [
+    {
+      "case": 1,
+      "expected_ad_id": "match_1",
+      "raw": "{\"scores\":[{\"ad_id\":\"bait_1\",\"relevance\":10,\"reason\":\"Action/Gore targeting does not match the family scene tag, despite the title.\"},{\"ad_id\":\"match_1\",\"relevance\":95,\"reason\":\"Explicit Family and Casual target tags align strongly with the family user tag; Simulation/cozy theme fits broadly.\"},{\"ad_id\":\"filler_1\",\"relevance\":25,\"reason\":\"Adventure category has no explicit family or casual alignment with the scene tags.\"}]}",
+      "scores": {
+        "bait_1": {
+          "relevance": 10,
+          "reason": "Action/Gore targeting does not match the family scene tag, despite the title."
+        },
+        "match_1": {
+          "relevance": 95,
+          "reason": "Explicit Family and Casual target tags align strongly with the family user tag; Simulation/cozy theme fits broadly."
+        },
+        "filler_1": {
+          "relevance": 25,
+          "reason": "Adventure category has no explicit family or casual alignment with the scene tags."
+        }
+      },
+      "selected_by_relevance": "match_1"
+    },
+    {
+      "case": 2,
+      "expected_ad_id": "match_2",
+      "raw": "{\"scores\":[{\"ad_id\":\"bait_2\",\"relevance\":0,\"reason\":\"Action and Violence target tags do not align with the scene's family user tag and may conflict with it.\"},{\"ad_id\":\"match_2\",\"relevance\":95,\"reason\":\"Explicit Family and Casual target tags align strongly with the scene's family user tag, and Simulation is suitable for afternoon desktop browsing.\"},{\"ad_id\":\"filler_2\",\"relevance\":15,\"reason\":\"Adventure is a generic match but lacks any Family or Casual alignment with the scene's family user tag.\"}]}",
+      "scores": {
+        "bait_2": {
+          "relevance": 0,
+          "reason": "Action and Violence target tags do not align with the scene's family user tag and may conflict with it."
+        },
+        "match_2": {
+          "relevance": 95,
+          "reason": "Explicit Family and Casual target tags align strongly with the scene's family user tag, and Simulation is suitable for afternoon desktop browsing."
+        },
+        "filler_2": {
+          "relevance": 15,
+          "reason": "Adventure is a generic match but lacks any Family or Casual alignment with the scene's family user tag."
+        }
+      },
+      "selected_by_relevance": "match_2"
+    },
+    {
+      "case": 3,
+      "expected_ad_id": "match_3",
+      "raw": "{\"scores\":[{\"ad_id\":\"bait_3\",\"relevance\":5,\"reason\":\"Action/Blood tags do not match family-friendly scene tags.\"},{\"ad_id\":\"match_3\",\"relevance\":95,\"reason\":\"Puzzle, Family, and Casual tags align strongly with the family user tag.\"},{\"ad_id\":\"filler_3\",\"relevance\":20,\"reason\":\"Adventure has weak relevance to the specified family and afternoon desktop scene.\"}]}",
+      "scores": {
+        "bait_3": {
+          "relevance": 5,
+          "reason": "Action/Blood tags do not match family-friendly scene tags."
+        },
+        "match_3": {
+          "relevance": 95,
+          "reason": "Puzzle, Family, and Casual tags align strongly with the family user tag."
+        },
+        "filler_3": {
+          "relevance": 20,
+          "reason": "Adventure has weak relevance to the specified family and afternoon desktop scene."
+        }
+      },
+      "selected_by_relevance": "match_3"
+    },
+    {
+      "case": 4,
+      "expected_ad_id": "match_4",
+      "raw": "{\"scores\":[{\"ad_id\":\"bait_4\",\"relevance\":5,\"reason\":\"Target tags include Drugs and Action; no match to family user tag and poor fit for wholesome family context.\"},{\"ad_id\":\"match_4\",\"relevance\":95,\"reason\":\"Target tags include Family and Casual, strongly matching the family user tag and suitable for afternoon desktop browsing.\"},{\"ad_id\":\"filler_4\",\"relevance\":35,\"reason\":\"Adventure tag is broadly relevant but lacks any explicit family-focused targeting.\"}]}",
+      "scores": {
+        "bait_4": {
+          "relevance": 5,
+          "reason": "Target tags include Drugs and Action; no match to family user tag and poor fit for wholesome family context."
+        },
+        "match_4": {
+          "relevance": 95,
+          "reason": "Target tags include Family and Casual, strongly matching the family user tag and suitable for afternoon desktop browsing."
+        },
+        "filler_4": {
+          "relevance": 35,
+          "reason": "Adventure tag is broadly relevant but lacks any explicit family-focused targeting."
+        }
+      },
+      "selected_by_relevance": "match_4"
+    },
+    {
+      "case": 5,
+      "expected_ad_id": "match_5",
+      "raw": "{\"scores\":[{\"ad_id\":\"bait_5\",\"relevance\":0,\"reason\":\"Targets Sexual Content and Action, not the family scene; unsuitable mismatch.\"},{\"ad_id\":\"match_5\",\"relevance\":95,\"reason\":\"Targets Family, Simulation, and Casual, strongly matching the family user tag.\"},{\"ad_id\":\"filler_5\",\"relevance\":15,\"reason\":\"Adventure only; no direct match to the family scene tag.\"}]}",
+      "scores": {
+        "bait_5": {
+          "relevance": 0,
+          "reason": "Targets Sexual Content and Action, not the family scene; unsuitable mismatch."
+        },
+        "match_5": {
+          "relevance": 95,
+          "reason": "Targets Family, Simulation, and Casual, strongly matching the family user tag."
+        },
+        "filler_5": {
+          "relevance": 15,
+          "reason": "Adventure only; no direct match to the family scene tag."
+        }
+      },
+      "selected_by_relevance": "match_5"
+    }
+  ],
+  "known_title_cases": [
+    {
+      "case": 1,
+      "expected_ad_id": "match_known_1",
+      "raw": "{\"scores\":[{\"ad_id\":\"known_1\",\"relevance\":15,\"reason\":\"Action shooter matches afternoon desktop gaming but not the family user tag.\"},{\"ad_id\":\"match_known_1\",\"relevance\":95,\"reason\":\"Simulation casual game explicitly targets Family, aligning strongly with the family scene tag.\"},{\"ad_id\":\"filler_known_1\",\"relevance\":20,\"reason\":\"Generic adventure title has no explicit family or casual alignment with the scene tags.\"}]}",
+      "scores": {
+        "known_1": {
+          "relevance": 15,
+          "reason": "Action shooter matches afternoon desktop gaming but not the family user tag."
+        },
+        "match_known_1": {
+          "relevance": 95,
+          "reason": "Simulation casual game explicitly targets Family, aligning strongly with the family scene tag."
+        },
+        "filler_known_1": {
+          "relevance": 20,
+          "reason": "Generic adventure title has no explicit family or casual alignment with the scene tags."
+        }
+      },
+      "selected_by_relevance": "match_known_1"
+    },
+    {
+      "case": 2,
+      "expected_ad_id": "match_known_2",
+      "raw": "{\"scores\":[{\"ad_id\":\"known_2\",\"relevance\":15,\"reason\":\"Action/Shooter targeting does not match the family scene tag.\"},{\"ad_id\":\"match_known_2\",\"relevance\":95,\"reason\":\"Casual/Simulation targeting directly includes the family scene tag.\"},{\"ad_id\":\"filler_known_2\",\"relevance\":10,\"reason\":\"Adventure targeting has no clear match to the family scene tag.\"}]}",
+      "scores": {
+        "known_2": {
+          "relevance": 15,
+          "reason": "Action/Shooter targeting does not match the family scene tag."
+        },
+        "match_known_2": {
+          "relevance": 95,
+          "reason": "Casual/Simulation targeting directly includes the family scene tag."
+        },
+        "filler_known_2": {
+          "relevance": 10,
+          "reason": "Adventure targeting has no clear match to the family scene tag."
+        }
+      },
+      "selected_by_relevance": "match_known_2"
+    },
+    {
+      "case": 3,
+      "expected_ad_id": "match_known_3",
+      "raw": "{\"scores\":[{\"ad_id\":\"known_3\",\"relevance\":10,\"reason\":\"Action/shooter targeting does not match the family user tag; desktop and afternoon are neutral.\"},{\"ad_id\":\"match_known_3\",\"relevance\":90,\"reason\":\"Puzzle/simulation game explicitly targets Family and Casual, aligning strongly with the family user tag.\"},{\"ad_id\":\"filler_known_3\",\"relevance\":5,\"reason\":\"Adventure targeting has no clear match to the family user tag; other scene details are neutral.\"}]}",
+      "scores": {
+        "known_3": {
+          "relevance": 10,
+          "reason": "Action/shooter targeting does not match the family user tag; desktop and afternoon are neutral."
+        },
+        "match_known_3": {
+          "relevance": 90,
+          "reason": "Puzzle/simulation game explicitly targets Family and Casual, aligning strongly with the family user tag."
+        },
+        "filler_known_3": {
+          "relevance": 5,
+          "reason": "Adventure targeting has no clear match to the family user tag; other scene details are neutral."
+        }
+      },
+      "selected_by_relevance": "match_known_3"
+    },
+    {
+      "case": 4,
+      "expected_ad_id": "match_known_4",
+      "raw": "{\"scores\":[{\"ad_id\":\"known_4\",\"relevance\":10,\"reason\":\"Action shooter title has little alignment with the family-oriented scene.\"},{\"ad_id\":\"match_known_4\",\"relevance\":95,\"reason\":\"Adventure, Family, and Casual tags strongly match the family user tag.\"},{\"ad_id\":\"filler_known_4\",\"relevance\":40,\"reason\":\"Adventure tag is somewhat relevant, but it lacks family-specific alignment.\"}]}",
+      "scores": {
+        "known_4": {
+          "relevance": 10,
+          "reason": "Action shooter title has little alignment with the family-oriented scene."
+        },
+        "match_known_4": {
+          "relevance": 95,
+          "reason": "Adventure, Family, and Casual tags strongly match the family user tag."
+        },
+        "filler_known_4": {
+          "relevance": 40,
+          "reason": "Adventure tag is somewhat relevant, but it lacks family-specific alignment."
+        }
+      },
+      "selected_by_relevance": "match_known_4"
+    },
+    {
+      "case": 5,
+      "expected_ad_id": "match_known_5",
+      "raw": "{\"scores\":[{\"ad_id\":\"known_5\",\"relevance\":15,\"reason\":\"Action shooter title does not match the family user tag.\"},{\"ad_id\":\"match_known_5\",\"relevance\":95,\"reason\":\"Family-friendly simulation title directly matches the family tag.\"},{\"ad_id\":\"filler_known_5\",\"relevance\":10,\"reason\":\"Generic adventure title has no clear match to the family scene tag.\"}]}",
+      "scores": {
+        "known_5": {
+          "relevance": 15,
+          "reason": "Action shooter title does not match the family user tag."
+        },
+        "match_known_5": {
+          "relevance": 95,
+          "reason": "Family-friendly simulation title directly matches the family tag."
+        },
+        "filler_known_5": {
+          "relevance": 10,
+          "reason": "Generic adventure title has no clear match to the family scene tag."
+        }
+      },
+      "selected_by_relevance": "match_known_5"
+    }
+  ]
+}

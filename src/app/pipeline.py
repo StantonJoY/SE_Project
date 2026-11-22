@@ -32,6 +32,7 @@ from dataclasses import dataclass
 from ads.banned_words import BannedWords
 from ads.repository import AdRepository
 from audit import AuditRecordBuilder, AuditStore, AuditWriteError, MetricSnapshot, new_audit_id
+from compliance.content_rules import ContentPolicy
 from compliance.pipeline import run_compliance
 from compliance.rules import SceneRules
 from render import DegradeReason, RenderResult, render_ad, render_no_ad
@@ -42,6 +43,7 @@ from selector import (
     ContextAssembler,
     LLMClient,
     LLMUnavailable,
+    format_scene_summary,
     generate_explanation,
     parse_llm_output,
     verify_explanation,
@@ -102,6 +104,7 @@ def recommend(
     client: LLMClient,
     audit_store: AuditStore,
     config: AppConfig,
+    content_policy: ContentPolicy | None = None,
 ) -> Recommendation:
     """执行一次推荐：场景 → 建议 → 确定性过滤 → 渲染 + 审计。
 
@@ -157,9 +160,10 @@ def recommend(
     # ---- 装配上下文 ----
     assembler = ContextAssembler(budget_tokens=config.selector.context_budget_tokens)
     ctx = assembler.assemble(
-        f"{scene.time_slot}/{scene.device}/{'/'.join(scene.user_tags) or '-'}",
+        # V3（ADR-006 D9）：场景摘要带语义，否则模型不知道 family/student 是什么意思
+        format_scene_summary(scene),
         briefs,
-        "请从候选列表中选择一条最适合当前场景的广告，并说明理由。",
+        "请从候选列表中选出与当前场景最匹配的一条候选条目，并说明理由。",
     )
     metrics.record("llm_context_tokens_per_request", ctx.tokens)
     metrics.record(
@@ -246,7 +250,7 @@ def recommend(
             rec, metrics, DegradeReason.COMPLIANCE_REJECTED,
             f"选中的 {judgment.ad_id} 不在素材库中", attempts=attempts,
         )
-    verdict = run_compliance(chosen, scene, candidates, banned_words, rules)
+    verdict = run_compliance(chosen, scene, candidates, banned_words, rules, content_policy)
     rec.add(
         compliance={
             "approved": verdict.approved,

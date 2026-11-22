@@ -189,3 +189,55 @@ approvals:
       P5/P6 曾跳过"先批测试再实现"的链条；本批测试在实现**之前**登记并获批，
       使该流程在本项目中得到第二次、也是**第一次完全按序**的执行。
       实现完成后须回填 implementation_commit；届时 approved_at 已早于实现时间。
+
+  # ---------------------------------------------------------------------------
+  # V3 +  F-006：本次是**真正的前置批准**（测试先写、批准先签、实现后提交）
+  # ---------------------------------------------------------------------------
+  - id: "TA-0005"
+    req_ids: ["REQ-ADS-FR-004"]
+    test_files:
+      - "test/offline/test_v3_output_encoding.py"
+    actor_kind: "human"
+    approved_by: "Shane"
+    approved_at: "2026-11-22T19:52:00+08:00"
+    implementation_commit: "pending"
+    status: "approved"
+    evidence: "人类在 2026-11-22 会话中指示「好，先签再修复」：先签本批准，再实现 F-006 的 UTF-8 输出修复。"
+    note: >-
+      覆盖 test_v3_output_encoding.py 的 1 条用例（GBK stdout 下输出仍为 UTF-8 字节）。
+      批准时间早于实现提交，满足门禁 1 的时序要求；V3 主体测试（2026-11-17 实现）的历史缺口
+      不在本条覆盖范围内，仍如实登记于 TD-018。
+
+  - id: "TA-0006"
+    req_ids: ["REQ-ADS-AI-001", "REQ-ADS-ARCH-002", "REQ-ADS-ARCH-004", "REQ-ADS-ARCH-012", "REQ-ADS-ARCH-013", "REQ-ADS-ARCH-014", "REQ-ADS-ARCH-015", "REQ-ADS-ARCH-016", "REQ-ADS-FR-006", "REQ-ADS-FR-008", "REQ-ADS-FR-009", "REQ-ADS-FR-010", "REQ-ADS-FR-011", "REQ-ADS-FR-012", "REQ-ADS-FR-013", "REQ-ADS-FR-014", "REQ-ADS-GOV-003", "REQ-ADS-NFR-COST-002", "REQ-ADS-NFR-QA-002", "REQ-ADS-NFR-QA-003", "REQ-ADS-NFR-QA-004", "REQ-ADS-NFR-QA-005", "REQ-ADS-NFR-QA-006", "REQ-ADS-NFR-QA-007", "REQ-ADS-NFR-SAFETY-001", "REQ-ADS-NFR-SAFETY-002", "REQ-ADS-NFR-SAFETY-003", "REQ-ADS-NFR-SAFETY-004", "REQ-ADS-NFR-SAFETY-007", "REQ-ADS-NFR-SAFETY-008", "REQ-ADS-NFR-SAFETY-009", "REQ-ADS-NFR-SAFETY-010", "REQ-ADS-SEC-001", "REQ-ADS-SEC-003"]
+    test_files:
+      - "test/offline/test_ads.py"
+      - "test/offline/test_compliance.py"
+      - "test/offline/test_corpus.py"
+      - "test/offline/test_pipeline_v2.py"
+      - "test/offline/test_relevance_v2.py"
+      - "test/offline/test_repo_completeness.py"
+      - "test/offline/test_requirements_registry.py"
+      - "test/offline/test_sanitize.py"
+      - "test/offline/test_v2_boundary_regressions.py"
+      - "test/offline/test_v2_governance.py"
+      - "test/offline/test_v2_mutation.py"
+      - "test/offline/test_v2_settlement_boundaries.py"
+      - "test/offline/test_v3_compliance.py"
+      - "test/offline/test_v3_eval.py"
+      - "test/offline/test_v3_pricing.py"
+      - "test/offline/test_v3_prompt.py"
+      - "test/offline/test_v3_regression.py"
+    actor_kind: "human"
+    approved_by: "Shane"
+    approved_at: "2026-11-22T20:05:00+08:00"
+    implementation_commit: "pending"
+    status: "approved"
+    evidence: "人类在 2026-11-22 会话中指示「补批准记录，然后我合并」：对 V2/V3 轮次的测试集作事后验收，确认其覆盖的 REQ 清单。"
+    note: >-
+      **这是事后验收（post-hoc acceptance），不是前置批准。**
+      V2/V3 的测试实现于 2026-11-17 之前，本记录 2026-11-22 签署，
+      时序上必然晚于实现，因此**不能**满足门禁 1 的「批准早于实现」，
+      门禁会以「批准时间不早于实现开始」继续阻断——这是如实结果，不伪造、不回填。
+      本条用途：记录人类对既有测试集的验收结论，替代此前「完全没有批准记录」的空缺。
+      前向规则：此后新增测试一律先签 TA 再实现（见 TA-0005 的样例）。

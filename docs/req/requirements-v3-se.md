@@ -33,7 +33,7 @@
 
 ---
 
-## 1. 需求条目（17 条）
+## 1. 需求条目（20 条）
 
 > 类型/优先级取值受 `req-schema.json` 约束：`functional | invariant | quality | performance | cost | governance | security`；`must | should | could | wont`。
 
@@ -41,7 +41,7 @@
 
 | 草案标签 | 正式 ID | 类型 | 需求 | fit criterion（机器可检查） |
 |---|---|---|---|---|
-| REQ-V3-SE-01 | `REQ-ADS-FR-009` | functional | 新增**只读** `CorpusRepository`，从 `items.jsonl` + `tags.jsonl` 加载，只加载轻字段（`item_id/name/genres/native_tags/summary/required_age/content_descriptors/review_count` + 七维 tags），**不加载 `description_clean`** | 加载 30 条样本成功且行数一致；加载对象**不含** `description_clean` 属性；`src/corpus/` 对 `audit`/`selector`/`compliance` 零 import（fitness 静态检查） |
+| REQ-V3-SE-01 | `REQ-ADS-FR-009` | functional | 新增**只读** `CorpusRepository`，从 `items.jsonl` + `tags.jsonl` 加载，只加载轻字段（`item_id/name/genres/native_tags/summary/required_age/content_descriptors/review_count` + 七维 tags），**不加载 `description_clean`** | 加载条数与 `items.jsonl` 行数一致（**相对量，不写死数字**）；当前子集 5,000 条；加载对象**不含** `description_clean` 属性；`src/corpus/` 对 `audit`/`selector`/`compliance` 零 import（fitness 静态检查） |
 | REQ-V3-SE-02 | `REQ-ADS-ARCH-013` | invariant | 语料与手写素材**双源并存**：投影产物必须通过 `AD_SCHEMA` 与 `AdRepository` 校验；扩展信息（七维标签/内容标识/警告/年龄）**走旁路映射**，不进 `Ad` 对象、不扩 `AD_SCHEMA` | 30 条投影全部通过 `AD_SCHEMA`（spike 已实测 30/30）；向 `AdRepository` 传入含额外字段的原始 item 必失败；14 条手写素材路径单独用例全过 |
 | REQ-V3-SE-03 | `REQ-ADS-FR-010` | functional | 投影适配器 `corpus_to_ad(item, tags)`：`ad_id = "ad_" + item_id`、`title = name`、`copy = summary`、`category` 三级兜底（`tags.genre[0]` → `items.genres[0]` → `"Uncategorized"`）、`scene_restrictions` 取默认全放开、`banned_check = "checked"` | 逐字段映射单测；**必须覆盖 `genres=[]` 的两条真实样本（241930、71250）**，断言 category 落到 `tags.genre` 而非 `Uncategorized`；`ad_id` 全部匹配 `^ad_[0-9]+$` |
 
@@ -95,6 +95,17 @@
 
 ---
 
+## 1.6 子集构建与系统接入
+
+> 决策依据：ADR-006 D7（5,000 条子集、剥离长文本、不入 SQL）。全量 25,899 条留在仓库外。
+
+| 草案标签 | 正式 ID | 类型 | 需求 | fit criterion |
+|---|---|---|---|---|
+| REQ-V3-SE-18 | `REQ-ADS-FR-013` | functional | `scripts/build_corpus_subset.py` 生成**确定性**入库子集：分层抽样（无随机）、必含边界样本、剥离 `description_clean` 与无关字段、产出 `manifest.json`（来源行数 / 规则 / SHA-256） | 双跑**逐字节一致**；`genres` 为空与 `required_age≥13` 的条目**全部**包含；每个 `content_descriptors` 组合 ≥200 条；manifest 的 rows 与两份文件 SHA-256 与产物一致；子集 ≤6 MB |
+| REQ-V3-SE-19 | `REQ-ADS-FR-014` | functional | 语料接入既有编排：按场景选 top-K → 投影成 `Ad` → 交给 `pipeline.recommend`，**不改管道签名与权威链**（CLI 新增 `--corpus`） | `--corpus` 端到端返回 `ad` 或结构化 `no_ad`；候选数 = `top_k`；单次请求（含 5,000 条加载 + 选候选 + 投影）**≤500 ms**；非法场景仍返回 `scene_invalid` |
+
+---
+
 ## 2. 不变量与反例（给 mutation_check 的抓手）
 
 | 不变量 | 反例（必须能失败） |
@@ -115,13 +126,15 @@
 
 | 文件 | 动作 | 是否受保护 |
 |---|---|---|
-| `src/corpus/`（新包，5 个文件：models / repository / projection / select / **pricing**） | 新增 | 否 |
+| `src/corpus/`（新包：models / repository / projection / select / config / pricing） | 新增 | 否 |
+| `scripts/build_corpus_subset.py` + `data/corpus/{items,tags,demo_ids,manifest}` | 子集构建与产物（5.5 MB） | **是（data/，须 ADR-006）** |
+| `src/app/cli.py` | 新增 `--corpus` 接线（候选来源切换） | 否 |
 | `src/app/pipeline_v2.py` | 调用 `run_compliance(..., facts=...)`，把语料事实传进合规 | **是（ADR-005 清单，须 ADR-006 覆盖）** |
 | `scripts/build_bids_v3.py` + `data/bids-corpus.json` | 由语料派生 bid sidecar（产物入库、可复算） | **是（data/，须 ADR-006）** |
 | `src/compliance/pipeline.py` | `run_compliance` 加可选 `facts` 参数；`check_scene` 读它 | **是（须 ADR-006）** |
 | `data/scene-content-rules.yaml` | 新增三档禁项表 | **是（ADR-005 同族，须 ADR-006 覆盖）** |
 | `config.yaml` | 新增 `corpus` 段（路径、K、场景标签映射） | 否 |
-| `docs/req/requirements.yaml` | 追加 17 条 + 改 `scope.out` 的 RAG 条 + `evolution_rounds` 加 V3 | **是（须 ADR-006）** |
+| `docs/req/requirements.yaml` | 追加 20 条 + 改 `scope.out` 的 RAG 条 + `evolution_rounds` 加 V3 | **是（须 ADR-006）** |
 | `docs/architecture/invariants.md` | 追加 7 条 V3 不变量 | **仅只读（须人工批准）** |
 | `docs/architecture/trace-matrix.md` | 追加 V3 行 + monitor | 否 |
 | `docs/code-governance/acceptance-coverage-map.yaml` | 追加 V3 覆盖去向 | **是（须 ADR-006）** |

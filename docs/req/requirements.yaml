@@ -15,9 +15,9 @@ project:
   name: "场景化广告推荐引擎 / Scenario-based Ad Recommendation Engine"
   course: "CS5351 Agentic Software Engineering Project"
   repository: "https://github.com/StantonJoY/SE_Project"
-  baseline_version: "V2"
-  baseline_versions: ["V1", "V2"]
-  target_versions: ["V1", "V2"]
+  baseline_version: "V3"
+  baseline_versions: ["V1", "V2", "V3"]
+  target_versions: ["V1", "V2", "V3"]
 
 # ---------------------------------------------------------------------------
 # 版本轮次 ↔ 目录映射（课程 note 行 1531/1562：每轮 ADD append-only，绝不合并轮次）
@@ -33,6 +33,11 @@ evolution_rounds:
     docs_dir: "docs/architecture/"
     status: "active"
     note: "V2 增量：原目录维护，V1 历史条目保留，全部历史测试继续回归；正式人工验收待完成。"
+  - round: "V3"
+    governs: "docs/architecture/"
+    docs_dir: "docs/architecture/"
+    status: "active"
+    note: "V3 增量：真实语料接入 + 合规内容分级 + V2 竞价接入；沿用原目录（ADR-006 记录理由），V1/V2 历史条目与测试全部保留。"
 
 scope:
   in:
@@ -41,10 +46,11 @@ scope:
     - "确定性合规过滤作为安全边界，拦截违禁词、敏感品类、场景冲突与非法输出。"
     - "全流程审计日志（JSONL），可重放每次决策。"
     - "V2（原目录增量）：报价竞价框架，LLM 降级为相关性建议，成交/花费/胜负由确定性数学代码决定。"
+    - "V3（原目录增量）：接入 Steam 真实语料（只读 + 投影旁路），候选改为确定性标签匹配，合规扩展为内容并集判据 + 年龄兜底，并接入 V2 竞价（广告费为定价的 5%）。"
   out:
     - item: "RAG / 向量检索召回"
-      deferred_to: "V3"
-      rationale: "课程只要求至少一个真实 AI 组件；V1 用闭集 LLM 选择已满足，且无数据库约束下 RAG 成本高。"
+      deferred_to: "V4"
+      rationale: "V3 改为接入真实语料并做确定性标签匹配（ADR-006）：验证平面绑定 docs/ 路径，引入向量库会打破零外部依赖与确定性可校验边界。"
       source_refs:
         - {source: "proposal", locator: "§2 核心流程（RAG 检索层）"}
         - {source: "req_v1_draft", locator: "§1 不做什么"}
@@ -75,6 +81,11 @@ sources:
     kind: "requirement_draft"
     authority: "normative"
     note: "V1 内容底稿，已固定为 V1 基线。"
+  - key: "req_v3_draft"
+    path: "docs/req/requirements-v3-se.md"
+    kind: "requirement_draft"
+    authority: "normative"
+    note: "V3 语料接入轮次的需求草案；18 条已录入基线，正式 ID 与草案标签的映射见该文件 §1。"
   - key: "req_v2_draft"
     path: "docs/req/requirements-v2-bidding-draft.md"
     kind: "requirement_draft"
@@ -177,7 +188,7 @@ baseline_requirements:
     fit_criterion: "输出符合 render schema，两种形态均通过校验，通过率 100%。"
     verification: ["schema_validation", "unit_test"]
     enforced_by: "render"
-    enforcement: ["render"]
+    enforcement: ["render", "app.cli.write_stdout"]
     asr: false
     legacy_id: "REQ-012"
     source_refs:
@@ -440,7 +451,7 @@ baseline_requirements:
     fit_criterion: "评估集 ≥ 20 条，可一键 replay 并输出通过率与违规数。"
     verification: ["evaluation_replay", "ci_gate"]
     enforced_by: "eval.eval_runner（CI 阻断门）"
-    enforcement: ["eval.eval_runner"]
+    enforcement: ["eval.eval_runner", "eval.v3_runner.main"]
     asr: true
     asr_id: "ASR-ADS-15"
     invariants: ["INV-ADS-016"]
@@ -538,7 +549,7 @@ baseline_requirements:
     fit_criterion: "解释评估失败时 ad_id 不变；解释文本中含违禁词时被剥离，剥离率 100%。"
     verification: ["unit_test", "negative_test"]
     enforced_by: "解释路径组装元素（与决策路径结构分离）"
-    enforcement: ["selector（explanation path）"]
+    enforcement: ["selector.context.format_scene_summary", "selector.explanation.generate_explanation"]
     asr: true
     asr_id: "ASR-ADS-A3-02"
     invariants: ["INV-ADS-004"]
@@ -927,6 +938,323 @@ baseline_requirements:
 # ---------------------------------------------------------------------------
 # 旧编号映射（D1 v1 → v2）。旧编号已废弃，仅用于追溯历史讨论与文档。
 # ---------------------------------------------------------------------------
+
+  - id: "REQ-ADS-FR-009"
+    version: "V3"
+    type: "functional"
+    statement: "新增只读 CorpusRepository，从 items.jsonl 与 tags.jsonl 加载真实语料；只加载轻字段，明确不加载 description_clean。"
+    priority: "must"
+    fit_criterion: "加载条数与 items.jsonl 行数一致（相对量，不写死具体数字）；当前子集 5,000 条；加载后的对象不包含 description_clean 属性；src/corpus/ 对 audit/selector/compliance 零 import。"
+    verification: ["unit_test", "negative_test", "static_analysis"]
+    enforced_by: "corpus.repository.CorpusRepository"
+    enforcement: ["corpus.repository.CorpusRepository", "corpus.models.CorpusItem"]
+    asr: false
+    source_refs:
+      - {source: "req_v3_draft", locator: "docs/req/requirements-v3-se.md"}
+    status: "specified"
+    notes: "草案编号 REQ-V3-SE-01。"
+
+  - id: "REQ-ADS-ARCH-013"
+    version: "V3"
+    type: "invariant"
+    statement: "真实语料与手写素材双源并存：投影产物必须通过 AD_SCHEMA 与 AdRepository 校验，扩展信息走旁路映射，不扩 AD_SCHEMA。"
+    priority: "must"
+    fit_criterion: "30 条投影全部通过 AD_SCHEMA；向 AdRepository 传入含额外字段的原始 item 必须失败；14 条手写素材路径用例全过。"
+    verification: ["unit_test", "negative_test", "schema_validation"]
+    enforced_by: "corpus.projection.corpus_to_ad"
+    enforcement: ["corpus.projection.corpus_to_ad"]
+    asr: false
+    fallback: "投影失败即整批拒绝加载（CorpusLoadError），永不降级为未校验素材。"
+    invariants: ["INV-V3-001"]
+    source_refs:
+      - {source: "req_v3_draft", locator: "docs/req/requirements-v3-se.md"}
+    status: "specified"
+    notes: "草案编号 REQ-V3-SE-02。spike 实测 30/30 可过。"
+
+  - id: "REQ-ADS-FR-010"
+    version: "V3"
+    type: "functional"
+    statement: "投影适配器把语料条目转换为合法 Ad：ad_id 由 item_id 合成，title 取 name，copy 取 summary，category 三级兜底。"
+    priority: "must"
+    fit_criterion: "逐字段映射单测；genres 为空的两条真实样本（241930、71250）category 落到 tags.genre 而非 Uncategorized；ad_id 全部匹配 ^ad_[0-9]+$。"
+    verification: ["unit_test", "negative_test"]
+    enforced_by: "corpus.projection.corpus_to_ad"
+    enforcement: ["corpus.projection.corpus_to_ad"]
+    asr: false
+    source_refs:
+      - {source: "req_v3_draft", locator: "docs/req/requirements-v3-se.md"}
+    status: "specified"
+    notes: "草案编号 REQ-V3-SE-03。"
+
+  - id: "REQ-ADS-FR-011"
+    version: "V3"
+    type: "functional"
+    statement: "候选生成保留 V1 规则预筛作为硬约束前置，按配置化场景标签映射做确定性 top-K（命中标签数降序、item_id 升序）。"
+    priority: "must"
+    fit_criterion: "同输入双跑 diff 为 0；K 从 config.yaml 读取；空匹配返回空列表；不依赖 review_count 连续值。"
+    verification: ["unit_test", "deterministic_replay", "negative_test"]
+    enforced_by: "corpus.select.select_candidates"
+    enforcement: ["corpus.select.select_candidates"]
+    asr: false
+    source_refs:
+      - {source: "req_v3_draft", locator: "docs/req/requirements-v3-se.md"}
+    status: "specified"
+    notes: "草案编号 REQ-V3-SE-04。"
+
+  - id: "REQ-ADS-ARCH-014"
+    version: "V3"
+    type: "invariant"
+    statement: "候选生成是确定性纯函数：不回读审计、不读会话历史、不依赖时间与随机数。"
+    priority: "must"
+    fit_criterion: "src/corpus/ 对 audit/random/time 零 import；双跑 diff 为 0；纳入 mutation_check。"
+    verification: ["static_analysis", "property_test", "deterministic_replay"]
+    enforced_by: "corpus.select.select_candidates"
+    enforcement: ["corpus.select.select_candidates"]
+    asr: false
+    fallback: "返回空候选并降级 no_ad，不使用非确定性输入。"
+    invariants: ["INV-V3-002"]
+    source_refs:
+      - {source: "req_v3_draft", locator: "docs/req/requirements-v3-se.md"}
+    status: "specified"
+    notes: "草案编号 REQ-V3-SE-05。"
+
+  - id: "REQ-ADS-NFR-COST-002"
+    version: "V3"
+    type: "cost"
+    statement: "候选规模 K 的上限由上下文预算反推，不得让装配后上下文超过预算。"
+    priority: "must"
+    fit_criterion: "配置校验拒绝 K 大于 50；K=30 时装配约 1152 token（预算 2000 的 58%）；超预算时降级 budget_exceeded 而非截断候选。"
+    verification: ["unit_test", "metric_measurement"]
+    enforced_by: "corpus.config.CorpusConfig"
+    enforcement: ["corpus.config.CorpusConfig"]
+    asr: false
+    metric: {name: 'context_tokens_at_k30', unit: 'token', threshold: 2000, direction: 'at_most'}
+    source_refs:
+      - {source: "req_v3_draft", locator: "docs/req/requirements-v3-se.md"}
+    status: "specified"
+    notes: "新增条目。依据 spike：K=60 时 2162 token 已超预算。"
+
+  - id: "REQ-ADS-ARCH-015"
+    version: "V3"
+    type: "invariant"
+    statement: "合规管道步骤数与顺序不变：output_exists、banned_words、banned_check、category、scene；新增规则只能作为既有步骤内部扩充。"
+    priority: "must"
+    fit_criterion: "管道步骤列表与 V1 逐位一致（diff 为 0）；fail-closed 语义不变。"
+    verification: ["unit_test", "negative_test"]
+    enforced_by: "compliance.pipeline.run_compliance"
+    enforcement: ["compliance.pipeline.run_compliance"]
+    asr: false
+    fallback: "结构断言失败即阻断构建，不允许调整步骤顺序。"
+    invariants: ["INV-V3-005"]
+    source_refs:
+      - {source: "req_v3_draft", locator: "docs/req/requirements-v3-se.md"}
+    status: "implemented"
+    notes: "草案编号 REQ-V3-SE-06。"
+
+  - id: "REQ-ADS-NFR-SAFETY-008"
+    version: "V3"
+    type: "invariant"
+    statement: "合规主判据：content_warnings 与映射后的 content_descriptors 取并集，与场景禁项求交集，命中即拒。"
+    priority: "must"
+    fit_criterion: "item 730（age=0 但 descriptors=[2,5]）在 family 场景必须被拒；item 945360（descriptors 空但 warnings 含 Violence/Blood）在 family 场景必须被拒。"
+    verification: ["unit_test", "negative_test"]
+    enforced_by: "compliance.pipeline.check_scene"
+    enforcement: ["compliance.pipeline.check_scene", "compliance.content_rules.ContentRules"]
+    asr: false
+    fallback: "展示终止，返回 no_ad 并记录命中规则与条目。"
+    invariants: ["INV-V3-003"]
+    source_refs:
+      - {source: "req_v3_draft", locator: "docs/req/requirements-v3-se.md"}
+    status: "implemented"
+    notes: "草案编号 REQ-V3-SE-07。只用 descriptors 会漏 7/30。"
+
+  - id: "REQ-ADS-NFR-SAFETY-009"
+    version: "V3"
+    type: "invariant"
+    statement: "合规兜底判据：required_age 超过场景上限即拒，上限走配置不硬编码。"
+    priority: "must"
+    fit_criterion: "表驱动覆盖每个场景的年龄上限；item 359550（age=17）在 campus 被拒、在 competitive 通过。"
+    verification: ["unit_test", "negative_test"]
+    enforced_by: "compliance.pipeline.check_scene"
+    enforcement: ["compliance.pipeline.check_scene"]
+    asr: false
+    fallback: "展示终止，返回 no_ad。"
+    invariants: ["INV-V3-004"]
+    source_refs:
+      - {source: "req_v3_draft", locator: "docs/req/requirements-v3-se.md"}
+    status: "implemented"
+    notes: "草案编号 REQ-V3-SE-08。80% 样本 age=0，故仅作兜底。"
+
+  - id: "REQ-ADS-NFR-SAFETY-010"
+    version: "V3"
+    type: "invariant"
+    statement: "场景内容分级三档：family 严、campus 中、competitive 宽，禁项表配置化。"
+    priority: "must"
+    fit_criterion: "表驱动覆盖三档：413150 三档全过；730 仅 competitive 过；265210 三档全拒。"
+    verification: ["unit_test", "negative_test"]
+    enforced_by: "compliance.pipeline.check_scene"
+    enforcement: ["compliance.pipeline.check_scene"]
+    asr: false
+    fallback: "规则表缺失或非法即拒绝启动（fail-closed）。"
+    source_refs:
+      - {source: "req_v3_draft", locator: "docs/req/requirements-v3-se.md"}
+    status: "implemented"
+    notes: "草案编号 REQ-V3-SE-09。"
+
+  - id: "REQ-ADS-SEC-003"
+    version: "V3"
+    type: "security"
+    statement: "语料文本（name、summary、标签）视为不可信输入，进入 selector prompt 前必须经过既有 pre-model 注入门。"
+    priority: "must"
+    fit_criterion: "既有注入模式全部仍命中；构造含注入模式的语料样本，命中则不进入 prompt；检出率 100%。"
+    verification: ["unit_test", "negative_test"]
+    enforced_by: "app.pipeline.recommend"
+    enforcement: ["app.pipeline.recommend"]
+    asr: false
+    invariants: ["INV-V3-006"]
+    source_refs:
+      - {source: "req_v3_draft", locator: "docs/req/requirements-v3-se.md"}
+    status: "specified"
+    notes: "草案编号 REQ-V3-SE-10。"
+
+  - id: "REQ-ADS-NFR-QA-005"
+    version: "V3"
+    type: "quality"
+    statement: "零回归：V1 与 V2 全部离线测试全绿，旧 25 条 eval 达成率不因 V3 下降。"
+    priority: "must"
+    fit_criterion: "CI 全绿；旧分区 replay 报告与 V2 基线 diff 为 0；测试数不低于 617。"
+    verification: ["evaluation_replay", "ci_gate"]
+    enforced_by: "app.pipeline.recommend"
+    enforcement: ["app.pipeline.recommend"]
+    asr: false
+    metric: {name: 'regression_test_failures', unit: 'count', threshold: 0, direction: 'at_most'}
+    source_refs:
+      - {source: "req_v3_draft", locator: "docs/req/requirements-v3-se.md"}
+    status: "specified"
+    notes: "草案编号 REQ-V3-SE-11。"
+
+  - id: "REQ-ADS-NFR-QA-006"
+    version: "V3"
+    type: "quality"
+    statement: "评估集新增 V3 分区：12 至 15 条真实语料场景用例，含至少 3 条无匹配负例，旧分区不变。"
+    priority: "must"
+    fit_criterion: "新分区 case_count 登记；负例 100% 走显式无匹配语义，不硬凑 top-K。"
+    verification: ["evaluation_replay"]
+    enforced_by: "eval.eval_runner"
+    enforcement: ["eval.eval_runner"]
+    asr: false
+    metric: {name: 'v3_eval_partition_cases', unit: 'case', threshold: 12, direction: 'at_least'}
+    source_refs:
+      - {source: "req_v3_draft", locator: "docs/req/requirements-v3-se.md"}
+    status: "implemented"
+    notes: "草案编号 REQ-V3-SE-12。"
+
+  - id: "REQ-ADS-GOV-004"
+    version: "V3"
+    type: "governance"
+    statement: "新增 ADR-006 记录 V3 轮次接入与真实语料边界：只读、投影旁路、不扩 AD_SCHEMA、合规只动 2 个函数、权威链不变。"
+    priority: "must"
+    fit_criterion: "ADR 文件存在且状态为 Accepted（具名人类批准）；check_safety_paths 解析通过。"
+    verification: ["ci_gate", "static_analysis"]
+    enforced_by: "docs.architecture.adr_006"
+    enforcement: ["docs.architecture.adr_006"]
+    asr: false
+    source_refs:
+      - {source: "req_v3_draft", locator: "docs/req/requirements-v3-se.md"}
+    status: "specified"
+    notes: "草案编号 REQ-V3-SE-13。"
+
+  - id: "REQ-ADS-NFR-QA-007"
+    version: "V3"
+    type: "quality"
+    statement: "corpus 登记为新架构元素并纳入 fitness function。"
+    priority: "must"
+    fit_criterion: "ELEMENT_BY_PACKAGE 含 corpus；fitness_functions 通过；依赖方向单向。"
+    verification: ["static_analysis", "ci_gate"]
+    enforced_by: "scripts.fitness_functions"
+    enforcement: ["scripts.fitness_functions", "scripts.fitness_functions.check_v1"]
+    asr: false
+    metric: {name: 'fitness_failures', unit: 'count', threshold: 0, direction: 'at_most'}
+    source_refs:
+      - {source: "req_v3_draft", locator: "docs/req/requirements-v3-se.md"}
+    status: "specified"
+    notes: "草案编号 REQ-V3-SE-14。"
+
+  - id: "REQ-ADS-GOV-005"
+    version: "V3"
+    type: "governance"
+    statement: "合规规则扩展属 safety-critical：测试必须先于实现获批，并同步更新不变量、追踪矩阵、覆盖表与 AI 使用日志。"
+    priority: "must"
+    fit_criterion: "check_test_approval 通过（TA-0005）；四份工件均有 V3 条目；check_ai_use_log 通过。"
+    verification: ["ci_gate"]
+    enforced_by: "docs.test_approvals"
+    enforcement: ["docs.test_approvals"]
+    asr: false
+    source_refs:
+      - {source: "req_v3_draft", locator: "docs/req/requirements-v3-se.md"}
+    status: "specified"
+    notes: "草案编号 REQ-V3-SE-15。"
+
+  - id: "REQ-ADS-FR-012"
+    version: "V3"
+    type: "functional"
+    statement: "广告费由游戏定价派生：出价取定价的 5%（四舍五入到分，免费游戏保底 1 分），预算为出价的 20 倍（配置化）。"
+    priority: "must"
+    fit_criterion: "30 条样本表驱动：ad_413150 出价 75 分、ad_730 出价 1 分；每条 budget 等于 bid 乘以 20；bid 恒不小于 1。"
+    verification: ["unit_test", "negative_test"]
+    enforced_by: "corpus.pricing.bid_cents_from_price"
+    enforcement: ["corpus.pricing.bid_cents_from_price", "scripts.build_bids_v3.build_bids"]
+    asr: false
+    source_refs:
+      - {source: "req_v3_draft", locator: "docs/req/requirements-v3-se.md"}
+    status: "implemented"
+    notes: "草案编号 REQ-V3-SE-16，演示级口径。"
+
+  - id: "REQ-ADS-ARCH-016"
+    version: "V3"
+    type: "invariant"
+    statement: "广告费派生规则唯一来源：5% 系数与取整方式只出现在 corpus.pricing；V2 账本不变量照旧成立且不可透支。"
+    priority: "must"
+    fit_criterion: "常量只在该模块出现（静态检查）；bidding 模块零改动；连续 20 次成交后 remaining 为 0 且 exhausted；第 21 次不得透支。"
+    verification: ["static_analysis", "deterministic_replay", "negative_test"]
+    enforced_by: "corpus.pricing.bid_cents_from_price"
+    enforcement: ["corpus.pricing.bid_cents_from_price", "bidding.ledger.Ledger.finalize"]
+    asr: false
+    fallback: "派生函数失败即拒绝启动；账本异常停止新成交。"
+    invariants: ["INV-V3-007", "INV-V3-008"]
+    source_refs:
+      - {source: "req_v3_draft", locator: "docs/req/requirements-v3-se.md"}
+    status: "implemented"
+    notes: "草案编号 REQ-V3-SE-17，演示级口径。"
+  - id: "REQ-ADS-FR-013"
+    version: "V3"
+    type: "functional"
+    statement: "提供可复现的语料子集构建脚本：确定性分层抽样、必含边界样本、剥离 description_clean 与无关字段、产出 manifest（来源行数、规则、SHA-256）。"
+    priority: "must"
+    fit_criterion: "双跑产物逐字节一致；genres 为空与 required_age>=13 的条目全部包含；每个 content_descriptors 组合至少 200 条；manifest 的 rows 与两份文件 SHA-256 与产物一致；子集不超过 6 MB。"
+    verification: ["unit_test", "deterministic_replay", "schema_validation"]
+    enforced_by: "scripts.build_corpus_subset.select_subset"
+    enforcement: ["scripts.build_corpus_subset.select_subset"]
+    asr: false
+    source_refs:
+      - {source: "req_v3_draft", locator: "requirements-v3-se.md §1.1 + ADR-006 D7"}
+    status: "implemented"
+    notes: "全量 25,899 条 → 5,000 条；入库 5.5 MB。抽样规则与产物 hash 见 data/corpus/manifest.json。"
+
+  - id: "REQ-ADS-FR-014"
+    version: "V3"
+    type: "functional"
+    statement: "真实语料接入既有编排：按场景选 top-K 语料、投影成 Ad 后交给 pipeline.recommend，不改动管道签名与权威链。"
+    priority: "must"
+    fit_criterion: "以 --corpus 运行端到端返回 ad 或结构化 no_ad；候选数等于 top_k；单次请求（含 5,000 条加载、选候选、投影）不超过 500 ms；非法场景仍返回 scene_invalid 而非在接线层吞掉。"
+    verification: ["unit_test", "deterministic_replay"]
+    enforced_by: "app.cli.load_corpus_context"
+    enforcement: ["app.cli.load_corpus_context", "corpus.select.select_candidates"]
+    asr: false
+    source_refs:
+      - {source: "req_v3_draft", locator: "requirements-v3-se.md §1.6"}
+    status: "implemented"
+    notes: "实测：加载 180 ms + 选候选 39 ms + 投影 0.2 ms ≈ 220 ms（不含解释器启动）。"
 
 candidate_requirements: []
 

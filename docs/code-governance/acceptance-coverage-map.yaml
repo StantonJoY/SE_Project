@@ -53,7 +53,7 @@ requirements:
     note: "P5 已实现全部降级路径；每条路径均验证「结构化 no_ad + 恰好 1 条审计 + 不抛异常」。"
   - id: "REQ-ADS-FR-004"
     test_backed: true
-    evidence: ["test_render.py（两形态 schema、ad_id 模式反例、confidence 越界反例、空标题反例、**每个降级原因码都在 schema 中**、未登记原因码被拒、metadata 不外泄、序列化确定性）", "test_app_pipeline.py::test_all_results_pass_render_schema"]
+    evidence: ["test_render.py（两形态 schema、ad_id 模式反例、confidence 越界反例、空标题反例、**每个降级原因码都在 schema 中**、未登记原因码被拒、metadata 不外泄、序列化确定性）", "test_app_pipeline.py::test_all_results_pass_render_schema", "test_v3_output_encoding.py::test_write_stdout_emits_utf8_bytes"]
   - id: "REQ-ADS-ARCH-003"
     test_backed: true
     evidence: ["test_selector.py（9 项反例：非 JSON、顶层非对象、缺字段、多余字段、ad_id 空、reason 类型错、bool confidence、越界、非字符串 raw）"]
@@ -91,7 +91,7 @@ requirements:
     blocked_by: "D3 交付物 .opencode/permissions.jsonc 待建（.opencode 规则文件尚未产出）"
   - id: "REQ-ADS-AI-001"
     test_backed: true
-    evidence: ["test_explanation.py::test_explanation_states_why_this_ad", "test_explanation.py::test_explanation_contrasts_with_other_candidates", "test_explanation.py::test_explanation_degradation_keeps_ad_id", "test_explanation.py::test_explanation_with_banned_word_is_stripped", "test_explanation.py::test_verify_explanation_signature_cannot_rewrite_decision", "test_explanation.py::test_generate_explanation_does_not_mutate_judgment"]
+    evidence: ["test_explanation.py::test_explanation_states_why_this_ad", "test_explanation.py::test_explanation_contrasts_with_other_candidates", "test_explanation.py::test_explanation_degradation_keeps_ad_id", "test_explanation.py::test_explanation_with_banned_word_is_stripped", "test_explanation.py::test_verify_explanation_signature_cannot_rewrite_decision", "test_explanation.py::test_generate_explanation_does_not_mutate_judgment", "test_v3_prompt.py::test_prompt_contains_scene_semantics_and_no_external_knowledge"]
     note: "P4 已实现解释路径的结构隔离与口径（OQ-009：为什么选这条广告）。「解释质量评分」（独立评估器）属 Tier 3，待评估集（TD-003）。"
   - id: "REQ-ADS-AI-002"
     test_backed: true
@@ -178,6 +178,77 @@ requirements:
     test_backed: true
     evidence: ["test_bidding_v2.py::test_hundred_candidate_offline_compute_median_below_fifty_ms"]
     acceptance: pending_human_acceptance
+
+  # ---- V3（PR-0 登记，测试待 PR-1/PR-2 落地）----
+  - id: "REQ-ADS-FR-009"
+    test_backed: true
+    evidence: ["test_corpus.py::test_load_thirty_items", "test_corpus.py::test_item_does_not_hold_long_description", "test_corpus.py（文件缺失/坏 JSON/空语料/重复 ID/缺标签五条反例）"]
+    note: "PR-1 语料接入已实现；PR-2 的合规分项另行登记。"
+  - id: "REQ-ADS-ARCH-013"
+    test_backed: true
+    evidence: ["test_corpus.py::test_projection_all_pass_ad_schema", "test_corpus.py::test_raw_corpus_item_rejected_by_ad_schema"]
+    note: "PR-1 语料接入已实现；PR-2 的合规分项另行登记。"
+  - id: "REQ-ADS-FR-010"
+    test_backed: true
+    evidence: ["test_corpus.py::test_projection_ad_id_pattern", "test_corpus.py::test_projection_empty_genres_fallback"]
+    note: "PR-1 语料接入已实现；PR-2 的合规分项另行登记。"
+  - id: "REQ-ADS-FR-011"
+    test_backed: true
+    evidence: ["test_corpus.py::test_select_orders_by_hits_then_item_id", "test_corpus.py::test_select_empty_match_returns_empty", "test_corpus.py::test_select_respects_k"]
+    note: "PR-1 语料接入已实现；PR-2 的合规分项另行登记。"
+  - id: "REQ-ADS-ARCH-014"
+    test_backed: true
+    evidence: ["test_corpus.py::test_select_is_deterministic", "test_corpus.py::test_corpus_package_has_no_forbidden_imports"]
+    note: "PR-1 语料接入已实现；PR-2 的合规分项另行登记。"
+  - id: "REQ-ADS-NFR-COST-002"
+    test_backed: true
+    evidence: ["test_corpus.py::test_k_upper_bound_rejected"]
+    note: "PR-1 语料接入已实现；PR-2 的合规分项另行登记。"
+  - id: "REQ-ADS-ARCH-015"
+    test_backed: true
+    evidence: ["test_v3_compliance.py::test_pipeline_order_unchanged", "test_v3_compliance.py::test_policy_none_is_identical_to_v1"]
+  - id: "REQ-ADS-NFR-SAFETY-008"
+    test_backed: true
+    evidence: ["test_v3_compliance.py::test_among_us_rejected_by_warnings_side", "test_v3_compliance.py::test_three_tier_matrix"]
+  - id: "REQ-ADS-NFR-SAFETY-009"
+    test_backed: true
+    evidence: ["test_v3_compliance.py::test_age_gate_rejects_above_limit", "test_v3_compliance.py::test_three_tier_matrix"]
+  - id: "REQ-ADS-NFR-SAFETY-010"
+    test_backed: true
+    evidence: ["test_v3_compliance.py::test_three_tier_matrix", "test_v3_compliance.py::test_content_rules_fail_closed"]
+  - id: "REQ-ADS-SEC-003"
+    test_backed: true
+    evidence: ["test_corpus.py::test_injected_corpus_text_blocked"]
+    note: "PR-1 语料接入已实现；PR-2 的合规分项另行登记。"
+  - id: "REQ-ADS-NFR-QA-005"
+    test_backed: true
+    evidence: ["test_v3_regression.py::test_no_baseline_test_module_removed", "test_v3_regression.py::test_offline_suite_size_not_reduced"]
+  - id: "REQ-ADS-NFR-QA-006"
+    test_backed: true
+    evidence: ["test_v3_eval.py::test_v3_partition_passes_without_escaping", "test_v3_eval.py::test_v3_partition_is_registered_and_sized"]
+  - id: "REQ-ADS-GOV-004"
+    test_backed: false
+    pending_test: "ADR-006 待具名人类批准"
+    blocked_by: "ADR 仍为 Proposed"
+  - id: "REQ-ADS-NFR-QA-007"
+    test_backed: true
+    evidence: ["test_corpus.py::test_corpus_element_registered_in_fitness"]
+  - id: "REQ-ADS-GOV-005"
+    test_backed: false
+    pending_test: "TA-0005 待具名人类签署"
+    blocked_by: "测试批准记录缺失（Gate 1 会拦）"
+  - id: "REQ-ADS-FR-012"
+    test_backed: true
+    evidence: ["test_v3_pricing.py::test_bid_is_five_percent_of_price", "test_v3_pricing.py::test_free_game_bids_one_cent", "test_v3_pricing.py::test_bids_sidecar_matches_corpus_prices"]
+  - id: "REQ-ADS-ARCH-016"
+    test_backed: true
+    evidence: ["test_v3_pricing.py::test_twenty_impressions_exhaust_budget", "test_v3_pricing.py::test_five_percent_constant_single_source"]
+  - id: "REQ-ADS-FR-013"
+    test_backed: true
+    evidence: ["test_corpus.py::test_subset_manifest_matches_committed_files", "test_corpus.py::test_subset_selection_is_deterministic_and_covers_boundaries"]
+  - id: "REQ-ADS-FR-014"
+    test_backed: true
+    evidence: ["test_corpus.py::test_cli_corpus_repository_wiring"]
 
 invariants:
 
@@ -333,6 +404,30 @@ invariants:
     mutation_id: "MUT-V2-NO-SEMANTIC-TRIGGER"
     mutation_test_nodes:
       - "test/offline/test_v2_governance.py::test_semantic_gate_tracks_real_prompt_and_auction_paths"
+  - id: "INV-V3-001"
+    negative_test_backed: true
+    evidence: ["test_corpus.py::test_repository_rejects_extra_fields_in_raw_items", "scripts/mutation_check.py（变异注入：破坏实现后该用例确实失败）"]
+  - id: "INV-V3-002"
+    negative_test_backed: true
+    evidence: ["test_corpus.py::test_select_is_deterministic", "scripts/mutation_check.py（变异注入：破坏实现后该用例确实失败）"]
+  - id: "INV-V3-003"
+    negative_test_backed: true
+    evidence: ["test_v3_compliance.py::test_among_us_rejected_by_warnings_side", "scripts/mutation_check.py（变异注入：破坏实现后该用例确实失败）"]
+  - id: "INV-V3-004"
+    negative_test_backed: true
+    evidence: ["test_v3_compliance.py::test_age_gate_rejects_above_limit", "scripts/mutation_check.py（变异注入：破坏实现后该用例确实失败）"]
+  - id: "INV-V3-005"
+    negative_test_backed: true
+    evidence: ["test_v3_compliance.py::test_pipeline_order_unchanged", "scripts/mutation_check.py（变异注入：破坏实现后该用例确实失败）"]
+  - id: "INV-V3-006"
+    negative_test_backed: true
+    evidence: ["test_corpus.py::test_injected_corpus_text_blocked", "scripts/mutation_check.py（变异注入：破坏实现后该用例确实失败）"]
+  - id: "INV-V3-007"
+    negative_test_backed: true
+    evidence: ["test_v3_pricing.py::test_five_percent_constant_single_source", "scripts/mutation_check.py（变异注入：破坏实现后该用例确实失败）"]
+  - id: "INV-V3-008"
+    negative_test_backed: true
+    evidence: ["test_v3_pricing.py::test_twenty_impressions_exhaust_budget", "scripts/mutation_check.py（变异注入：破坏实现后该用例确实失败）"]
 
 summary:
   requirements_total: 41

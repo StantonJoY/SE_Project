@@ -53,6 +53,7 @@ ELEMENT_BY_PACKAGE = {
     "audit": "⑥ 证据子系统",
     "app": "⑦ 编排 / pipeline / CLI / 降级路径",
     "bidding": "⑧ V2 确定性竞价与原子预算账本",
+    "corpus": "⑨ V3 真实语料接入（只读 + 投影旁路）",
 }
 
 # V4：本轮之前必须存在的测试模块（本轮新增模块不在此列，视为 append）

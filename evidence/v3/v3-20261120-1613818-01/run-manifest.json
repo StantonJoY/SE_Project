@@ -1,0 +1,113 @@
+{
+  "run_id": "v3-20261120-1613818-01",
+  "mode": "offline_plus_live_plus_screenshot_demo",
+  "scope": "V3 real Steam corpus, content grading, V1/V2 integration, replay, mutation, live semantic probes, screenshot acceptance demo",
+  "status": "PASS_WITH_LIMITATIONS",
+  "course_submission_readiness": "CHANGES_REQUIRED",
+  "source_branch": "test/v3-validation",
+  "upstream_branch": "origin/v3",
+  "tested_commit": "161381887e421a121cd2878fcbf397d42a8ac818",
+  "docs_evidence_commit_at_capture": "4da29339ae7e150302fe7123422bf78fa8135c04",
+  "environment": {
+    "conda_env": "SEProjectV3",
+    "python": "3.11.18",
+    "editable_project_location": "E:\\cityu\\SE\\project\\SE_Project-v3-test"
+  },
+  "related_runs": {
+    "environment_data": "v3-20261120-53d37fc-01",
+    "core_and_full_regression": "v3-20261120-15cc289-01",
+    "e2e_replay_mutation_static": "v3-20261120-4d0479f-01"
+  },
+  "tests": {
+    "collected": 675,
+    "v3_core_passed": 49,
+    "full_offline_passed": 675,
+    "failed": 0,
+    "errors": 0,
+    "result": "PASS"
+  },
+  "data": {
+    "items_rows": 5000,
+    "tags_rows": 5000,
+    "manifest_rows": 5000,
+    "items_sha256_match": true,
+    "tags_sha256_match": true,
+    "empty_genres_raw_total": 34,
+    "required_age_gte_13_raw_total": 715
+  },
+  "evaluation": {
+    "v1_must_pass": "11/11",
+    "v1_must_fail": "14/14",
+    "v1_violations": 0,
+    "v2_cases": 18,
+    "v2_violations": 0,
+    "v3_cases": 14,
+    "v3_passed": 14,
+    "v3_violations": 0,
+    "v3_p95_ms": 3.4,
+    "result": "PASS"
+  },
+  "quality": {
+    "mutation": "33/33",
+    "ruff": "PASS",
+    "mypy": "PASS",
+    "dependencies": "PASS",
+    "schema": "PASS",
+    "fitness": "PASS",
+    "repository_completeness": "PASS",
+    "safety_paths": "PASS",
+    "implementation_audit": "PASS",
+    "coverage_percent": 86,
+    "coverage_threshold": null
+  },
+  "tooling": {
+    "live_harness_directory": "test/live",
+    "file_count": 4,
+    "python_compile": "PASS",
+    "ruff": "PASS",
+    "secret_scan": "PASS"
+  },
+  "live": {
+    "provider": "http:deepseek-flash",
+    "v2_prompt_version": "relevance-v2.2",
+    "v2_scene_count": 6,
+    "v2_runs_per_scene": 5,
+    "v2_structural": "30/30",
+    "v2_title_bait": "5/5",
+    "v2_known_title": "5/5",
+    "v1_prompt_version": "ctx-v1.1",
+    "v1_mode": "test-only",
+    "v1_scene_count": 6,
+    "v1_runs_per_scene": 3,
+    "v1_structural": "18/18",
+    "semantic_quality": "PASS_WITH_LIMITATIONS",
+    "product_v1_default": "Mock / Offline"
+  },
+  "demo": {
+    "status": "COMPLETED",
+    "screenshot_count": 10,
+    "command_file_count": 10,
+    "script_document": "docs/testing/V3-Demo-Script.md",
+    "screenshots_document": "docs/testing/V3-Demo-Screenshots.md",
+    "screenshot_directory": "17-final-demo/screenshots",
+    "commands_directory": "17-final-demo/commands"
+  },
+  "gates": {
+    "gate_1_test_approval": "DEFERRED / FAIL",
+    "gate_2_static_analysis": "PASS",
+    "gate_3_schema": "PASS",
+    "gate_4_semantic_evaluation": "PASS_WITH_LIMITATIONS",
+    "gate_5_regression": "PASS",
+    "gate_6_ai_use_log": "PASS",
+    "adr_006": "Proposed",
+    "ta_0005": "MISSING_HUMAN_APPROVAL"
+  },
+  "known_limitations": [
+    "Gate 1 mapping and human approval remain incomplete.",
+    "V1 product CLI remains Mock / Offline; V1 live is test-only.",
+    "Live semantic coverage uses six controlled scenes rather than a broad human-labeled corpus.",
+    "Coverage is recorded at 86% without a mandatory project threshold.",
+    "Family/gamer audit detail is not captured as separate CLI evidence.",
+    "Course delivery remains changes required until governance is resolved."
+  ]
+}

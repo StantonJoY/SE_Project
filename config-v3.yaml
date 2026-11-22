@@ -1,0 +1,54 @@
+# V3 竞价配置：候选来自真实语料，出价由定价 5% 派生（ADR-006 D5/D7）。
+# 与 config-v2.yaml 的唯一差别：bids 指向语料 sidecar，账本单独隔离。
+
+model:
+  provider: fixed
+  version: fixed-v3
+  name: ""
+  endpoint: ""
+  api_key_env: V2_LLM_API_KEY
+  timeout_sec: 30
+  fixed_scores:
+    ad_001: 90
+    ad_002: 50
+prompt:
+  context_budget_tokens: 2000
+paths:
+  # 非 --corpus 模式下仍用手写素材；--corpus 模式忽略此项
+  ads: data/ads.json
+  bids: data/bids-corpus.json
+  banned_words: data/banned_words.json
+  scene_rules: data/scene_rules.json
+  # 与 V2 账本隔离：报价契约不同，共用会触发 persistent seed contract 冲突
+  ledger: logs/bidding-v3.sqlite3
+policy:
+  version: pay-as-bid-v1
+  score_formula: relevance_times_bid
+  pricing: pay_as_bid
+  tie_break: ad_id_ascending
+replay:
+  pass_rate_threshold: 0.95
+  compliance_escape_limit: 0
+  latency_p95_threshold_sec: 5.0
+
+# 语料段与 config.yaml 保持一致（V2 CLI 读的是 config-v3.yaml，需要自己的 corpus 配置）
+corpus:
+  items_path: "data/corpus/items.jsonl"
+  tags_path: "data/corpus/tags.jsonl"
+  content_rules_path: "data/scene-content-rules.yaml"
+  # V2 的相关性接口用 UTF-8 字节估 token（比 V1 的 len/3 保守约 3 倍），
+  # 2000 的预算只装得下 ~4 个语料候选；V1 仍用 30。
+  top_k: 4
+  budget_impressions: 20
+  tag_mapping:
+    morning: ["Relaxing", "Casual", "Indie"]
+    afternoon: ["Casual", "Adventure", "Open World"]
+    evening: ["Story Rich", "Atmospheric", "RPG"]
+    night: ["Relaxing", "Cozy", "Horror"]
+    mobile: ["Casual", "Indie", "2D"]
+    desktop: ["Action", "Strategy", "RPG"]
+    tablet: ["Casual", "Simulation", "Co-op"]
+    student: ["Casual", "Co-op", "Indie", "Free to Play"]
+    gamer: ["Action", "Competitive", "Multiplayer", "Shooter"]
+    family: ["Family-Friendly", "Wholesome", "Cozy"]
+    competitive: ["Competitive", "Esports", "Shooter", "Action"]

@@ -1,0 +1,144 @@
+======================================================================
+A. 数据合法性与 schema 一致性
+======================================================================
+
+======================================================================
+B. 规则分支覆盖率（有无死规则 / 未覆盖品类）
+======================================================================
+  素材品类: ['adult', 'education', 'financial_guarantee', 'food_delivery', 'gaming', 'medical', 'retail', 'subscription']
+
+======================================================================
+C. 跨层一致性：filter_by_scene（预筛）vs check_scene（终检）
+======================================================================
+
+======================================================================
+D. 确定性（命中是否与词表顺序无关 / 重复调用一致）
+======================================================================
+
+======================================================================
+E. 需求 enforcement 引用的代码实体是否真实存在
+======================================================================
+
+======================================================================
+F. 加载期 fail-closed 一致性（各入口错误类型）
+======================================================================
+
+======================================================================
+G. 素材 × 规则 交叉覆盖（有无从未被任何 gate 拒绝的素材）
+======================================================================
+    ad_001: 命中规则 ['scene']
+    ad_002: 命中规则 ['scene']
+    ad_003: 命中规则 ['scene']
+    ad_004: 命中规则 （无——从未被拒绝）
+    ad_005: 命中规则 （无——从未被拒绝）
+    ad_006: 命中规则 ['category', 'scene']
+    ad_007: 命中规则 ['category']
+    ad_008: 命中规则 ['scene']
+    ad_009: 命中规则 ['category']
+    ad_010: 命中规则 ['scene']
+    ad_011: 命中规则 ['scene']
+    ad_012: 命中规则 ['category', 'scene']
+    ad_013: 命中规则 ['category', 'scene']
+    ad_014: 命中规则 （无——从未被拒绝）
+
+======================================================================
+H. 数据字段有没有对应实现（孤儿字段检测）
+======================================================================
+
+======================================================================
+I. 确定性实证（等长违禁词的选择是否可复现）
+======================================================================
+
+======================================================================
+审计结果: 0 项发现 / 89 项通过
+======================================================================
+
+  ✓ [A] 设备枚举全部被数据覆盖: ['desktop', 'mobile', 'tablet']
+  ✓ [B] 规则 category_blacklist 的 'medical' 有对应素材可触发
+  ✓ [B] 规则 category_blacklist 的 'financial_guarantee' 有对应素材可触发
+  ✓ [B] 规则 category_blacklist 的 'adult' 有对应素材可触发
+  ✓ [B] 规则 night_blocked_categories 的 'gaming' 有对应素材可触发
+  ✓ [B] 规则 campus_blocked_categories 的 'adult' 有对应素材可触发
+  ✓ [B] not_night=true 覆盖素材: ['ad_002', 'ad_003', 'ad_013']
+  ✓ [B] not_campus=true 覆盖素材: ['ad_006']
+  ✓ [B] allowed_devices 有子集限制 覆盖素材: ['ad_001', 'ad_003', 'ad_006', 'ad_008', 'ad_010', 'ad_012', 'ad_013']
+  ✓ [C] 预筛与终检对素材级三层约束判定完全一致（无漂移）
+  ✓ [C] 两层为独立重实现（非共享函数）→ 符合架构『双层』意图；代价是漂移风险，故本检查常驻
+  ✓ [C] 规则级 night_blocked_categories 在终检层生效（预筛保留但终检拒绝）: ['ad_010', 'ad_011'] @ night/mobile
+  ✓ [C] 规则级 campus_blocked_categories 在终检层生效（预筛保留但终检拒绝）: ['ad_012'] @ afternoon/mobile/student
+  ✓ [D] 等长命中在 原序/逆序/码点序 三种排列下完全一致 → 确定性成立
+  ✓ [D] 同输入重复 check() 结果一致
+  ✓ [E] REQ-ADS-FR-001 → ads.repository.AdRepository.load 存在
+  ✓ [E] REQ-ADS-FR-002 → scene.parser.parse_scene 存在
+  ✓ [E] REQ-ADS-FR-002 → scene.schema.SCENE_SCHEMA 存在
+  ✓ [E] REQ-ADS-ARCH-001 → ads.schema.AD_SCHEMA 存在
+  ✓ [E] REQ-ADS-ARCH-001 → ads.repository.AdRepository.load 存在
+  ✓ [E] REQ-ADS-ARCH-004 → compliance.pipeline.run_compliance 存在
+  ✓ [E] REQ-ADS-ARCH-004 → ads.repository.AdRepository.filter_by_scene 存在
+  ✓ [E] REQ-ADS-NFR-SAFETY-001 → compliance.pipeline.run_compliance 存在
+  ✓ [E] REQ-ADS-NFR-SAFETY-002 → compliance.pipeline.check_category 存在
+  ✓ [E] REQ-ADS-NFR-SAFETY-002 → compliance.rules.SceneRules.category_blacklist 存在
+  ✓ [E] REQ-ADS-NFR-SAFETY-003 → ads.banned_words.BannedWords.check_all 存在
+  ✓ [E] REQ-ADS-NFR-SAFETY-003 → compliance.pipeline.check_banned_words 存在
+  ✓ [E] REQ-ADS-NFR-SAFETY-004 → compliance.pipeline.check_scene 存在
+  ✓ [E] REQ-ADS-NFR-SAFETY-004 → compliance.rules.SceneRules 存在
+  ✓ [E] REQ-ADS-NFR-SAFETY-004 → ads.repository.AdRepository.filter_by_scene 存在
+  ✓ [E] REQ-ADS-NFR-SAFETY-006 → bidding.models.validate_bids 存在
+  ✓ [E] REQ-ADS-ARCH-005 → bidding.ledger.Ledger.budgets 存在
+  ✓ [E] REQ-ADS-ARCH-006 → bidding.engine.choose_winner 存在
+  ✓ [E] REQ-ADS-ARCH-007 → bidding.ledger.Ledger.finalize 存在
+  ✓ [E] REQ-ADS-ARCH-008 → bidding.models.validate_bids 存在
+  ✓ [E] REQ-ADS-ARCH-009 → bidding.engine.choose_winner 存在
+  ✓ [E] REQ-ADS-NFR-SAFETY-007 → selector.relevance.parse_relevance_output 存在
+  ✓ [E] REQ-ADS-ARCH-010 → bidding.ledger.Ledger.finalize 存在
+  ✓ [E] REQ-ADS-ARCH-011 → bidding.engine.choose_winner 存在
+  ✓ [E] REQ-ADS-FR-005 → bidding.engine.choose_winner 存在
+  ✓ [E] REQ-ADS-FR-006 → app.cli_v2.load_v2_config 存在
+  ✓ [E] REQ-ADS-ARCH-012 → selector.relevance.parse_relevance_output 存在
+  ✓ [E] REQ-ADS-ARCH-012 → selector.relevance.HTTPRelevanceClient 存在
+  ✓ [E] REQ-ADS-ARCH-012 → app.pipeline_v2.recommend_v2 存在
+  ✓ [E] REQ-ADS-ARCH-012 → app.cli_v2.main 存在
+  ✓ [E] REQ-ADS-FR-007 → bidding.ledger.Ledger.finalize 存在
+  ✓ [E] REQ-ADS-FR-008 → bidding.ledger.Ledger.finalize 存在
+  ✓ [E] REQ-ADS-FR-008 → app.pipeline_v2.recommend_v2 存在
+  ✓ [E] REQ-ADS-FR-008 → render.schema_v2.validate_v2_result 存在
+  ✓ [E] REQ-ADS-NFR-QA-003 → bidding.engine.choose_winner 存在
+  ✓ [E] REQ-ADS-SEC-002 → bidding.models.validate_bids 存在
+  ✓ [E] REQ-ADS-GOV-003 → scripts.check_semantic_eval.semantic_changes 存在
+  ✓ [E] REQ-ADS-GOV-003 → scripts.check_test_approval.required_test_requirements 存在
+  ✓ [E] REQ-ADS-GOV-003 → scripts.check_safety_paths.read_adr_paths 存在
+  ✓ [E] REQ-ADS-GOV-003 → scripts.check_ai_use_log.check_structure 存在
+  ✓ [E] REQ-ADS-GOV-003 → scripts.fitness_functions.check_v2_contracts 存在
+  ✓ [E] REQ-ADS-GOV-003 → scripts.validate_requirements.check_consistency 存在
+  ✓ [E] REQ-ADS-NFR-QA-004 → eval.v2_runner.main 存在
+  ✓ [E] REQ-ADS-NFR-QA-004 → scripts.demo_v2.run_demo 存在
+  ✓ [E] REQ-ADS-NFR-PERF-002 → bidding.engine.choose_winner 存在
+  ✓ [E] REQ-ADS-ARCH-015 → compliance.pipeline.run_compliance 存在
+  ✓ [E] REQ-ADS-NFR-SAFETY-008 → compliance.pipeline.check_scene 存在
+  ✓ [E] REQ-ADS-NFR-SAFETY-009 → compliance.pipeline.check_scene 存在
+  ✓ [E] REQ-ADS-NFR-SAFETY-010 → compliance.pipeline.check_scene 存在
+  ✓ [E] REQ-ADS-NFR-QA-006 → eval.eval_runner 存在
+  ✓ [E] REQ-ADS-FR-012 → corpus.pricing.bid_cents_from_price 存在
+  ✓ [E] REQ-ADS-ARCH-016 → corpus.pricing.bid_cents_from_price 存在
+  ✓ [E] REQ-ADS-ARCH-016 → bidding.ledger.Ledger.finalize 存在
+  ✓ [E] REQ-ADS-FR-013 → scripts.build_corpus_subset.select_subset 存在
+  ✓ [E] REQ-ADS-FR-014 → app.cli.load_corpus_context 存在
+  ✓ [E] REQ-ADS-FR-014 → corpus.select.select_candidates 存在
+  ✓ [F] 专属错误类型: AdRepository.load→AdLoadError, BannedWords.load→BannedWordsLoadError, SceneRules.load→SceneRulesLoadError
+  ✓ [F] AdRepository.load 文件缺失 → AdLoadError（fail-closed）
+  ✓ [F] BannedWords.load 文件缺失 → BannedWordsLoadError（fail-closed）
+  ✓ [F] SceneRules.load 文件缺失 → SceneRulesLoadError（fail-closed）
+  ✓ [F] BannedWords(非列表) → TypeError（fail-closed）
+  ✓ [F] BannedWords(元素非字符串) → TypeError（fail-closed）
+  ✓ [F] BannedWords(空串元素) → ValueError（fail-closed）
+  ✓ [F] BannedWords(空列表) 被接受（空表由 load() 层拒绝，见下）
+  ✓ [F] load 拒绝空词表 → BannedWordsLoadError（fail-closed）
+  ✓ [G] 素材 ['ad_004', 'ad_005', 'ad_014'] 从未被任何 gate 拒绝 → 对照样本（证明不过度拦截）
+  ✓ [G] 规则 'banned_words' 无素材级锚点，但有测试级锚点（test_every_banned_word_is_actually_blocked）
+  ✓ [G] 规则 'category' 由素材 ['ad_006', 'ad_007', 'ad_009', 'ad_012', 'ad_013'] 触发
+  ✓ [G] 规则 'scene' 由素材 ['ad_001', 'ad_002', 'ad_003', 'ad_006', 'ad_008', 'ad_010', 'ad_011', 'ad_012', 'ad_013'] 触发
+  ✓ [G] 规则 'output_exists' 无素材级锚点，但有测试级锚点（test_check_output_reject_not_in_candidates）
+  ✓ [G] 违禁词表 24 个词全部由 test_banned_words.py 逐一反例覆盖
+  ✓ [H] banned_check 在 compliance 层被用于强制判定
+  ✓ [I] 等长命中稳定: '代孕'
+  ✓ [I] 命中选择规则（最长优先 → 同长取码点最小）已由 test_banned_words.py 用全排列锁定

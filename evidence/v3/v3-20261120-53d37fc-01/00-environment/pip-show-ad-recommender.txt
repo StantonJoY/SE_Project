@@ -1,0 +1,11 @@
+﻿Name: ad-recommender
+Version: 0.1.0
+Summary: Scenario-based ad recommendation engine with deterministic compliance safety boundary (CS5351)
+Home-page: 
+Author: 
+Author-email: 
+License: 
+Location: D:\miniconda3\envs\SEProjectV3\Lib\site-packages
+Editable project location: E:\cityu\SE\project\SE_Project-v3-test
+Requires: jsonschema, PyYAML
+Required-by: 
