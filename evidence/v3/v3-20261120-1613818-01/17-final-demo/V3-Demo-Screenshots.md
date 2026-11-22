@@ -22,25 +22,25 @@
 
 ## Captured Images
 
-![01 environment](../../evidence/v3/v3-20261120-1613818-01/17-final-demo/screenshots/01-environment.png)
+![01 environment](screenshots/01-environment.png)
 
-![02 corpus](../../evidence/v3/v3-20261120-1613818-01/17-final-demo/screenshots/02-corpus.png)
+![02 corpus](screenshots/02-corpus.png)
 
-![03 V1 normal](../../evidence/v3/v3-20261120-1613818-01/17-final-demo/screenshots/03-v1-normal.png)
+![03 V1 normal](screenshots/03-v1-normal.png)
 
-![04 V1 invalid](../../evidence/v3/v3-20261120-1613818-01/17-final-demo/screenshots/04-v1-invalid.png)
+![04 V1 invalid](screenshots/04-v1-invalid.png)
 
-![05 content safety](../../evidence/v3/v3-20261120-1613818-01/17-final-demo/screenshots/05-content-safety.png)
+![05 content safety](screenshots/05-content-safety.png)
 
-![06 V2 auction and budget](../../evidence/v3/v3-20261120-1613818-01/17-final-demo/screenshots/06-v2-auction-budget.png)
+![06 V2 auction and budget](screenshots/06-v2-auction-budget.png)
 
-![07 regression replay mutation](../../evidence/v3/v3-20261120-1613818-01/17-final-demo/screenshots/07-regression-replay-mutation.png)
+![07 regression replay mutation](screenshots/07-regression-replay-mutation.png)
 
-![08 static checks and coverage](../../evidence/v3/v3-20261120-1613818-01/17-final-demo/screenshots/08-static-coverage.png)
+![08 static checks and coverage](screenshots/08-static-coverage.png)
 
-![09 live prompt](../../evidence/v3/v3-20261120-1613818-01/17-final-demo/screenshots/09-live-prompt.png)
+![09 live prompt](screenshots/09-live-prompt.png)
 
-![10 gates and limitations](../../evidence/v3/v3-20261120-1613818-01/17-final-demo/screenshots/10-gates-limitations.png)
+![10 gates and limitations](screenshots/10-gates-limitations.png)
 
 ## Capture Notes
 

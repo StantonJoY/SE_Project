@@ -60,7 +60,7 @@
 
 | 断言 | 失败条件 |
 |---|---|
-| 覆盖表必须包含 `invariants.md` 声明的**全部** 16 条不变量 | 缺条目即 FAIL |
+| 覆盖表必须包含 `invariants.md` 声明的**全部**不变量（当前 36 条：V1 16 + V2 12 + V3 8） | 缺条目即 FAIL |
 | 声明 `negative_test_backed: true` 的不变量，其 ID 必须出现在某个**含反例标记**的测试模块中 | 无反例标记 → FAIL（防止把"顺带提到"当成"反例测试"） |
 | 声明 `false` 的必须给出 `pending_test` 与 `blocked_by` | 缺任一项即 FAIL |
 

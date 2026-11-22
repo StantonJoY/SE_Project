@@ -221,3 +221,34 @@
 本机已安装现有 `pre-commit`，使用复用的 Python 3.12 环境。在隔离的暂存副本中，由 Git 执行钩子并通过了 ADR 伴随检查和 AI 使用日志检查。正式前置测试批准仍见 [V2 审批状态](v2-approval-status.yaml)。
 
 同日通过 GitHub 公开接口核对 `main`，`protected` 为 `false`，适用规则列表为空。远端分支保护和评审者设置仍由管理员确认及配置。[分支保护说明](branch-protection.md)
+
+---
+
+## V3 复核记录（2026-11-22）
+
+**复核对象**：`v3` 分支 → `main` 的合并（PR #3，merge commit `8b5a17a`，21 个提交）
+**复核类型**：独立测试执行 + 本地门禁复跑。**不含具名人类的正式验收**——正式状态见
+[`v3-approval-status.yaml`](v3-approval-status.yaml)。
+
+| 维度 | 结论 | 证据 |
+|---|---|---|
+| 规格一致性 | 通过：61 条需求（V1 22 + V2 19 + V3 20）全部有 `enforcement` 与测试证据 | `req/requirements.yaml`、`acceptance-coverage-map.yaml` |
+| 架构一致性 | 通过：9 个元素与 S1 一致；`bidding/`、`ads/`、`scene/` 在 V3 中零改动 | `git diff origin/main...v3`、`fitness_functions.py` |
+| 代码与测试质量 | 通过：679 项离线测试、33/33 变异、三套 replay 违规 0 | `docs/testing/V3-Test-Report.md` |
+| 操作元数据 | 通过：AI 使用日志已更新；ADR-006 已 `Accepted`；`CODEOWNERS` 已落地 | `ai-use-log.yaml`、`adr-006-*.md`、`.github/CODEOWNERS` |
+| 真实模型 | PASS_WITH_LIMITATIONS：结构 30/30；标题诱导 5/5、名作对照 5/5 按标签选择 | `docs/testing/V3-Live-Prompt-Semantic-Report.md` |
+
+**独立测试发现（8 项）**：F-001（manifest 哈希与文件不符，根因是生成器在 Windows 写出 CRLF）、
+F-004（未跟踪文档阻断完整回归）、F-006（stdout 非 UTF-8）、F-007（13 项 lint）、F-008（门禁 1 映射缺口）
+等；除 F-008 外均已关闭或修复，F-008 的处理见下。
+
+**判定**：**ACCEPTED WITH DOCUMENTED GAP**
+
+- 代码与测试证据充分，可合入；
+- **门禁 1 对 V3 历史为红**：V3 测试实现于 2026-11-17，任何具名批准都无法早于它。
+  处置：`TA-0005`（首条前置批准，2026-11-22T19:52，早于实现提交 19:53:34）+
+  `TA-0006`（既有测试集的事后验收，明确不冒充前置批准）；缺口登记 `TD-018`；
+- **不回填、不改校验器**是本次复核的明确约束。
+
+**签署**：独立测试（测试成员）+ 本地复核（编码 agent）。**无具名人类签署**，
+故本段不构成课程意义上的正式验收。

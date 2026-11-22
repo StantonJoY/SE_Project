@@ -66,7 +66,7 @@
 | T12 | `run_tests`（pytest） | ❌ | ✅（**仅运行**，不得修改测试） | ✅ | ✅ | 运行测试 ≠ 读测试源码：BUILD 只接收 stripped error report |
 | T13 | `run_lint` / `typecheck`（ruff / mypy） | ✅ | ✅ | ✅ | ✅ | **CI 门禁 2** |
 | T14 | `git_commit` | ❌ | ✅（**须计划已批准**） | ❌ | ❌ | 提交信息须引用 ADR ID（若触及 safety-critical） |
-| T15 | `git_push` / `open_pr` | ❌ | ✅ | ❌ | ❌ | **分支保护**：6 道门禁须全绿（`docs/branch-protection.md`） |
+| T15 | `git_push` / `open_pr` | ❌ | ✅ | ❌ | ❌ | **分支保护**：7 道门禁须全绿（`docs/branch-protection.md`） |
 | T16 | `run_mutation_check` | ❌ | ✅ | ✅ | ❌ | 变异验证（`INV-ADS-011`）；**只注入内存变异，绝不改源文件**。注意 `scripts/mutation_check.py` 本身受 `ADR-004` 保护 |
 | T17 | `run_eval_replay`（`eval/eval_runner.py`） | ✅ | ✅ | ✅ | ✅ | **CI 门禁 4**；`ADR-003` D5 要求走**完整管道** |
 | T18 | `install_dependency`（改 `pyproject.toml`） | ❌ | ⚠️ **须人工批准** | ❌ | ❌ | 依赖面变更影响安全与供应链；`check_dependencies.py` 强制声明一致 |
@@ -103,7 +103,7 @@
 | `src/render/`、`src/audit/`、`src/app/` | 读 | 写 | 读 | 否（新增层） |
 | **`eval/eval_cases.json`** | 读 | 读 | 读 | **是 — 须 ADR**（`ADR-004` D1） |
 | **`eval/eval_runner.py`** | 读 | 读 | 读 | **是 — 须 ADR**（`ADR-004` D1） |
-| **`scripts/check_*.py`**（六道门禁检查器） | 读 | 读 | 读 | **是 — 须 ADR**（`ADR-004` D1） |
+| **`scripts/check_*.py`**（七道门禁检查器） | 读 | 读 | 读 | **是 — 须 ADR**（`ADR-004` D1） |
 | **`scripts/fitness_functions.py`** | 读 | 读 | 读 | **是 — 须 ADR**（`ADR-004` D1） |
 | **`scripts/mutation_check.py`** | 读 | 读 | 读 | **是 — 须 ADR**（`ADR-004` D1） |
 | **`docs/code-governance/acceptance-coverage-map.yaml`** | 读/写 | 读 | 读 | **是 — 须 ADR**（`ADR-004` D1） |
@@ -132,7 +132,7 @@
 |---|---|---|---|
 | **Permission** | 宽范围、始终生效 | `.opencode/permissions.jsonc`（声明）+ 本文件（说明） | ✅ 本文件产出 |
 | **Hook** | 事件特定（仅变更时） | `scripts/check_safety_paths.py`（CI 阶段） | ✅ 已实现并验证 |
-| **CI 门禁** | 分支保护、合并前 | 6 道门禁（`.github/workflows/ci.yml`） | ✅ 已实现；**待管理员启用分支保护** |
+| **CI 门禁** | 分支保护、合并前 | 7 道门禁（`.github/workflows/ci.yml`） | ✅ 已实现；已备 `.github/CODEOWNERS` 与启用清单；**待管理员启用分支保护** |
 | **Fitness function** | 结构约束、每次提交 | `scripts/fitness_functions.py`（S1/S2/S3、V1–V4） | ✅ 已实现 |
 
 > ⚠️ **诚实的局限**（必须说清，否则本表是虚假承诺）：

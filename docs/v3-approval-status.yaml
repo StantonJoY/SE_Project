@@ -1,0 +1,70 @@
+schema_version: "1.0"
+round: V3
+status: delivered_pending_human_acceptance
+
+delivery:
+  pr: "#3"
+  merge_commit: "8b5a17a"
+  merged_at: "2026-11-22"
+  branch: "v3"
+  commits_in_round: 21
+
+work_authorization:
+  actor_kind: human
+  actor: owner_in_conversation
+  scope: v3_local_implementation_delivery_and_documentation
+  note: >-
+    人类在会话中逐项下达目标（语料接入、5% 定价、合规分级、补批准、合并、保护、报告）。
+    agent 无权自行批准或验收，本条只记录授权范围。
+
+architecture_decision:
+  id: ADR-006
+  status: Accepted
+  approved_by: "Shane"
+  approved_at: "2026-11-22T19:50:00+08:00"
+  scope: D1-D9
+
+independent_test_execution:
+  status: completed
+  evidence: "docs/testing/V3-Test-Report.md"
+  raw_evidence: "evidence/v3/"
+  findings:
+    closed: [F-001, F-002, F-003, F-004, F-005, F-007]
+    fixed_after_review: [F-006]
+    open: [F-008]
+
+formal_test_approval:
+  pre_implementation:
+    status: partial
+    records: ["TA-0005"]
+    note: >-
+      TA-0005 是本仓库首条真正的前置批准（测试提交 38997ca/19:52:16 早于实现
+      3f230a8/19:53:34）。仅对 2026-11-22 之后的新增测试可复现。
+  post_hoc_acceptance:
+    status: recorded
+    records: ["TA-0006"]
+    note: >-
+      对 V2/V3 既有测试集（17 文件 / 34 需求）的事后验收，**不满足**门禁 1 的时序要求，
+      不冒充前置批准。
+
+gate_status_at_delivery:
+  gate1_test_approval: red
+  gate1_reason: "historical timing gap (TD-018); tests implemented 2026-11-17, approval can only be dated later"
+  gate2_static_analysis: green
+  gate3_requirements_schema: green
+  gate4_semantic_evaluation: green
+  gate5_offline_regression: green
+  gate5b_mutation: green
+  gate6_ai_use_log: green
+  verification_mode: local_run_on_merge_commit
+  remote_ci: not_verifiable_from_this_workstation
+
+merge_readiness:
+  branch_protection: pending_enablement
+  codeowners: committed
+  live_model_validation: pass_with_limitations
+  known_limitations:
+    - "TD-001 runtime monitor registered but not wired"
+    - "corpus is a 5,000-row subset of 25,899"
+    - "5% fee is a demo rule, no billing reconciliation"
+    - "V2 corpus mode carries top_k=4 due to byte-based token estimate"

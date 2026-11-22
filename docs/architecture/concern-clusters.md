@@ -2,7 +2,7 @@
 
 > **A5 产物** · 对应课程 `3. 软件架构.md` §3.5（P19）、§3.7（P21）、§3.8（P22）
 > 状态：**草案待人工批准** · 版本：V1（`docs/architecture/` 轮次）· 日期：2026-10-06
-> 输入：`docs/architecture/asr-register.md`（A1：18 ASR + 4 impl）、`docs/architecture/invariants.md`（A2：16 条不变量）
+> 输入：`docs/architecture/asr-register.md`（A1：18 ASR + 4 impl）、`docs/architecture/invariants.md`（A2：当前 36 条不变量，V1 16 + V2 12 + V3 8）
 > 下游：课程第六章"架构候选探索 7 步循环"（P72–95）——本文件是 Step 2「候选生成」与 Step 3「评价准则」的输入
 
 ---

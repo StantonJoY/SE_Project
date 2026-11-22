@@ -67,7 +67,7 @@
 
 | 草案标签 | 正式 ID | 类型 | 需求 | fit criterion |
 |---|---|---|---|---|
-| REQ-V3-SE-11 | `REQ-ADS-NFR-QA-005` | quality | **零回归**：V1+V2 全部 617 个离线测试全绿；旧 25 条 eval 达成率不下降 | CI 全绿；旧分区 replay 报告与 V2 基线 diff = 0；测试数 ≥ 617 |
+| REQ-V3-SE-11 | `REQ-ADS-NFR-QA-005` | quality | **零回归**：V1+V2+V3 全部 679 个离线测试全绿；旧 25 条 eval 达成率不下降 | CI 全绿；旧分区 replay 报告与 V2 基线 diff = 0；测试数 ≥ 617 |
 | REQ-V3-SE-12 | `REQ-ADS-NFR-QA-006` | quality | eval 新增 V3 分区：**12–15 条**真实语料场景用例，含 ≥3 条无匹配负例；旧分区不变 | 新分区 `case_count` 登记；负例 100% 走显式无匹配语义（不硬凑 top-K） |
 | REQ-V3-SE-13 | `REQ-ADS-GOV-004` | governance | 新增 `ADR-006`《V3 轮次接入与真实语料边界》，记录：只读、投影旁路、不扩 AD_SCHEMA、合规只动 2 个函数、权威链不变、语料不可信、轮次目录沿用 | ADR 存在且 **Accepted（具名人类批准）**；`check_safety_paths.py` 解析通过 |
 | REQ-V3-SE-14 | `REQ-ADS-NFR-QA-007` | quality | `corpus` 登记为**新架构元素**并纳入 fitness | `ELEMENT_BY_PACKAGE` 含 `"corpus"`；`fitness_functions.py` 通过；依赖方向单向 |

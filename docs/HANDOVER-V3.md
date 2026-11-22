@@ -74,7 +74,7 @@ items.jsonl + tags.jsonl（5,000 条）
 | 7 | **同一场景**、换一个 `--request-id`，沿用同一 `--db` | 预算接着扣：`5700 → 5400`（每条 300 分），证明跨请求持久 |
 | 8 | `--request-id r1` 但**换场景** | `no_ad` + `reason_code: request_conflict`，不扣费 |
 | 9 | `python eval/v3_runner.py` | 14/14、逃逸 0、p95 < 5 ms |
-| 10 | `pytest test/offline -q` | **671 passed**，约 27 s |
+| 10 | `pytest test/offline -q` | **679 passed**，约 26 s |
 | 11 | `python scripts/mutation_check.py` | **33/33** 全部被检出 |
 
 > ⚠️ **三档之间不要直接比通过率**：`family` / `student` / `gamer` 映射到的标签不同，选出的候选集本来就不同。
