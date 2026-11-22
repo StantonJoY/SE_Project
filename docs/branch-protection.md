@@ -1,6 +1,9 @@
 # 分支保护配置（Branch Protection）— D7 交付物
 
-> V2 状态（2026-11-05）。六道门禁已配置，Python prompt、竞价与配置变更触发 V1 和 V2 回放。GitHub 公开接口显示 `main` 未受保护，未返回适用的分支规则。管理员仍需配置远端保护和真实评审者。V2 正式前置测试批准待处理。后文 V1 状态为历史配置说明。
+> **V3 状态（2026-11-22）**：V3 已通过 PR #3（merge commit `8b5a17a`）合入 `main`。
+> 七道门禁（Gate 1/2/3/4/5/5b/6）已在 CI 中稳定运行；`.github/CODEOWNERS` 已落地。
+> **`main` 仍未启用远端保护** —— 这是下一步唯一待办（§5）。
+> ⚠️ 已知：Gate 1 在 V3 合并提交上为红（历史时序缺口，见 §6），**不影响**后续 PR 的判定。
 
 > 课程 §6 原文：
 > **"Branch protection: Branch protection must require passing CI, and changes to
@@ -43,23 +46,25 @@
 
 ---
 
-## 3. CODEOWNERS（建议新增 `.github/CODEOWNERS`）
+## 3. CODEOWNERS（已落地：`.github/CODEOWNERS`）
 
+```text
+*                          @StantonJoY @Synapse2002 @gaozhechun408-eng
+/src/compliance/           @StantonJoY @Synapse2002
+/src/ads/schema.py         @StantonJoY
+/data/                     @StantonJoY @Synapse2002
+/docs/req/                 @StantonJoY
+/docs/architecture/        @StantonJoY
+/src/corpus/               @StantonJoY @Synapse2002   # V3 新增
+/src/selector/             @StantonJoY
+/scripts/mutation_check.py @StantonJoY @gaozhechun408-eng
+/eval/                     @StantonJoY @gaozhechun408-eng
+/test/offline/             @gaozhechun408-eng @StantonJoY
+/.github/                  @StantonJoY
 ```
-# 安全关键路径须指定人工评审者（课程 BP-2）
-# 用法：把 @handle 替换为仓库中真实的人类账号。
 
-# 默认所有路径需要评审
-*                       @<team-lead>
-
-# 安全关键路径
-/src/compliance/        @<arch-owner> @<qa-owner>
-/src/ads/schema.py      @<arch-owner>
-/data/                  @<arch-owner> @<qa-owner>
-/docs/req/              @<arch-owner> @<product-owner>
-/docs/architecture/     @<arch-owner>
-/architecture-blueprint.md  @<arch-owner>
-```
+> **校准提示**：CODEOWNERS 里的账号若不在协作者列表中，GitHub **不会报错**，只会让该条规则静默失效。
+> 启用保护前请确认这三个 handle 都在 `Settings → Collaborators` 里。
 
 **注意**：CODEOWNERS 只强制"必须有人评审"，**不检查是否附带 ADR**——
 后者由 `check_safety_paths.py` 在 CI 中强制。两者互补，与课程
@@ -67,18 +72,21 @@
 
 ---
 
-## 4. 所需 status checks（与 `ci.yml` 的 job 名一致）
-
-分支保护必须要求以下 6 个 check 通过：
+## 4. 所需 status checks（与 `ci.yml` 的 job 名一字不差）
 
 | Job 名（`ci.yml`） | 对应课程门禁 |
 |---|---|
-| `Gate 1 · Test approval` | 门禁 1 |
-| `Gate 2 · Static analysis` | 门禁 2 |
-| `Gate 3 · Schema (requirements registry)` | 门禁 3 |
-| `Gate 4 · Semantic evaluation` | 门禁 4 |
-| `Gate 5 · Regression (full offline suite)` | 门禁 5 |
-| `Gate 6 · AI-use log` | 门禁 6 |
+| `Gate 1 · Test approval` | 门禁 1（测试批准） |
+| `Gate 2 · Static analysis` | 门禁 2（ruff / mypy） |
+| `Gate 3 · Schema (requirements registry)` | 门禁 3（需求登记册） |
+| `Gate 4 · Semantic evaluation` | 门禁 4（语义评估 replay） |
+| `Gate 5 · Regression (full offline suite)` | 门禁 5（全量离线回归） |
+| `Gate 5b · Mutation verification` | 门禁 5b（变异验证） |
+| `Gate 6 · AI-use log` | 门禁 6（AI 使用日志） |
+
+> **Gate 1 建议晚一步再设为必需**：V3 合并提交上它是红的（历史时序缺口）。
+> 对**新 PR** 而言，只要变更集里没有未获批的测试，它是会绿的（docs-only PR 直接 PASS）。
+> 先跑通一次带前置批准的 PR（`TA-0005` 模式），再把 Gate 1 加进必需检查。
 
 ---
 
@@ -113,6 +121,7 @@ gh api \
   -F "required_status_checks[contexts][]=Gate 3 · Schema (requirements registry)" \
   -F "required_status_checks[contexts][]=Gate 4 · Semantic evaluation" \
   -F "required_status_checks[contexts][]=Gate 5 · Regression (full offline suite)" \
+  -F "required_status_checks[contexts][]=Gate 5b · Mutation verification" \
   -F "required_status_checks[contexts][]=Gate 6 · AI-use log" \
   -F "enforce_admins=true" \
   -F "required_pull_request_reviews[dismiss_stale_reviews]=true" \
@@ -136,10 +145,10 @@ gh api /repos/StantonJoY/SE_Project/branches/main/protection \
 
 | 事实 | 说明 |
 |---|---|
-| **生效起点** | 分支保护与 6 道门禁于 **2026-10-06** 设计与落地，此前不存在 |
+| **生效起点** | 分支保护与 6 道门禁于 **2026-10-06** 设计与落地，此前不存在；**7 道**（含 5b）自 2026-11-05 起 |
 | **历史缺口** | 2026-09-30 的 4 次构建提交（`edac673` / `3ea7868` / `d85f910` / `d097d34`）**未经任何门禁**，且已直接进入 `main` |
-| **门禁 1 不可追溯** | 该 4 次提交中测试与实现同批产出，**无法追溯满足**"实现前测试获批" |
-| **门禁 4 尚未可用** | 固定评估集未建（口径待 `OQ-005`），且仓库当前无 prompt 文件 |
+| **门禁 1 不可追溯** | 该 4 次提交中测试与实现同批产出，**无法追溯满足**"实现前测试获批"；V2/V3 的测试同样如此（`TD-018`） |
+| **本轮的补救** | `TA-0005`（2026-11-22）是**第一条真正的前置批准**（测试先写 → 批准 → 再实现）；`TA-0006` 对既有测试集作**事后验收**，不冒充前置批准 |
 | **自批准问题** | 单人仓库下 `require_code_owner_reviews` 将导致**无法自行合并**；若团队只有一人有写权限，须显式接受此限制或增设第二名评审者 |
 
 **处理方式**：本缺口**登记而不掩盖**，同时：
@@ -157,7 +166,8 @@ gh api /repos/StantonJoY/SE_Project/branches/main/protection \
 
 | # | 待确认项 | 状态 |
 |---|---|---|
-| 1 | 是否启用 `enforce_admins`（管理员也受限） | ⏳ 待定 |
-| 2 | CODEOWNERS 中的真实账号名 | ⏳ **需你提供** |
-| 3 | 单人仓库下的评审者安排（见 §6 自批准问题） | ⏳ **需你决定** |
-| 4 | 是否允许 force push（建议禁止） | ⏳ 待定 |
+| 1 | 是否启用 `enforce_admins`（管理员也受限） | ⏳ 待定（建议：先不勾，跑通 2 次 PR 后再勾） |
+| 2 | CODEOWNERS 中的真实账号名 | ✅ 已写入 `@StantonJoY` / `@Synapse2002` / `@gaozhechun408-eng`，**需确认三者在协作者列表中** |
+| 3 | 单人仓库下的评审者安排（见 §6 自批准问题） | ⏳ 待定：至少 1 名非作者协作者可批准 |
+| 4 | 是否允许 force push（建议禁止） | ⏳ 待定（建议禁止） |
+| 5 | Gate 1 是否立刻设为必需检查 | ⏳ 建议**先不设**，等一次带前置批准的 PR 走通后再设 |

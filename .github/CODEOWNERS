@@ -1,0 +1,25 @@
+# 安全关键路径须人工评审（课程 BP-2）
+# 生效条件：分支保护里勾选 "Require review from Code Owners"
+#
+# ⚠️ GitHub 不允许批准自己的 PR。单人仓库勾上后无法自行合并（见 docs/branch-protection.md §6）。
+# ⚠️ 账号名必须是本仓库真实的协作者；写错不会报错，只会让该条规则静默失效。
+
+# 默认所有路径需要评审（任一协作者批准即可）
+*                          @StantonJoY @Synapse2002 @gaozhechun408-eng
+
+# 安全关键路径：必须由架构/安全负责人评审
+/src/compliance/           @StantonJoY @Synapse2002
+/src/ads/schema.py         @StantonJoY
+/data/                     @StantonJoY @Synapse2002
+/docs/req/                 @StantonJoY
+/docs/architecture/        @StantonJoY
+
+# V3 新增的安全关键面
+/src/corpus/               @StantonJoY @Synapse2002
+/src/selector/             @StantonJoY
+/scripts/mutation_check.py @StantonJoY @gaozhechun408-eng
+/eval/                     @StantonJoY @gaozhechun408-eng
+
+# 验证资产：测试负责人把关
+/test/offline/             @gaozhechun408-eng @StantonJoY
+/.github/                  @StantonJoY
