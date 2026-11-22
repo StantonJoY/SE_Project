@@ -91,7 +91,7 @@ requirements:
     blocked_by: "D3 交付物 .opencode/permissions.jsonc 待建（.opencode 规则文件尚未产出）"
   - id: "REQ-ADS-AI-001"
     test_backed: true
-    evidence: ["test_explanation.py::test_explanation_states_why_this_ad", "test_explanation.py::test_explanation_contrasts_with_other_candidates", "test_explanation.py::test_explanation_degradation_keeps_ad_id", "test_explanation.py::test_explanation_with_banned_word_is_stripped", "test_explanation.py::test_verify_explanation_signature_cannot_rewrite_decision", "test_explanation.py::test_generate_explanation_does_not_mutate_judgment"]
+    evidence: ["test_explanation.py::test_explanation_states_why_this_ad", "test_explanation.py::test_explanation_contrasts_with_other_candidates", "test_explanation.py::test_explanation_degradation_keeps_ad_id", "test_explanation.py::test_explanation_with_banned_word_is_stripped", "test_explanation.py::test_verify_explanation_signature_cannot_rewrite_decision", "test_explanation.py::test_generate_explanation_does_not_mutate_judgment", "test_v3_prompt.py::test_prompt_contains_scene_semantics_and_no_external_knowledge"]
     note: "P4 已实现解释路径的结构隔离与口径（OQ-009：为什么选这条广告）。「解释质量评分」（独立评估器）属 Tier 3，待评估集（TD-003）。"
   - id: "REQ-ADS-AI-002"
     test_backed: true
@@ -221,9 +221,8 @@ requirements:
     evidence: ["test_corpus.py::test_injected_corpus_text_blocked"]
     note: "PR-1 语料接入已实现；PR-2 的合规分项另行登记。"
   - id: "REQ-ADS-NFR-QA-005"
-    test_backed: false
-    pending_test: "由全量回归套件 + fitness V4 跨轮次检查覆盖，无单条用例引用该 ID"
-    blocked_by: "该要求是聚合断言（617→660 全绿），不适合写进某个测试函数"
+    test_backed: true
+    evidence: ["test_v3_regression.py::test_no_baseline_test_module_removed", "test_v3_regression.py::test_offline_suite_size_not_reduced"]
   - id: "REQ-ADS-NFR-QA-006"
     test_backed: true
     evidence: ["test_v3_eval.py::test_v3_partition_passes_without_escaping", "test_v3_eval.py::test_v3_partition_is_registered_and_sized"]
@@ -232,9 +231,8 @@ requirements:
     pending_test: "ADR-006 待具名人类批准"
     blocked_by: "ADR 仍为 Proposed"
   - id: "REQ-ADS-NFR-QA-007"
-    test_backed: false
-    pending_test: "由 fitness 门禁覆盖（非 pytest 用例）"
-    blocked_by: "该要求由 CI 门禁断言，pytest 无对应用例"
+    test_backed: true
+    evidence: ["test_corpus.py::test_corpus_element_registered_in_fitness"]
   - id: "REQ-ADS-GOV-005"
     test_backed: false
     pending_test: "TA-0005 待具名人类签署"

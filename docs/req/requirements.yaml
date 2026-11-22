@@ -451,7 +451,7 @@ baseline_requirements:
     fit_criterion: "评估集 ≥ 20 条，可一键 replay 并输出通过率与违规数。"
     verification: ["evaluation_replay", "ci_gate"]
     enforced_by: "eval.eval_runner（CI 阻断门）"
-    enforcement: ["eval.eval_runner"]
+    enforcement: ["eval.eval_runner", "eval.v3_runner.main"]
     asr: true
     asr_id: "ASR-ADS-15"
     invariants: ["INV-ADS-016"]
@@ -549,7 +549,7 @@ baseline_requirements:
     fit_criterion: "解释评估失败时 ad_id 不变；解释文本中含违禁词时被剥离，剥离率 100%。"
     verification: ["unit_test", "negative_test"]
     enforced_by: "解释路径组装元素（与决策路径结构分离）"
-    enforcement: ["selector（explanation path）"]
+    enforcement: ["selector.context.format_scene_summary", "selector.explanation.generate_explanation"]
     asr: true
     asr_id: "ASR-ADS-A3-02"
     invariants: ["INV-ADS-004"]
@@ -1059,7 +1059,7 @@ baseline_requirements:
     fit_criterion: "item 730（age=0 但 descriptors=[2,5]）在 family 场景必须被拒；item 945360（descriptors 空但 warnings 含 Violence/Blood）在 family 场景必须被拒。"
     verification: ["unit_test", "negative_test"]
     enforced_by: "compliance.pipeline.check_scene"
-    enforcement: ["compliance.pipeline.check_scene"]
+    enforcement: ["compliance.pipeline.check_scene", "compliance.content_rules.ContentRules"]
     asr: false
     fallback: "展示终止，返回 no_ad 并记录命中规则与条目。"
     invariants: ["INV-V3-003"]
@@ -1172,7 +1172,7 @@ baseline_requirements:
     fit_criterion: "ELEMENT_BY_PACKAGE 含 corpus；fitness_functions 通过；依赖方向单向。"
     verification: ["static_analysis", "ci_gate"]
     enforced_by: "scripts.fitness_functions"
-    enforcement: ["scripts.fitness_functions"]
+    enforcement: ["scripts.fitness_functions", "scripts.fitness_functions.check_v1"]
     asr: false
     metric: {name: 'fitness_failures', unit: 'count', threshold: 0, direction: 'at_most'}
     source_refs:
@@ -1203,7 +1203,7 @@ baseline_requirements:
     fit_criterion: "30 条样本表驱动：ad_413150 出价 75 分、ad_730 出价 1 分；每条 budget 等于 bid 乘以 20；bid 恒不小于 1。"
     verification: ["unit_test", "negative_test"]
     enforced_by: "corpus.pricing.bid_cents_from_price"
-    enforcement: ["corpus.pricing.bid_cents_from_price"]
+    enforcement: ["corpus.pricing.bid_cents_from_price", "scripts.build_bids_v3.build_bids"]
     asr: false
     source_refs:
       - {source: "req_v3_draft", locator: "docs/req/requirements-v3-se.md"}

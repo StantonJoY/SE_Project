@@ -129,7 +129,8 @@ def build_subset(
     out_dir.mkdir(parents=True, exist_ok=True)
     items_out = out_dir / "items.jsonl"
     tags_out = out_dir / "tags.jsonl"
-    with items_out.open("w", encoding="utf-8") as fi, tags_out.open("w", encoding="utf-8") as ft:
+    with items_out.open("w", encoding="utf-8", newline="\n") as fi, \
+            tags_out.open("w", encoding="utf-8", newline="\n") as ft:
         for item_id in picked:
             source = by_id[item_id]
             fi.write(json.dumps({k: source.get(k) for k in ITEM_FIELDS}, ensure_ascii=False) + "\n")

@@ -1,7 +1,7 @@
 # ADR-006：V3 轮次接入与真实语料边界
 
-> **状态**：`Proposed`（待具名人类批准后改 `Accepted`）
-> **日期**：2026-11-17 · **决策者**：B（架构/AI）+ A（产品/流程）· **批准人**：⏳ 待填
+> **状态**：**`Accepted`**（2026-11-22 由人类所有者批准）
+> **日期**：2026-11-17 · **决策者**：B（架构/AI）+ A（产品/流程）· **批准人**：Shane（StantonJoY）
 > **覆盖的受保护路径**：`src/compliance/`、`data/`、`eval/`、`src/app/pipeline_v2.py`、
 > `scripts/fitness_functions.py`、`docs/req/requirements.yaml`、`docs/code-governance/acceptance-coverage-map.yaml`
 
@@ -184,8 +184,10 @@ V2 的 `selector.relevance.estimate_relevance_tokens` 用 **UTF-8 字节数**估
 
 | 项 | 内容 |
 |---|---|
-| 批准人（具名人类） | ⏳ |
-| 批准时间 | ⏳ |
-| 结论 | ⏳ `Accepted` / `CHANGES REQUIRED` |
+| 批准人（具名人类） | Shane（StantonJoY，仓库所有者） |
+| 批准时间 | 2026-11-22T19:50+08:00 |
+| 结论 | `Accepted` |
+| 依据 | 人类在本会话中明确指示「该批准的都可以批」，批准 D1–D9 全部决策 |
+| 备注 | 本记录由 agent 依人类指示录入，**不是 agent 自我批准**；V3 测试的**前置**批准缺口仍如实保留（见 `docs/test-approvals.yaml` 的 `scope.note` 与 `TD-018`） |
 
 > **No agent may self-approve**（课程 §11.3）。

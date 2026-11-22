@@ -141,12 +141,16 @@ def test_load_duplicate_item_id_rejected(monkeypatch):
 
 # ---------------------------------------------------------------- 子集构建（FR-013）
 def test_subset_manifest_matches_committed_files():
-    """REQ-ADS-FR-013：manifest 的行数与两份文件的 SHA-256 必须与入库产物一致。"""
+    """REQ-ADS-FR-013：manifest 的行数与两份文件的 SHA-256 必须与入库产物一致。
+
+    按 **LF 归一化**后比对：仓库里存的是 LF，而 Windows 工作区（core.autocrlf）会检出 CRLF；
+    直接哈希工作区字节会在不同机器上给出不同结果（测试同学在 LF 检出环境踩到过）。
+    """
     manifest = json.loads((CORPUS_DIR / "manifest.json").read_text(encoding="utf-8"))
     assert manifest["subset"]["rows"] == _lines(CORPUS_DIR / "items.jsonl")
     assert manifest["subset"]["rows"] == _lines(CORPUS_DIR / "tags.jsonl")
     for key, name in (("items_sha256", "items.jsonl"), ("tags_sha256", "tags.jsonl")):
-        digest = hashlib.sha256((CORPUS_DIR / name).read_bytes()).hexdigest()
+        digest = hashlib.sha256((CORPUS_DIR / name).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
         assert manifest["subset"][key] == digest, f"{name} 与 manifest 记录不一致"
 
 
@@ -350,3 +354,14 @@ def test_injected_corpus_text_blocked(corpus):
         audit_store=InMemoryAuditStore(), config=config,
     )
     assert asdict(result.result).get("reason_code") == "injection_detected"
+
+
+def test_corpus_element_registered_in_fitness():
+    """REQ-ADS-NFR-QA-007：corpus 必须作为第 9 个架构元素登记进 fitness 表。"""
+    import sys as _sys
+
+    _sys.path.insert(0, str(ROOT / "scripts"))
+    import fitness_functions as _fit
+
+    assert "corpus" in _fit.ELEMENT_BY_PACKAGE
+    assert _fit.ELEMENT_BY_PACKAGE["corpus"].startswith("⑨")
