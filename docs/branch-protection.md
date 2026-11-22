@@ -224,3 +224,15 @@ gh api /repos/StantonJoY/SE_Project/branches/main/protection \
 > “Do not allow bypassing the above settings” 是否勾选。勾了 = 直推会被拒；没勾 = 直推放行。
 >
 > 本表不写"已生效"这类无法验证的结论——**没测到就算没验证**。
+
+---
+
+## 9. 保护开启后的直推探针（2026-11-22）
+
+本节的提交被**直接推送**到 `main`，作为保护开启后的第一个观测点：
+
+- 如果本节出现在远端 `main` → admin bypass 生效（“Do not allow bypassing” 未勾）；
+- 如果直推被拒 → 规则已作用于管理员，本节需通过 PR 合入。
+
+> 探针本身不含业务内容，仅用于观测。真正证明"拦得住"仍需**非管理员身份**的一次尝试，
+> 或临时勾选 “Do not allow bypassing” 后重试。
