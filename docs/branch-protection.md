@@ -229,10 +229,33 @@ gh api /repos/StantonJoY/SE_Project/branches/main/protection \
 
 ## 9. 保护开启后的直推探针（2026-11-22）
 
-本节的提交被**直接推送**到 `main`，作为保护开启后的第一个观测点：
+本节的提交被**直接推送**到 `main`，作为保护开启后的第一个观测点。
 
-- 如果本节出现在远端 `main` → admin bypass 生效（“Do not allow bypassing” 未勾）；
-- 如果直推被拒 → 规则已作用于管理员，本节需通过 PR 合入。
+### 9.1 结果：被拦
 
-> 探针本身不含业务内容，仅用于观测。真正证明"拦得住"仍需**非管理员身份**的一次尝试，
-> 或临时勾选 “Do not allow bypassing” 后重试。
+```
+remote: - 6 of 6 required status checks are expected.
+! [remote rejected] main -> main (push declined due to repository rule violations)
+```
+
+| 观测 | 结论 |
+|---|---|
+| 规则存在且匹配 `main` | ✅ 是（否则不会被拒） |
+| 必填 status check 生效 | ✅ 是，且数量为 **6 道**（与配置一致） |
+| 管理员直推是否放行 | ❌ **不放行** —— 规则作用于 admin（无 bypass 列表，或已勾 “Do not allow bypassing”） |
+
+这条记录的价值：**同一账号、同一命令**，开启前成功（§8.1）、开启后被拒。
+保护不是"配了就算"，而是有实证。
+
+### 9.2 后续影响
+
+- 所有人（含 admin）推 `main` 必须走 PR + 6 道 check；
+- 只改 `docs/` 的 PR **不需要批准**（CODEOWNERS 未覆盖 `docs/`），check 过了即可合；
+- 改 `src/` 等的 PR 仍需 Code Owner 批准。
+
+若日后要恢复"admin 可直推文档"，两条路：
+
+1. Rulesets → 该规则 → **Bypass list** → 加入 `StantonJoY`（或角色 `Repository admin`）；
+2. 经典界面 → 取消勾选 “Do not allow bypassing the above settings”。
+
+两种都会同时放开**代码**直推，属已知取舍。
