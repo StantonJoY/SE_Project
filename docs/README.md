@@ -64,6 +64,7 @@
 | 想知道 | 读 |
 |---|---|
 | 每一轮怎么排的计划 | [`plans/`](plans/) |
+| 补监控（TD-001）的方案与步骤 | [`plans/TD-001-monitor-wiring.md`](plans/TD-001-monitor-wiring.md) |
 | agent 会话原始记录 | [`../transcripts/`](../transcripts/) |
 
 ---
