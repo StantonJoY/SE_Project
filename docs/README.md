@@ -57,6 +57,7 @@
 | 演示脚本与截图 | [`testing/V3-Demo-Script.md`](testing/V3-Demo-Script.md)、[`testing/V3-Demo-Screenshots.md`](testing/V3-Demo-Screenshots.md) |
 | 原始证据（junit / stdout / png） | [`../evidence/v3/`](../evidence/v3/) |
 | 评审备忘 | [`review-memo.md`](review-memo.md) |
+| 文档面一致性审查 | [`testing/V3-Documentation-Consistency-Audit.md`](testing/V3-Documentation-Consistency-Audit.md) |
 
 ## 6. 计划与历史
 
