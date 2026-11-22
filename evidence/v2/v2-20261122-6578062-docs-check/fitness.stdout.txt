@@ -1,0 +1,5 @@
+PASS — 结构性 fitness function 全部通过
+  检查项: S1 一个元素一个模块 · S2 扩展永不删除/权威边界 · S3 ADR docstring 可追溯性
+          V1 fit criterion 测试覆盖 · V2 不变量反例覆盖 · V3 测试引用 REQ/INV
+          V4 跨轮次无回归 · TRACE 追踪矩阵同步
+  测试模块 31 个: test_ads.py, test_app_pipeline.py, test_audit.py, test_banned_words.py, test_bidding_v2.py, test_compliance.py, test_context_assembly.py, test_corpus.py, test_eval_runner.py, test_explanation.py, test_mutation_check.py, test_pipeline_v2.py, test_provenance.py, test_relevance_v2.py, test_render.py, test_repo_completeness.py, test_requirements_registry.py, test_sanitize.py, test_scene.py, test_selector.py, test_v2_boundary_regressions.py, test_v2_eval.py, test_v2_governance.py, test_v2_mutation.py, test_v2_settlement_boundaries.py, test_v3_compliance.py, test_v3_eval.py, test_v3_output_encoding.py, test_v3_pricing.py, test_v3_prompt.py, test_v3_regression.py

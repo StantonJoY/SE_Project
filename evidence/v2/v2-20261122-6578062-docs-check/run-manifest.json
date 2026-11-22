@@ -1,0 +1,104 @@
+{
+  "purpose": "New V2 verification for documentation closeout; not a historical implementation run or a human approval.",
+  "source_commit": "65780628b724fdb6499625d45d4b8d9da5589bd0",
+  "branch": "docs/v2-documentation-closeout",
+  "started_at": "2026-11-22T14:08:44.355963+00:00",
+  "provider": "fixed/offline; loopback HTTP boundary tests only; no live service",
+  "python_version": "Python 3.12.14",
+  "runs": [
+    {
+      "id": "schema",
+      "command": [
+        "python",
+        "scripts/validate_requirements.py"
+      ],
+      "exit_code": 0,
+      "started_at": "2026-11-22T14:08:44.467829+00:00",
+      "stdout": "schema.stdout.txt",
+      "stderr": "schema.stderr.txt"
+    },
+    {
+      "id": "fitness",
+      "command": [
+        "python",
+        "scripts/fitness_functions.py"
+      ],
+      "exit_code": 0,
+      "started_at": "2026-11-22T14:08:49.079205+00:00",
+      "stdout": "fitness.stdout.txt",
+      "stderr": "fitness.stderr.txt"
+    },
+    {
+      "id": "v2-offline",
+      "command": [
+        "python",
+        "-m",
+        "pytest",
+        "test/offline/test_bidding_v2.py",
+        "test/offline/test_pipeline_v2.py",
+        "test/offline/test_relevance_v2.py",
+        "test/offline/test_v2_boundary_regressions.py",
+        "test/offline/test_v2_eval.py",
+        "test/offline/test_v2_governance.py",
+        "test/offline/test_v2_mutation.py",
+        "test/offline/test_v2_settlement_boundaries.py",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--cov=src/bidding",
+        "--cov-report=term-missing",
+        "--cov-fail-under=90"
+      ],
+      "exit_code": 0,
+      "started_at": "2026-11-22T14:08:52.641956+00:00",
+      "stdout": "v2-offline.stdout.txt",
+      "stderr": "v2-offline.stderr.txt"
+    },
+    {
+      "id": "demo",
+      "command": [
+        "python",
+        "scripts/demo_v2.py"
+      ],
+      "exit_code": 0,
+      "started_at": "2026-11-22T14:09:43.378894+00:00",
+      "stdout": "demo.stdout.txt",
+      "stderr": "demo.stderr.txt"
+    },
+    {
+      "id": "v2-replay",
+      "command": [
+        "python",
+        "eval/v2_runner.py"
+      ],
+      "exit_code": 0,
+      "started_at": "2026-11-22T14:09:45.108121+00:00",
+      "stdout": "v2-replay.stdout.txt",
+      "stderr": "v2-replay.stderr.txt"
+    },
+    {
+      "id": "loopback-rerun",
+      "command": [
+        "python",
+        "-m",
+        "pytest",
+        "test/offline/test_v2_boundary_regressions.py::test_real_loopback_slow_drip_respects_total_deadline",
+        "-q",
+        "-rs",
+        "-p",
+        "no:cacheprovider"
+      ],
+      "exit_code": 0,
+      "environment": "outside filesystem/network sandbox; 127.0.0.1 only",
+      "stdout": "loopback-rerun.stdout.txt",
+      "stderr": "loopback-rerun.stderr.txt",
+      "reason": "initial targeted run skipped this test because loopback was unavailable"
+    }
+  ],
+  "targeted_suite_summary": {
+    "passed": 303,
+    "skipped": 1,
+    "skipped_case_rerun_passed": true,
+    "bidding_statement_coverage_percent": 95.59
+  }
+}

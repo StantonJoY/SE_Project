@@ -1,6 +1,6 @@
 # SE Project — 场景化广告推荐引擎（Ad Recommendation Engine）
 
-## V2 本地演示与当前状态（2026-10-31）
+## V2 演示与交付状态（2026-11-22）
 
 V2 在 V1 上增加确定性单赢家竞价和 SQLite 持久预算；原 19 条 V2 需求已在同一注册表激活。LLM 只给相关性，`relevance*bid`、ID 平局、pay-as-bid 价格和花费由代码决定。合规拒绝发生在扣费之前；预算、幂等结果和权威审计同事务提交。报价由 `data/bids-v2.json` sidecar 提供。
 
@@ -15,9 +15,9 @@ pytest test/offline -q --cov=src/bidding --cov-report=term-missing --cov-fail-un
 
 CLI 默认 `fixed`，账本默认 `logs/bidding-v2.sqlite3`；同 ID 同输入重复请求返回保存响应，不重扣费。修改输入须使用新的 request_id；发生 status_unknown 时用原 ID 原输入恢复，不能假定零收费。重新运行演示应依其脚本说明使用独立数据库，禁止靠重新 seed 重置历史花费。
 
-HTTP 路径使用标准库 urllib 和 chat-completions 协议。在本地通过环境变量提供密钥，默认名称为 `V2_LLM_API_KEY`，也可用 `--api-key-env` 指定。显式选择 `--provider http --model <model> --base-url <API-root>`（或 `--endpoint <complete-url>`）。CityU 的 `CS5351/DeepSeek-V4-Flash` 已通过正常成交、请求重放和医疗品类拒绝的真实调用验证。可重复执行的 live 测试套件、质量评估、p95 和成本测量仍待完成。V2 按 UTF-8 字节数保守估算上下文用量，超过 2000 上限即拒绝。[真实调用记录](docs/review-memo.md#cityu-真实调用与本地钩子复核2026-11-05)
+HTTP 路径使用标准库 urllib 和 chat-completions 协议。在本地通过环境变量提供密钥，默认名称为 `V2_LLM_API_KEY`，也可用 `--api-key-env` 指定。显式选择 `--provider http --model <model> --base-url <API-root>`（或 `--endpoint <complete-url>`）。CityU 的 `CS5351/DeepSeek-V4-Flash` 已通过正常成交、请求重放和医疗品类拒绝的真实调用验证。[历史真实调用记录](docs/review-memo.md#cityu-真实调用与本地钩子复核2026-11-05)。后续已有 [V2 relevance live harness](test/live/run_v2_relevance_live.py) 和 [真实模型实验报告](docs/testing/V3-Live-Prompt-Semantic-Report.md)，后者针对 `deepseek-flash` 的直接客户端实验，不独立证明完整 live 管道的审计落库；广泛质量、线上 p95 与实际费用仍待测。V2 按 UTF-8 字节数保守估算上下文用量，超过 2000 上限即拒绝。
 
-V2 的实现、干预和验证摘要见 [AI 使用记录](docs/ai-use-log.yaml) 和 [评审备忘录](docs/review-memo.md)。原始 agent 会话、工具输出和干预注释在本地归档，课程如需原始证据，由团队另行提交。部分协作正文仍无法导出为可读文本。正式人工前置测试批准、最终验收和远程 CI/分支保护仍待处理，详见 [V2 审批状态](docs/v2-approval-status.yaml)。
+V2 已随 [PR #2](https://github.com/StantonJoY/SE_Project/pull/2) 合入 `main`；成员 C 自评已随 [PR #5](https://github.com/StantonJoY/SE_Project/pull/5) 合入。[V2 交付总结](docs/testing/V2-Delivery-Summary.md)汇总实现、测试和演示证据。`main` 已设置分支保护，远端 CI 已实际运行；当前 Gate 5 回归失败，不能视为全绿。`TA-0006` 记录了部分既有测试的事后验收，历史前置批准缺口及完整 V2 正式验收仍保留。原始会话完整性须结合本地归档与仓库材料逐项核对，现有整理稿不替代完整原始记录。详见 [V2 审批状态](docs/v2-approval-status.yaml)、[AI 使用记录](docs/ai-use-log.yaml)和 [评审备忘录](docs/review-memo.md)。
 
 `PyYAML` 为运行时依赖（配置实际使用）；`pytest-cov` 为开发依赖，由 CI 命令行测 bidding >=90% 覆盖率。后面的课程状态表为 V1 历史快照，其计数和“尚无 prompt/联网”说明不代表当前 V2 状态。
 

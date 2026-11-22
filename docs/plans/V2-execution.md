@@ -1,5 +1,7 @@
 # V2 执行计划与真实授权边界
 
+> **交付状态核对：2026-11-22**。V2 已随 [PR #2](https://github.com/StantonJoY/SE_Project/pull/2) 合入 `main`；成员 C 自评已随 [PR #5](https://github.com/StantonJoY/SE_Project/pull/5) 合入。下文第 1–6 节保留原实施阶段的计划与授权范围；当前结果、验证范围及未完成项见第 7 节。
+
 基线：a31860fc3fb7c0710cf2d7ed157d3ebab2dafe77。目标：在 V1 上增加单赢家竞价和持久预算结算。
 
 ## 1. 来源与授权
@@ -48,3 +50,20 @@ V1 全套回归；至少 10 条 V2 固定评估；保留团队既有覆盖率和
 ## 6. 回退与未知结果
 
 本轮仅在本地功能分支，不合并远程 main。不成功的预算事务回滚；已提交但响应未知的请求用同一 request_id 查询恢复。不得将状态未知伪报为未收费。数据库全不可用时无法保证持久化审计，这一异常应明确报告，不承诺不可能实现的保证。
+
+## 7. 实施结果与交付核对（2026-11-22）
+
+| 计划内容 | 当前结果 | 可核查入口 |
+|---|---|---|
+| 单赢家、整数金额、确定性评分和平局 | 已实现，pay-as-bid | `src/bidding/models.py`、`engine.py`；`test/offline/test_bidding_v2.py` |
+| 预算持久化、幂等、并发与原子审计 | 已实现；预算/结果/审计同事务；未知结果同 ID 恢复 | `src/bidding/ledger.py`；`test/offline/test_v2_settlement_boundaries.py` |
+| AI 建议与最终合规权威分离 | 已实现；模型不能写经济字段，合规拒绝零扣费 | `src/selector/relevance.py`、`src/app/pipeline_v2.py`；`test/offline/test_pipeline_v2.py` |
+| CLI、严格输出、固定评估和演示 | 已实现；固定离线与 HTTP 提供者分开 | `src/app/cli_v2.py`、`src/render/schema_v2.py`、`eval/v2_runner.py`、`scripts/demo_v2.py` |
+| 原 19 条 V2 需求的追踪与验证 | 有实现和测试映射；不等于全部正式人工验收 | [覆盖表](../code-governance/acceptance-coverage-map.yaml)、[V2 交付总结](../testing/V2-Delivery-Summary.md) |
+| 上传和协作交付 | PR #2 已合并，后续 V3 复用 V2；PR #5 补入个人自评 | PR #2 merge `143cba6`；PR #5 merge `7c459c9` |
+| CI 与远端保护 | 工作流已实际执行；`main` 已设 6 项必需检查与 Code Owner 评审规则 | [分支保护](../branch-protection.md)；当前 Gate 5 失败仍须排障，不能宣称全绿 |
+| 人工批准 | `TA-0006` 已记录部分既有测试的事后验收；历史前置批准证据仍缺失 | [批准记录](../test-approvals.yaml)、[V2 审批状态](../v2-approval-status.yaml) |
+
+本次补文档时重新执行的 V2 离线测试、演示、回放及原始输出见 [本次验证](../../evidence/v2/v2-20261122-6578062-docs-check/README.md)。历史 CityU smoke 与后续直接 relevance-client 实验分别列在交付总结中，不能混写成同一批完整端到端实测。
+
+仍保留的工作：运行时 monitor 接线、广泛人工标注的 live 质量与线上 p95/实际费用评估、全部 V2 的正式验收、D5 原始会话完整性核对，以及当前远端回归故障。它们各自需要实现、测量或真实记录，不能通过填写计划页完成。V1/V3 历史计划与全组报告提交任务不计作本次 V2 文档完成项。

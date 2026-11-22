@@ -52,6 +52,7 @@
 | 想知道 | 读 |
 |---|---|
 | V3 测试做了什么、结论如何 | [`testing/V3-Test-Report.md`](testing/V3-Test-Report.md) |
+| V2 完成了什么、证据在哪、还欠什么 | [`testing/V2-Delivery-Summary.md`](testing/V2-Delivery-Summary.md) |
 | 逐条执行记录 | [`testing/V3-Test-Execution.md`](testing/V3-Test-Execution.md) |
 | 真实模型提示词效果 | [`testing/V3-Live-Prompt-Semantic-Report.md`](testing/V3-Live-Prompt-Semantic-Report.md) |
 | 演示脚本与截图 | [`testing/V3-Demo-Script.md`](testing/V3-Demo-Script.md)、[`testing/V3-Demo-Screenshots.md`](testing/V3-Demo-Screenshots.md) |
