@@ -48,23 +48,37 @@
 
 ## 3. CODEOWNERS（已落地：`.github/CODEOWNERS`）
 
-```text
-*                          @StantonJoY @Synapse2002 @gaozhechun408-eng
-/src/compliance/           @StantonJoY @Synapse2002
-/src/ads/schema.py         @StantonJoY
-/data/                     @StantonJoY @Synapse2002
-/docs/req/                 @StantonJoY
-/docs/architecture/        @StantonJoY
-/src/corpus/               @StantonJoY @Synapse2002   # V3 新增
-/src/selector/             @StantonJoY
-/scripts/mutation_check.py @StantonJoY @gaozhechun408-eng
-/eval/                     @StantonJoY @gaozhechun408-eng
-/test/offline/             @gaozhechun408-eng @StantonJoY
-/.github/                  @StantonJoY
+**设计目标是"文档好改、代码要审"**。GitHub **不支持按路径豁免评审**（评审要求是分支级、全有或全无），
+因此用下面的组合模拟：
+
 ```
+required_approving_review_count = 0     # 默认不需要批准
+require_code_owner_reviews    = true    # 但被 CODEOWNERS 覆盖的路径需要 owner 批准
+```
+
+于是：
+
+| 变更内容 | 结果 |
+|---|---|
+| 只改 `docs/`、`README.md`、`Report.md`（**未列入 CODEOWNERS**） | 只需过 CI，**不需要任何批准** |
+| 改 `src/`、`data/`、`scripts/`、`eval/`、`test/`、`.github/`、`AGENTS.md`、blueprint | 需要所列 owner 之一批准 |
+
+```text
+/src/                        @StantonJoY @Synapse2002
+/data/                       @StantonJoY @Synapse2002
+/scripts/                    @StantonJoY @gaozhechun408-eng
+/eval/                       @StantonJoY @gaozhechun408-eng
+/test/                       @gaozhechun408-eng @StantonJoY
+/.github/                    @StantonJoY
+/AGENTS.md                   @StantonJoY
+/architecture-blueprint.md   @StantonJoY
+```
+
+**刻意没有 `*` 通配**：`*` 会让所有路径都需要批准，文档 PR 就免不了签。
 
 > **校准提示**：CODEOWNERS 里的账号若不在协作者列表中，GitHub **不会报错**，只会让该条规则静默失效。
 > 启用保护前请确认这三个 handle 都在 `Settings → Collaborators` 里。
+> 另：GitHub 不允许批准自己的 PR，改 `src/` 的 PR 必须由另一位 owner 批。
 
 **注意**：CODEOWNERS 只强制"必须有人评审"，**不检查是否附带 ADR**——
 后者由 `check_safety_paths.py` 在 CI 中强制。两者互补，与课程
@@ -98,15 +112,27 @@
 
 1. **Branch name pattern**：`main`
 2. 勾选 **Require a pull request before merging**
-   - **Require approvals**：`1`（≥1 名人工评审者）
+   - **Require approvals**：`0` ← 关键：让文档 PR 不需要签
    - 勾选 **Dismiss stale pull request approvals when new commits are pushed**
-   - 勾选 **Require review from Code Owners**
+   - 勾选 **Require review from Code Owners** ← 代码路径由 CODEOWNERS 兜住
 3. 勾选 **Require status checks to pass before merging**
    - 勾选 **Require branches to be up to date before merging**
-   - 在搜索框中逐个加入上表 6 个 check 名（**首次需先有一次 PR 运行过 CI，名称才会出现**）
+   - 逐个加入 6 个 check 名（**首次需先有一次 PR 运行过 CI，名称才会出现**）
+   - ⬜ 暂不勾 `Gate 1 · Test approval`
 4. 勾选 **Require conversation resolution before merging**
-5. 勾选 **Do not allow bypassing the above settings**（含管理员）
-6. 勾选 **Restrict who can push to matching branches**（可选，推荐）
+5. ⬜ **Do not allow bypassing the above settings** —— **先不勾**
+   - 不勾 = 管理员可以直推 `main`（你可以在需要时直接推文档，也会绕过代码评审，属已知取舍）
+   - 勾 = 管理员也不能直推，所有改动必须走 PR
+6. ⬜ **Restrict who can push to matching branches** —— 暂不勾（勾了会把 admin 直推也关掉）
+7. **Block force pushes / Prevent deletion**：保持勾选（默认阻止强推与删除）
+
+**三种可选形态**（按你的偏好选）：
+
+| 形态 | 文档怎么改 | 代码怎么改 | 代价 |
+|---|---|---|---|
+| **A. 推荐**：approvals=0 + Code Owners | 开 PR，过 CI 即可合（不需批准），或 admin 直推 | 必须 PR + 另一位 owner 批准 | 无 |
+| B. 严格：approvals=1 + 不勾 bypass | 也要 1 个批准 | 必须 PR + 1 批准 + owner | 文档改动也要等人 |
+| C. 仅 admin 直推：不勾 "Require a pull request" | 直推 | 直推（无评审） | 保护基本失效，不推荐 |
 
 ### 方式 B：`gh` CLI（需仓库管理员权限）
 

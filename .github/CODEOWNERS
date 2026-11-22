@@ -1,25 +1,27 @@
-# 安全关键路径须人工评审（课程 BP-2）
-# 生效条件：分支保护里勾选 "Require review from Code Owners"
+# Code Owners —— 只覆盖「代码 / 数据 / 验证 / 治理」路径
 #
-# ⚠️ GitHub 不允许批准自己的 PR。单人仓库勾上后无法自行合并（见 docs/branch-protection.md §6）。
-# ⚠️ 账号名必须是本仓库真实的协作者；写错不会报错，只会让该条规则静默失效。
+# 设计前提（见 docs/branch-protection.md §3）：
+#   分支保护设为 required_approving_review_count = 0 + require_code_owner_reviews = true。
+#   于是：**列在这里的路径**改动 → 需要 owner 批准；
+#         **未列出的路径**（docs/、README.md、*.md 文档）→ 只需过 CI，无需批准。
+#
+# 刻意**不加** `*` 通配：GitHub 的 `*` 会让所有路径都需批准，文档 PR 就免不了签。
+#
+# ⚠️ 账号必须是本仓库真实协作者；写错不报错，只会让该条规则静默失效。
+# ⚠️ GitHub 不允许批准自己的 PR：改 src/ 的 PR 必须由另一位 owner 批。
 
-# 默认所有路径需要评审（任一协作者批准即可）
-*                          @StantonJoY @Synapse2002 @gaozhechun408-eng
+# 源码（含 V3 新增的 corpus 与 prompt 层）
+/src/                        @StantonJoY @Synapse2002
 
-# 安全关键路径：必须由架构/安全负责人评审
-/src/compliance/           @StantonJoY @Synapse2002
-/src/ads/schema.py         @StantonJoY
-/data/                     @StantonJoY @Synapse2002
-/docs/req/                 @StantonJoY
-/docs/architecture/        @StantonJoY
+# 数据与安全关键配置
+/data/                       @StantonJoY @Synapse2002
 
-# V3 新增的安全关键面
-/src/corpus/               @StantonJoY @Synapse2002
-/src/selector/             @StantonJoY
-/scripts/mutation_check.py @StantonJoY @gaozhechun408-eng
-/eval/                     @StantonJoY @gaozhechun408-eng
+# 验证与治理工具
+/scripts/                    @StantonJoY @gaozhechun408-eng
+/eval/                       @StantonJoY @gaozhechun408-eng
+/test/                       @gaozhechun408-eng @StantonJoY
 
-# 验证资产：测试负责人把关
-/test/offline/             @gaozhechun408-eng @StantonJoY
-/.github/                  @StantonJoY
+# 流程与架构入口文档（改动影响 agent 与分支保护本身）
+/.github/                    @StantonJoY
+/AGENTS.md                   @StantonJoY
+/architecture-blueprint.md   @StantonJoY
