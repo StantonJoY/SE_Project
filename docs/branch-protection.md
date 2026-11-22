@@ -259,3 +259,19 @@ remote: - 6 of 6 required status checks are expected.
 2. 经典界面 → 取消勾选 “Do not allow bypassing the above settings”。
 
 两种都会同时放开**代码**直推，属已知取舍。
+
+### 9.3 加入 bypass 后：直推恢复（2026-11-22 21:2x）
+
+把仓库所有者加入 Bypass list 后重试：`52717b6..20d5856 main -> main`，**成功**。
+GitHub 仍会打印 `6 of 6 required status checks are expected` 作为提示，但被 bypass 放行。
+
+三段对照（同一账号、同一命令、只改设置）：
+
+| 阶段 | 直推结果 |
+|---|---|
+| 保护开启前 | ✅ 成功（无规则） |
+| 保护开启、无 bypass | ❌ 被拒（`push declined due to repository rule violations`） |
+| 保护开启 + admin bypass | ✅ 成功（提示仍在，放行） |
+
+**结论**：规则对普通成员生效、对 admin 放行——与 §5 形态 A 的设计一致。
+代价：admin 对**代码**同样可直推，机器不再强制"代码必须评审"。
