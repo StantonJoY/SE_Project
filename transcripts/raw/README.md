@@ -6,6 +6,8 @@
 |---|---|---|---|
 | `2026-10-06-session.v4.jsonl.zstd` | `session-a8810df4-2c17-4226-b48e-1a453890c191` | ~5.9 MB | V1 从零构建（2026-10-06 → 11-02，39 轮 / 1149 次工具调用 / 16 次审批） |
 | `2026-11-17-session.v4.jsonl.zstd` | `session-7cc4a18d-21fb-4881-a8a8-9fc484f2ecca` | ~1.1 MB | V2 整合与 CI 修复（12 轮 / 189 次工具调用） |
+| `2026-11-19-session.v4.jsonl.zstd` | `session-43b97b962c9f53a28016c3be51169d0d` | ~0.22 MB | V3 测试与验证（2026-11-19 → 11-22，69 轮 / 351 次工具调用 / 2 次审批；OpenCode v4 兼容导出） |
+| `2026-11-22-session.v4.jsonl.zstd` | `session-57b77933e4ac52b08e09ca2f033deb2a` | ~0.10 MB | V3 最终验收 Demo（2026-11-22，49 轮 / 217 次工具调用 / 6 次审批；OpenCode v4 兼容导出） |
 
 ## 格式
 

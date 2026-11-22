@@ -12,6 +12,8 @@ agent 实际承担了什么、什么时候被调用、人类如何审核/纠正/
 | 3 | `session-b0e6882` | 2026-11-04 → 11-11 | **V1 测试与证据**：Mock/Offline 测试、证据采集、截图演示、推送验证；45 轮 / 175 次工具调用 / 0 次审批，源事件 425 条 | [`2026-11-04-v1-testing-and-evidence.md`](2026-11-04-v1-testing-and-evidence.md) | `raw/2026-11-04-session.v4.jsonl.zstd` |
 | 4 | `session-5486afbc` | 2026-11-16 → 11-18 | **V2 测试与验证**：独立 worktree/Conda、竞价与结算、V1 回归、Live 测试、截图演示、证据封装；摘要 18 轮 / 20 个工具块，原始 84 轮 / 120 次工具调用 / 0 次审批 | [`2026-11-18-v2-testing-and-evidence.md`](2026-11-18-v2-testing-and-evidence.md) | `raw/2026-11-16-session.v4.jsonl.zstd` |
 | 5 | `01a0b97e` | 2026-10-30 → 10-31 | **V2 开发与治理**（校准选录 3 轮 / 148 次监督工具调用 / 25 条干预） | [校准稿](2026-10-30-v2-build-and-governance.md) | [监督主会话校准导出](exports/2026-10-30-v2-supervisor.calibrated.jsonl.zstd) |
+| 6 | `session-43b97b96` | 2026-11-19 → 11-22 | **V3 测试与验证**：真实 Steam 语料、内容分级、manifest 修复、V1/V2 集成、replay/mutation/static/coverage、V1/V2 Live semantic；摘要 22 轮 / 30 个工具块 / 2 次审批，源事件 859 条 | [`2026-11-19-v3-testing-and-evidence.md`](2026-11-19-v3-testing-and-evidence.md) | `raw/2026-11-19-session.v4.jsonl.zstd` |
+| 7 | `session-57b77933` | 2026-11-22 | **V3 最终验收 Demo**：视频转截图、10 张截图、命令脚本、live harness 归档、evidence 封装与正式提交；摘要 13 轮 / 39 个工具块 / 6 次审批，源事件 535 条 | [`2026-11-22-v3-demo-and-acceptance.md`](2026-11-22-v3-demo-and-acceptance.md) | `raw/2026-11-22-session.v4.jsonl.zstd` |
 
 > 长会话（工具调用上千次）用 `--compact` 导出：助手正文截到 600 字符、工具调用按名称聚合，
 > 单条细节回 `raw/` 里查。短会话用完整模式，保留逐条工具参数与结果。
