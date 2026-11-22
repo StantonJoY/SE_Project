@@ -18,7 +18,7 @@ import yaml
 
 from ads.banned_words import BannedWords
 from ads.repository import AdRepository
-from app.cli import load_corpus_context
+from app.cli import load_corpus_context, write_stdout
 from app.pipeline_v2 import recommend_v2
 from bidding import Ledger, validate_bids
 from compliance.rules import SceneRules
@@ -194,7 +194,8 @@ def main(argv: list[str] | None = None) -> int:
         # Provider configuration errors are already scrubbed; never display credential values.
         print(f"V2 startup/request failed ({type(exc).__name__}): {exc}", file=sys.stderr)
         return 2
-    print(json.dumps(result, ensure_ascii=False, allow_nan=False, indent=args.indent or None))
+    # UTF-8 字节输出（F-006）：Windows 默认 stdout 是 GBK，重定向后机器读不了
+    write_stdout(json.dumps(result, ensure_ascii=False, allow_nan=False, indent=args.indent or None) + "\n")
     if result["kind"] == "status_unknown":
         print("Storage status unknown; retry the same request_id and identical inputs.", file=sys.stderr)
         return 1

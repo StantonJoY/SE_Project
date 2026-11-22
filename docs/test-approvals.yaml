@@ -197,6 +197,7 @@ approvals:
     req_ids: ["REQ-ADS-FR-004"]
     test_files:
       - "test/offline/test_v3_output_encoding.py"
+    actor_kind: "human"
     approved_by: "Shane"
     approved_at: "2026-11-22T19:56:00+08:00"
     implementation_commit: "pending"

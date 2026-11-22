@@ -80,6 +80,23 @@ def load_corpus_context(
     )
 
 
+def write_stdout(text: str) -> None:
+    """把 JSON 输出按 **UTF-8 字节**写出（F-006 / REQ-ADS-FR-004）。
+
+    Windows 下 `sys.stdout` 默认编码是 GBK/CP936，重定向到文件后得到的是 GBK 字节，
+    按 UTF-8 解析即失败——机器读不了。JSON 按 RFC 8259 必须是 UTF-8，
+    所以这里绕过文本层直接写 `sys.stdout.buffer`；没有缓冲区（如某些测试替身）时
+    退回普通写入，行为不变。
+    """
+    buffer = getattr(sys.stdout, "buffer", None)
+    if buffer is None:
+        sys.stdout.write(text)
+        sys.stdout.flush()
+        return
+    buffer.write(text.encode("utf-8"))
+    buffer.flush()
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="python -m app",
@@ -173,7 +190,7 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     indent = None if args.indent == 0 else args.indent
-    print(to_json(rec.result, indent=indent))
+    write_stdout(to_json(rec.result, indent=indent) + chr(10))
     # 审计 ID 走 stderr，保持 stdout 只含渲染结果（便于管道化消费）
     print(f"[audit_id] {rec.audit_id or '(审计失败)'}", file=sys.stderr)
     return 0
