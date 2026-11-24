@@ -1,5 +1,13 @@
 schema_version: "1.0"
 status: pending_human_acceptance
+checked_at: "2026-11-22"
+checked_source_commit: "65780628b724fdb6499625d45d4b8d9da5589bd0"
+delivery:
+  status: merged_to_main
+  implementation_pr: "https://github.com/StantonJoY/SE_Project/pull/2"
+  implementation_merge_commit: "143cba6b67a49eaf8cc5c314617f92ab78262319"
+  self_evaluation_pr: "https://github.com/StantonJoY/SE_Project/pull/5"
+  summary: docs/testing/V2-Delivery-Summary.md
 work_authorization:
   actor_kind: human
   actor: user_in_current_conversation
@@ -14,9 +22,29 @@ formal_test_approval:
   status: pending_human_acceptance
   approved_by: null
   approved_at: null
-  note: No new named human approval exists; historical TA-0001..0004 remain unchanged. Postimplementation acceptance cannot be backdated into preimplementation approval.
+  note: Historical V2 preimplementation approval evidence remains missing. TA-0006 records later acceptance of part of the existing test set and cannot satisfy approval-before-implementation or certify every V2 requirement.
+post_hoc_test_acceptance:
+  status: recorded_for_partial_existing_test_scope
+  records: [TA-0006]
+  approved_by: "Shane"
+  approved_at: "2026-11-22T20:05:00+08:00"
+  evidence: docs/test-approvals.yaml
+  note: The recorded scope spans 17 test files and 34 requirement IDs across versions; it is not full V2 formal acceptance.
 merge_readiness:
-  branch_protection: main_unprotected_as_of_2026_11_05
-  ci_execution: not_verified_remotely
-  live_model_validation: cityu_smoke_passed_live_suite_pending
-  local_pre_commit: installed_and_rehearsed
+  branch_protection: main_rules_observed_2026_11_22_six_required_checks_and_code_owner_review
+  branch_protection_evidence: docs/branch-protection.md
+  ci_execution: remotely_executed_current_main_regression_failed
+  ci_run: "https://github.com/StantonJoY/SE_Project/actions/runs/45029164091"
+  ci_note: CI execution is verified, not all checks passing. Gate 5 also failed on the prior self-evaluation PR; this document does not attribute the root cause.
+  live_model_validation: cityu_pipeline_smoke_and_later_direct_client_harness_passed_with_limits
+  live_model_evidence: docs/testing/V3-Live-Prompt-Semantic-Report.md
+  live_model_note: Historical CityU smoke and later deepseek-flash client experiments are separate runs. Broad live quality, online p95, real fees and complete live-pipeline audit provenance validation remain open.
+  local_pre_commit: installed_and_rehearsed_in_historical_v2_checkout_2026_11_05
+  local_pre_commit_note: Git hooks are local to each checkout and are not installed by cloning the repository.
+remaining_gaps:
+  - historical_preimplementation_test_approval
+  - full_v2_formal_acceptance
+  - full_raw_session_completeness_review
+  - runtime_monitor_collection_and_aggregation
+  - current_remote_regression_failure
+  - broad_live_quality_online_p95_and_actual_cost_measurement

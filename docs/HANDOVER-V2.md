@@ -1,5 +1,7 @@
 # V1 → V2 交接文档（Handover to Next Developer）
 
+> **历史交接快照说明（2026-11-22）**：本文件记录 V1 完成时给 V2 开发者的建议，保留当时数字和待办。V2 已完成核心实现并通过 PR #2 合入 `main`。当前结果见 [V2 交付总结](testing/V2-Delivery-Summary.md)、[执行计划收尾](plans/V2-execution.md#7-实施结果与交付核对2026-11-22)和 [审批状态](v2-approval-status.yaml)。实际采用 ADR-005 的 SQLite 原子结算及原目录增量方案；下文 `docs2/` 等历史建议不代表当前实施要求。课程要求仍以原项目说明 PDF 为准。
+
 > **快照日期**：2026-10-06 · **版本**：V1 完成（`docs/architecture/` 轮次）
 > **面向读者**：接手 V2（竞价轮次）开发的人
 > **先读**：本文件 → `AGENTS.md` → `Prompt.md` → `docs/HANDOVER.md`（V1 的技术交接）

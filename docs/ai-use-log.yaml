@@ -461,3 +461,32 @@ entries:
       需要改测试断言一处（元素数 7→9），按门禁 1 的时序先签 TA-0007 再改。
       未回填任何历史快照（HANDOVER.md / HANDOVER-V2.md / AGENTS V1-V2 段原样保留），
       也未改写测试报告里当次运行的 675 数字。
+
+  - id: "AIU-0030"
+    date: "2026-11-22"
+    agent: "Codex supervisor and independent documentation agents"
+    tool: "native collaboration + local Git/Python + read-only GitHub API"
+    role: "review"
+    task: "按用户要求完成 V2 相关文档：核对原课程 PDF、交付状态和证据，补齐报告数据流与验证索引"
+    artifacts:
+      - "Report.md"
+      - "README.md"
+      - "docs/plans/V2-execution.md"
+      - "docs/plans/REMAINING-WORK.md"
+      - "docs/plans/TD-001-monitor-wiring.md"
+      - "docs/testing/V2-Delivery-Summary.md"
+      - "docs/v2-approval-status.yaml"
+      - "docs/HANDOVER-V2.md"
+      - "docs/debt-register.md"
+      - "docs/review-memo.md"
+      - "docs/README.md"
+      - "evidence/v2/v2-20261122-6578062-docs-check/"
+    outcome: "revised"
+    evidence: "docs/testing/V2-Delivery-Summary.md"
+    review_kind: "ai_proxy"
+    notes: >-
+      用户授权文档收尾；独立 agent 只读核对课程及 V2 证据，报告 agent 仅修改 Report 的 V2 章节、架构表和成员 C 段落边界。
+      监督代理要求保留历史前置批准和会话完整性缺口，拒绝把未实现的 monitor、事后验收或 client-only live 实验标为全部完成。
+      新运行的 V2 定向测试为303通过1跳过，受限的回环测试放开本地端口后重跑通过；覆盖率95.59%、7项demo和18条固定回放通过。
+      独立复核要求将报告中的报价校验/场景筛选次序与实际代码对齐，并说明 V1 两种输出与 V2 三种输出；监督代理据此修正文档。
+      自评321词原文保持，仅两段合一；未补造姓名、贡献比例、原始会话或人工批准，未修改产品代码与测试。

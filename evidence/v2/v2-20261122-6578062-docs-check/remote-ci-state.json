@@ -1,0 +1,49 @@
+{
+  "checked_at": "2026-11-22T14:19:22.8400540Z",
+  "source_commit": "65780628b724fdb6499625d45d4b8d9da5589bd0",
+  "run": "https://github.com/StantonJoY/SE_Project/actions/runs/45029164091",
+  "jobs": [
+    {
+      "name": "Gate 2 · Static analysis",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/StantonJoY/SE_Project/actions/runs/45029164091/job/137228684748"
+    },
+    {
+      "name": "Gate 5 · Regression (full offline suite)",
+      "status": "completed",
+      "conclusion": "failure",
+      "html_url": "https://github.com/StantonJoY/SE_Project/actions/runs/45029164091/job/137228684980"
+    },
+    {
+      "name": "Gate 5b · Mutation verification",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/StantonJoY/SE_Project/actions/runs/45029164091/job/137228685068"
+    },
+    {
+      "name": "Gate 3 · Schema (requirements registry)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/StantonJoY/SE_Project/actions/runs/45029164091/job/137228685074"
+    },
+    {
+      "name": "Gate 4 · Semantic evaluation",
+      "status": "completed",
+      "conclusion": "skipped",
+      "html_url": "https://github.com/StantonJoY/SE_Project/actions/runs/45029164091/job/137228686016"
+    },
+    {
+      "name": "Gate 6 · AI-use log",
+      "status": "completed",
+      "conclusion": "skipped",
+      "html_url": "https://github.com/StantonJoY/SE_Project/actions/runs/45029164091/job/137228686653"
+    },
+    {
+      "name": "Gate 1 · Test approval",
+      "status": "completed",
+      "conclusion": "skipped",
+      "html_url": "https://github.com/StantonJoY/SE_Project/actions/runs/45029164091/job/137228717439"
+    }
+  ]
+}

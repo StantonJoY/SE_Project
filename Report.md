@@ -103,10 +103,12 @@ structural constraint S1 in `scripts/fitness_functions.py`):
 | ③ Compliance | `src/compliance/` | Five-step deterministic gate — **final authority** |
 | ④ Selector | `src/selector/` | Prompt assembly, model client, strict output parsing, explanation |
 | ⑤ App | `src/app/` | Orchestration, sanitize gate, fail-closed degradation, CLIs |
-| ⑥ Render | `src/render/` | Two-shape output contract and validation |
+| ⑥ Render | `src/render/` | Output validation: two forms in V1; `ad`, `no_ad`, `status_unknown` in V2 |
 | ⑦ Audit | `src/audit/` | Append-only JSONL audit and the monitor registry |
-| ⑧ Evaluation | `eval/` | Fixed case sets and deterministic replay |
+| ⑧ Bidding | `src/bidding/` | Deterministic auction and atomic budget, response and audit settlement |
 | ⑨ Corpus | `src/corpus/` | Read-only Steam corpus, projection, deterministic top-K, pricing |
+
+`eval/` and `scripts/` provide verification assets outside these nine runtime packages.
 
 The authority chain is the point of the design:
 
@@ -133,15 +135,70 @@ proves the ordering test fails.
 
 ### 2.3 V2: auction between advice and authority
 
-V2 inserts a deterministic auction *after* relevance advice and *before* compliance. Bids are
-integer cents, the winner is the highest `relevance × bid`, ties break on ascending `ad_id`,
-and the charge equals the winner's own bid (pay-as-bid). Budget, result and audit row are
-written in one SQLite transaction, and `request_id` makes every request idempotent. A
-fingerprint conflict returns `request_conflict` without charging.
+V2 adds a single-winner auction and a persistent budget ledger alongside the V1 entry point.
+The [V2 CLI](src/app/cli_v2.py) loads the scene, material repository, bid sidecar and rules,
+selects a fixed or explicitly configured HTTP relevance provider, and opens the SQLite
+ledger. `Ledger.seed()` installs the initial bid contract; reopening the same database with
+the same contract preserves spending rather than resetting the budget.
 
-The important architectural property is that the auction cannot weaken the gate: compliance
-still runs afterwards on the winner, and a rejected winner yields `no_ad` even though money
-was already computed. The ledger commit happens only after compliance approves.
+The [V2 pipeline](src/app/pipeline_v2.py) carries a request through the following boundaries:
+
+1. **Bind identity before new work.** A nonempty, valid-Unicode `request_id` identifies the
+   logical request. The pipeline fingerprints the normalized scene, bids, material, rules,
+   banned words, model/prompt/policy versions and context budget. Mutable remaining balances
+   are excluded, so a retry after a successful charge still matches. `Ledger.lookup()` reads
+   the request table: an identical retry returns the saved response before calling the
+   provider; changed fingerprinted inputs return `request_conflict` without a new charge.
+2. **Build a safe, affordable candidate set.** After bid validation and budget loading,
+   scene filtering and affordability checks retain only active offers with enough remaining cents.
+   Original scene and material text is scanned for known injection patterns before any
+   provider call. The conservative UTF-8 byte estimate must fit the configured context
+   budget, which cannot exceed 2,000 estimated tokens. The model receives the scene and
+   candidate summaries, without bids or remaining balances.
+3. **Parse advice within a closed set.** `RelevanceClient.score(scene, candidates)` returns
+   raw JSON. `parse_relevance_output()` requires exactly the offered candidate IDs, integer
+   relevance in 0–100 and string reasons; missing, duplicate, foreign or extra fields fail
+   closed. Financial fields cannot be supplied by the model.
+4. **Compute the winner in code.** `choose_winner()` ranks positive integer
+   `relevance × bid_cents` scores, breaking ties by ascending `ad_id`. The charge is the
+   winner's own bid, in integer cents (pay-as-bid). All-zero relevance produces `no_ad`.
+5. **Apply final authority before charging.** The selected material passes the deterministic
+   compliance pipeline. A rejected winner produces `no_ad/compliance_rejected`; the system
+   does not automatically try the next candidate. Explanation text is read-only and can be
+   replaced with safe fallback text without changing the winner, price or compliance verdict.
+6. **Settle and preserve evidence together.** After output-schema validation,
+   [Ledger.finalize()](src/bidding/ledger.py) uses `BEGIN IMMEDIATE`, rechecks request identity
+   and the winner's current affordability, then commits the debit, saved response and one
+   authoritative audit record together. The response's before/after balances are taken from
+   this transaction, replacing the earlier snapshot. Rejected requests with a valid identity
+   are also finalized, with zero charge, when storage is available. Provider calls run outside
+   the transaction; audit history is never read to make a decision.
+
+The three public output forms are `ad`, `no_ad` and `status_unknown`. Their failure semantics
+matter as much as the successful auction:
+
+| Trigger | Public result | Settlement and recovery |
+|---|---|---|
+| Invalid model JSON or provider timeout | `no_ad/llm_output_invalid` or `no_ad/llm_timeout` | Save a zero-charge result and audit if storage is available |
+| Winner fails compliance | `no_ad/compliance_rejected` | No debit and no automatic replacement candidate |
+| Identical completed request is retried | Exact saved `ad` or `no_ad` | No new provider call, debit or audit row |
+| Existing ID is reused with changed fingerprinted inputs | `no_ad/request_conflict` | No new debit or audit row; the original result remains saved |
+| Another request consumes the winner's balance first | `no_ad/budget_race` | The failed charged transaction rolls back, then a zero-charge rejection is finalized if possible |
+| Lookup or finalization cannot establish a reliable storage outcome | `status_unknown` with `retry_same_request=true` | Make no claim about the charge; retry identical inputs with the same ID |
+
+Failures injected after debit, before audit insertion or before commit roll back the whole
+transaction. If a commit succeeded but its response was lost, the next identical request
+recovers the saved result. Generating a fresh ID would lose that recovery guarantee. Invalid
+request identities are rejected before durable recording, so the one-audit guarantee applies
+to finalized logical requests rather than every attempted call.
+
+Verification is traceable to the [pipeline tests](test/offline/test_pipeline_v2.py),
+[settlement boundary tests](test/offline/test_v2_settlement_boundaries.py),
+[relevance contract tests](test/offline/test_relevance_v2.py) and the independent
+[V2 fixed-case replay](eval/v2_runner.py) with its [case set](eval/v2_cases.json).
+These offline checks exercise deterministic behaviour; live-model quality is assessed
+separately. Historical pre-implementation approval gaps remain recorded in
+[the V2 approval status](docs/v2-approval-status.yaml).
 
 ### 2.4 V3: real corpus without breaking the contract
 
@@ -259,9 +316,7 @@ gap rather than backdate a timestamp.
 
 #### MEMBER C — self-evaluation
 
-I was responsible for iterating on and extending V2. Building on V1, I used Codex agents to develop a deterministic, single-winner advertising auction and persistent budget management. The model provided relevance scores, while the code ranked candidates using relevance multiplied by bid, resolved ties by advertisement ID, and charged the winner its own bid. Compliance checks retained the final authority to reject an advertisement before charging. SQLite ensured that budget updates, request results, and audit records were committed together, while request replay prevented duplicate charges. I also used the agents to check the implementation against the course specification and V2 handover document, run regression tests and fixed-case evaluations, organize verification materials, and prepare the GitHub submission. A subsequent CI configuration fix enabled GitHub Actions to run the checks. The missing evidence of pre-implementation human test approval remained documented as a process limitation.
-
-This group assignment differed from those in other courses and offered a fresh approach to project work. However, as AI becomes more capable, I feel that users’ interventions have a diminishing influence on the results of relatively straightforward tasks. During my V2 work, I tried different prompts and found little difference in the outputs. Nevertheless, I deliberately adopted more detailed conversational prompts partly to improve the presentation and make the amount of work involved more visible. This made me question how effectively the length or detail of a conversation demonstrates a student’s contribution. I considered using a weaker agent or model, but then wondered why I should choose an older, less capable tool when a better one was available simply to demonstrate my own ability. To me, that would be like applying an outdated standard after the circumstances had changed. My greatest gain from this project was the thinking that took place while using AI. Following the implementation, asking questions about its behavior, and examining the verification results helped me understand the project’s components and how they worked together.
+I was responsible for iterating on and extending V2. Building on V1, I used Codex agents to develop a deterministic, single-winner advertising auction and persistent budget management. The model provided relevance scores, while the code ranked candidates using relevance multiplied by bid, resolved ties by advertisement ID, and charged the winner its own bid. Compliance checks retained the final authority to reject an advertisement before charging. SQLite ensured that budget updates, request results, and audit records were committed together, while request replay prevented duplicate charges. I also used the agents to check the implementation against the course specification and V2 handover document, run regression tests and fixed-case evaluations, organize verification materials, and prepare the GitHub submission. A subsequent CI configuration fix enabled GitHub Actions to run the checks. The missing evidence of pre-implementation human test approval remained documented as a process limitation. This group assignment differed from those in other courses and offered a fresh approach to project work. However, as AI becomes more capable, I feel that users’ interventions have a diminishing influence on the results of relatively straightforward tasks. During my V2 work, I tried different prompts and found little difference in the outputs. Nevertheless, I deliberately adopted more detailed conversational prompts partly to improve the presentation and make the amount of work involved more visible. This made me question how effectively the length or detail of a conversation demonstrates a student’s contribution. I considered using a weaker agent or model, but then wondered why I should choose an older, less capable tool when a better one was available simply to demonstrate my own ability. To me, that would be like applying an outdated standard after the circumstances had changed. My greatest gain from this project was the thinking that took place while using AI. Following the implementation, asking questions about its behavior, and examining the verification results helped me understand the project’s components and how they worked together.
 
 #### MEMBER D — self-evaluation
 
