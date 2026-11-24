@@ -265,7 +265,13 @@ This group assignment differed from those in other courses and offered a fresh a
 
 #### MEMBER D — self-evaluation
 
-> **[To be written by MEMBER D. Do not submit this placeholder.]**
+My main contribution was independent quality assurance across the whole project, not only the final V3 round. I treated each delivered version as a separate test target and verified that it could be reproduced outside the original development workspace. For V1, I created an isolated test directory, confirmed the Conda environment and editable package path, and ran the deterministic offline tests, fixed evaluation replay, CLI scenarios, and evidence collection. I also checked the audit output and the fail-closed behaviour for invalid scenes. The V1 work established the testing pattern I reused later: verify the environment first, preserve the command output, record the exit code, and keep the evidence traceable.
+
+For V2, I used a separate worktree and Conda environment so the V1 baseline and evidence would not be overwritten. I tested the auction and settlement path, request idempotency, budget persistence, request conflicts, and regression against V1. I also supported the real-model path and recorded where Live testing differed from fixed offline behaviour. The screenshot demonstration, command scripts, manifest, and checksums were built so the reviewer could reproduce both the functional result and the limitations. This round made it clear that passing tests alone was not enough; the accounting, audit, and deployment boundaries also had to be checked.
+
+For V3, I verified the final corpus, investigated the manifest hash mismatch, confirmed the final JSONL data with the team, and checked content grading, age gating, V1/V2 integration, replay, mutation, static analysis, coverage, and live semantic evidence. The V3 work was important, but it was the same independent verification process applied to a larger and more safety-sensitive data set.
+
+Across all three rounds, I organized the execution records, raw logs, screenshots, checksums, and session transcripts. I kept unresolved issues visible. I did not own most product implementation, but I provided the external check on whether the delivered system, evidence, and claims matched each other.
 
 ---
 
