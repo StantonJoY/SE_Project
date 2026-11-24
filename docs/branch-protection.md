@@ -2,7 +2,9 @@
 
 > **V3 状态（2026-11-22）**：V3 已通过 PR #3（merge commit `8b5a17a`）合入 `main`。
 > 七道门禁（Gate 1/2/3/4/5/5b/6）已在 CI 中稳定运行；`.github/CODEOWNERS` 已落地。
-> **`main` 仍未启用远端保护** —— 这是下一步唯一待办（§5）。
+> **`main` 的远端保护已启用（2026-11-22 实测，证据见 §9）** —— 6 道 check 为必需，
+> 直推被拒（`push declined due to repository rule violations`）；仓库所有者被加入 bypass list 后可直推（§9.3）。
+> 唯一遗留未启用项是 **`Gate 1 · Test approval` 尚未加入必需 check**（§5 方式 A 第 3 步已有说明，见 §4 建议）。
 > ⚠️ 已知：Gate 1 在 V3 合并提交上为红（历史时序缺口，见 §6），**不影响**后续 PR 的判定。
 
 > 课程 §6 原文：
@@ -105,6 +107,10 @@ require_code_owner_reviews    = true    # 但被 CODEOWNERS 覆盖的路径需�
 ---
 
 ## 5. 设置方式
+
+> **状态**：本节是**已完成**的配置记录（2026-11-22 执行，实测见 §9）。保留操作步骤供复现与审计。
+> 实际生效的形态 = 下表「形态 A」：`required_approving_review_count = 0` +
+> `require_code_owner_reviews = true` + 6 道必需 check（**不含** Gate 1）+ 所有者 bypass。
 
 ### 方式 A：GitHub 网页
 
