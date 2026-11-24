@@ -92,4 +92,5 @@ no_implicit_optional = true
 check_untyped_defs = true
 
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["src", "."]
+exclude = ["test*", "eval*", "evidence*", "docs*", "data*", "transcripts*"]
