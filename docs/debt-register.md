@@ -40,6 +40,7 @@
 | 描述 | 追踪矩阵为每条需求定义了可度量的 monitor（如 `compliance_escape_count == 0`），但**没有任何一条落地**。当前系统运行期**无法发现任何不变量违例**。 |
 | 影响 | 安全主张只在离线测试中成立；生产运行无观测能力。课程口径："缺运行时 monitor → 无法发现生产故障"（note 行 5162） |
 | 补法 | P6 实现 `src/audit/` 时一并落地全部 monitor 定义 |
+| **状态** | `open` · `src/audit/metrics.py` 已登记 22 条 monitor，但 `MetricDefinition` 无 `source` 字段；`src/app/pipeline.py:127` 只填 2 条；`scripts/report_monitors.py`、`test/offline/test_monitors.py` 均不存在 · **处置**：`RW-01`（方案见 `docs/plans/TD-001-monitor-wiring.md`，须先签 `TA-0008`） |
 | **重开条件** | P6 完成前，Tier 3 验证视为不完整；**`compliance_escape_count` 是首个必须落地的 monitor** |
 | 负责人 | D（质量与治理） |
 
@@ -54,6 +55,7 @@
 | 描述 | `src/audit/`、`.opencode/permissions.jsonc`、pre-commit hook **全部未建**。因此 `INV-ADS-009`/`010`/`011`（三条流程不变量）**没有任何强制机制**。 |
 | 影响 | 课程标注**流程不变量 Required for full marks**（note 行 5122）；治理主张无法验证 |
 | 补法 | D3 交付 `.opencode/permissions.jsonc`；D4 交付 hook 与评估门 |
+| **状态** | `closed` · `src/audit/`、`.opencode/permissions.jsonc`、`docs/test-approvals.yaml` 均已建成；`INV-ADS-009/010/011` 分别由 `scripts/check_safety_paths.py`、`check_test_approval.py` 落在 CI 与 live 路径上 · **处置**：无（条目所述三个缺失件均已就位） |
 | **重开条件** | D3/D4 交付完成 |
 | 负责人 | D |
 
@@ -68,6 +70,7 @@
 | 描述 | `eval/eval_cases.json`（应 ≥20 条）与 `eval/eval_runner.py` 未建，语义评估门（课程门禁第 4 条）无法运行 |
 | 影响 | 无法阻断质量回退；`INV-ADS-016` 无法验证；CI 六道门禁缺第 4 道 |
 | 补法 | 建评估集；口径待 `OQ-005` |
+| **状态** | `closed` · `eval/eval_cases.json` 25 条 + `eval_runner.py` 已于 2026-10-06 建成；残留的真实 LLM 行为验证由 V3 的 `eval/v3_cases.json`（14 条）与 `test/live/` 补上 · **处置**：无 |
 | **重开条件** | `OQ-005` 定口径后 |
 | 负责人 | D |
 | **处置（已执行，2026-10-06）** | ✅ **已关闭**。评估集建成 **25 条** + `eval_runner.py` 一键 replay；`INV-ADS-016` 已可验证（`test_eval_runner.py` 的阈值与违规判定各 2 项）。**残留**：Tier 3 的"真实 LLM 下行为验证"仍待 P8（届时按 `ADR-003` T2 重标定口径）。 |
@@ -83,6 +86,7 @@
 | 描述 | `src/app/` 未建。`REQ-ADS-NFR-PERF-001` 必需的四个元素（timeout gate、fallback path、p95 监控、SLA drift alert）**全部缺失** |
 | 影响 | 按课程"性能陷阱"口径（note 行 590）：**无 fallback 则需求未实现**。即该条需求当前**是假的** |
 | 补法 | P5 实现 `src/app/` 编排与 `RP-008`/`RP-009` 策略 |
+| **状态** | `closed` · `src/app/pipeline.py` 已实现 10 条降级路径 + timeout gate；`test/offline/test_app_pipeline.py` 有对应反例 · **处置**：无 |
 | **重开条件** | P5 完成；在此之前 `REQ-ADS-NFR-PERF-001` 不得标为已满足 |
 | 负责人 | C（应用与集成） |
 
@@ -97,6 +101,7 @@
 | 描述 | 22 条基线需求中 9 条有测试证据、13 条待建；16 条不变量中 5 条有反例测试、11 条待建 |
 | 影响 | V1/V2 约束未完全满足；**三条流程不变量无覆盖**是最高优先项 |
 | 补法 | 随 P4/P5/P6 实现逐条补测；每条去向已在覆盖表登记 |
+| **状态** | `open` · 见 `docs/code-governance/acceptance-coverage-map.yaml`；V2/V3 新增需求已覆盖，但 V1 的 13 条需求 / 11 条不变量缺口未清零 · **处置**：`RW-04` / `RW-08`（须先 TA） |
 | **重开条件** | 每次实现推进后重跑 `fitness_functions.py`，覆盖数必须单调上升 |
 | 负责人 | D |
 
@@ -115,6 +120,7 @@
 | 描述 | `FR-001`、`FR-002`、`FR-004`、`ARCH-001`、`ARCH-004`、`NFR-SAFETY-002`、`NFR-SAFETY-003` 由 ADR-001 §5 权威分配表覆盖，但**未单列 ADR → REQ → Code → Tests → Monitoring 链** |
 | 影响 | 可追溯性不完整（课程行 1380 要求每个决策都可追溯） |
 | 补法 | 在本表或 trace-matrix §4 追加链 |
+| **状态** | `open` · `docs/architecture/trace-matrix.md` 已建成，但未逐条展开 7 条需求的决策链 · **处置**：需架构侧补写（`RW-18` 之外） |
 | **重开条件** | Sprint Review 前 |
 | 负责人 | A（产品与流程） |
 
@@ -129,6 +135,7 @@
 | 描述 | `config.yaml` 目前是静态文件。课程配置治理四条规则（行 1452–1457）中，"**非法值在启动时大声失败**"与"**初始化后不可变**"**均未实现** |
 | 影响 | 危险示例（课程行 1461）：`VHIS_DIAMOND_LIMIT=treu`（拼写错误）被静默当成 False。本项目同理——若阈值写错被静默取默认，`INV-ADS-006` 形同虚设 |
 | 补法 | 实现 `src/app/` 启动校验时补齐四条规则 |
+| **状态** | `closed` · 实现侧：`src/app/config.py` 已实现启动期大声失败（`ConfigError` + 类型/范围校验，4 处 `raise ConfigError`），初始化后不可变由 `AppConfig` 为 `@dataclass(frozen=True)` 保证 —— **两条规则均在实现中成立**。<br>**已知残留**：配置校验分支目前**无直接反例测试**（全仓库无 `raises(ConfigError)`，`test_app_pipeline.py` 只调用 `AppConfig.load(config.yaml)` 的成功路径）。按 `INV-ADS-011` 的标准（每条不变量须有会失败的反例），这一块证据不足；请勿把本条状态当作"已有测试保护"。 · **处置**：实现已闭环；测试证据缺口随 `TD-018`（门禁 1 时序与证据）一并收敛 |
 | **重开条件** | P5 完成 |
 | 负责人 | C |
 
@@ -143,6 +150,7 @@
 | 描述 | 审计记录含 `user_tags`（`student`/`parent`/`office_worker`/`gamer`），**是 PII 代理**——配上时间戳与设备可构成可关联的行为记录。当前**没有任何隐私不变量**约束它 |
 | 影响 | 合规风险；课程对应 VHIS 的 `SEC-002`（授权角色 + 7 年审计）与"Patient data: hashed refs"处理方式，本项目无对应物 |
 | 补法 | 建议新增 `REQ-ADS-SEC-003` + 对应不变量（如 `INV-ADS-017`），规定标签最小化或哈希 |
+| **状态** | `open` · `src/audit/store.py` 仍写入 `user_tags` 原文，无最小化/哈希 · **处置**：`RW-05`（改审计结构须 ADR） |
 | **重开条件** | **`src/audit/` 落地前必须定案**（否则先落地再改代价高） |
 | 负责人 | D + B |
 
@@ -157,6 +165,7 @@
 | 描述 | 保留期未决策。若声称 7 年（对齐课程 VHIS），载体 `logs/audit.jsonl` 是普通追加文件，**无哈希链、无只追加介质保证** |
 | 影响 | 声称的保留期不可兑现，属自我欺骗式合规 |
 | 补法 | 先定保留期（建议有限 + 可配置）；若需长保留，须引入防篡改机制（课程 B3 的 WAL + 哈希链模式） |
+| **状态** | `open` · 保留期仍未决策；`logs/audit.jsonl` 仍是普通追加文件，无哈希链 · **处置**：`RW-07`（须人类给结论或 wontfix） |
 | **重开条件** | 保留期决策完成 |
 | 负责人 | D |
 
@@ -171,6 +180,7 @@
 | 描述 | V3 的**模块级**要求已达标；**函数级**（每个测试引用自己的 ID）未达标 |
 | 影响 | 追溯粒度较粗——能定位到模块，不能定位到具体测试验证哪条准则 |
 | 补法 | 逐函数补 docstring |
+| **状态** | `open` · `test/offline/test_requirements_registry.py` 的测试函数仍未逐函数标注 REQ/INV docstring · **处置**：`RW-04`（须先 TA） |
 | **重开条件** | 下次测试改动时一并补齐 |
 | 负责人 | D |
 
@@ -186,6 +196,7 @@
 | 影响 | 存在"测试迎合实现"的风险——测试可能描述实现而非规格 |
 | 缓解（已做） | 测试 docstring 显式声明验证的 REQ/INV ID；`test_requirements_registry.py` 含 24 个负向测试证明门禁真的会拦 |
 | 补法 | 正式 CI 建立时，由不同 agent 或不同人承担 Tester 角色 |
+| **状态** | `open` · V2/V3 已出现 `TA-0005`/`TA-0007` 的正例（先签后实现），但整体角色分离仍由同一 agent 兼任 TESTER · **处置**：`RW-04` / `RW-08` 的 TA 流程是收敛路径 |
 | **重开条件** | D3/D7 CI 与角色配置落地时 |
 | 负责人 | team |
 
@@ -203,6 +214,7 @@
 | 描述 | `scripts/_renumber_v2_candidates.py`（一次性维护脚本，已无用途）与 `.dsh_write_probe.tmp`（权限探查残留）。受限沙箱禁止子进程删除子目录内文件，故 agent 无法自行清理 |
 | 影响 | `git status` 出现无关文件；`scripts/` 混入非交付脚本 |
 | 补法 | **人工删除**。两者均不应入库 |
+| **状态** | `open` · 探查残留文件需人类确认后手工删除 · **处置**：需人类操作，无机械补法 |
 | **重开条件** | 立即（提交前） |
 | 负责人 | 人工 |
 
@@ -218,6 +230,7 @@
 | 影响 | 改动**仅为 docstring**，无逻辑变更（可从 `git diff` 核实），**不改变任何行为或不变量强制**。但流程上属违规：① `AGENTS.md` 该规则成文于改动之后，agent **无法预知**；② 即便如此，`ADR-002` §2 D4 的 safety-critical 清单**在改动之前就已存在**，因此 `src/compliance/models.py` 的改动**本应先请批准**。 |
 | 缓解（已做） | 已在 `review-memo.md` §5「是否触及 safety-critical 路径」如实申报；本条目即披露。 |
 | 补法 | ① 保留 docstring 改动（回滚会重新违反 S3，且无行为影响）；② **人工复核并追认**，或指示 agent 撤销；③ 后续任何对受保护路径的改动**一律先请批准**。 |
+| **状态** | `closed` · 该次违规已在 `docs/review-memo.md`、`docs/ai-use-log.yaml` 与 `AGENTS.md` 落地记录；前向约束由 `check_safety_paths.py` 强制 · **处置**：无（事后披露条目，记录即闭环） |
 | **重开条件** | 人工复核后关闭。**若判定应撤销，需同时为 S3 提供不触碰受保护文件的替代方案**（例如把追溯信息集中到独立映射文件而非模块 docstring）。 |
 | 负责人 | 人工（架构负责人 B + 质量负责人 D） |
 
@@ -232,6 +245,7 @@
 | 描述 | 三个 safety-critical 数据加载器（`AdRepository.load`、`BannedWords.load`、`SceneRules.load`）现均为 fail-closed 且各有专属异常类型，但**没有任何不变量或结构约束强制这一点**。`BannedWords` 原先正是漂移的实例（泛型 `ValueError` + 无存在性预检 + 零负向测试） |
 | 影响 | 新增加载器时可能再次出现"有的 fail-closed、有的 fail-open"的不一致，而安全主张依赖**所有**入口一致 |
 | 补法 | 新增一条不变量（建议 `INV-ADS-017`）：所有 safety-critical 数据加载器必须① 使用专属异常类型；② 拒绝文件缺失/格式非法/**空内容**；③ 有至少一个负向测试。并在 `structural-constraints.md` 增一条可机械检查的规则 |
+| **状态** | `open` · 三个加载器仍各自定义异常类型，无统一不变量约束 · **处置**：`RW-06`（`invariants.md` 属 HUMAN ONLY） |
 | **重开条件** | 任何新增加载器之前 |
 | 负责人 | D |
 
@@ -248,6 +262,7 @@
 | 补法 | 各补一条**未声明对应素材级限制**的同类素材（如一条不声明 `not_night` 的 gaming 广告、一条不声明 `not_campus` 的 adult 广告），使两层解耦并可分别验证 |
 | **处置（已执行）** | 已补 4 条解耦素材：`ad_010`、`ad_011`（gaming，未声明 `not_night`）与 `ad_012`（adult，未声明 `not_campus`）。**实测已验证规则级真正生效**：夜间场景下 `ad_010`/`ad_011` 通过预筛但被终检的品类规则拒绝；校园场景下 `ad_012` 同理（见 `audit_implementation.py` C 段输出） |
 | **残留** | 尚无**测试**直接断言"规则级独立生效"——当前仅由审计脚本（非 pytest）覆盖。建议后续补一条 `test_compliance.py` 用例，用解耦素材断言 `rejected_rule() == "scene"` 且 detail 含"夜间禁展示"/"校园禁展示" |
+| **状态** | `open` · `data/ads.json` 的解耦素材 `ad_010`/`ad_011`（gaming，`not_night: false`）/ `ad_012`（adult，`not_campus: false`）已就位；但 `test/offline/test_compliance.py:168` 与 `:175` **仍用 ad_003 / ad_006**（二者已被素材级 `not_night`/`not_campus` 先拦下），规则级分支仍无独立断言 · **处置**：`RW-08`（须先 TA；把夹具换成 `ad_010`/`ad_012` 即可解耦） |
 | **重开条件** | 补上测试后关闭 |
 | 负责人 | C |
 
@@ -262,6 +277,7 @@
 | 描述 | `category_blacklist: [medical, financial_guarantee, adult]`，但素材库 7 个品类中**没有 `medical`** → 该黑名单项永久空转（审计发现 `AF-001`） |
 | 影响 | `REQ-ADS-NFR-SAFETY-002` 的 fit criterion 是"黑名单品类广告展示数 = 0"。当时 `medical` 的"0"是**因为素材库根本没有医疗广告**（vacuous truth），不是因为有 gate 拦住它。空泛满足不等于经验证满足 |
 | **处置（已执行）** | 已补 `ad_009`（`medical`，未声明素材级限制）与 `ad_013`（`medical`，`banned_check=pending`）；并新增 `test_ads.py::test_every_rule_category_has_material` 作为**死规则防线**——规则引用的品类必须在素材库中存在，否则测试失败 |
+| **状态** | `closed` · 见本条目处置行；`audit_implementation.py` C 段已无死规则报告 · **处置**：无 |
 | **重开条件** | 已关闭。后续禁止再次引入"规则引用了不存在品类"的情形（由上述测试强制） |
 | 负责人 | C |
 
@@ -276,6 +292,7 @@
 | 描述 | `banned_check`（取值 `checked`/`banned`/`pending`）在 `AD_SCHEMA` 中声明、在 `Ad` 模型中存储、全部素材均填写，但 **`src/compliance/` 从不读取它**（修复前）。语义后果：**标为 `'banned'` 的素材仍会通过全部 gate 被展示** |
 | 影响 | 字段名与取值读起来像"已被标记为禁投"，实际零强制。这是审计中最容易被误读的落差——有人可能据此认为存在一层保护 |
 | **处置（已执行，方案 A）** | 已在 compliance 管道实装第五步 `check_banned_check`：**仅 `'checked'` 放行**，`pending` 与 `banned` 一律 REJECT（fail-closed）。同步更新：`ADR-001`、`asr-register.md`、`invariants.md`、`concern-clusters.md`、`trace-matrix.md`、`architecture-blueprint.md`、`runtime-policy-catalog.md`、`AGENTS.md`、`requirements.yaml`。新增 6 项反例测试（含管道顺序契约测试） |
+| **状态** | `closed` · compliance 管道已实装第五步 `check_banned_check`；`test/offline/test_compliance.py:106` 与 `:129` 有反例与顺序契约测试 · **处置**：无 |
 | **重开条件** | 已关闭。若未来决定改为方案 B（移除字段），须走 ADR（属 safety-critical 变更） |
 | 负责人 | B + D |
 
@@ -290,6 +307,7 @@
 | 描述 | 门禁 1 的载体（`docs/test-approvals.yaml`）与检查器已建立，但唯一记录 `TA-0001` 的 `approved_by` 仍是占位符，故被判定为**不可信的批准**。此外 **2026-09-30 的 4 次构建提交测试与实现同批产出**，课程要求的"实现前测试获批"**无法追溯满足** |
 | 影响 | 现有一切测试（86 个）均不满足门禁 1 的"事前批准"要求；若现在提交 PR 修改测试文件，门禁 1 将**如实阻断**（这是正确行为，不是缺陷） |
 | 补法 | ① 由**具名人类**在 `docs/test-approvals.yaml` 补一条真实批准记录（含 `req_ids` / `test_files` / `approved_by` / `approved_at` / `evidence`）；② 自生效起点（2026-10-06）起，所有新增/修改测试必须先有此记录 |
+| **状态** | `open` · 门禁 1 仍报 10 个测试文件缺人工批准（`test_bidding_v2.py`、`test_v2_*.py` 等无对应 TA 条目）；`docs/branch-protection.md` §8 无收敛记录 · **处置**：`RW-19`（须先有一次带 TA 的 PR 走通） |
 | **重开条件** | 下次修改测试文件之前。**历史缺口不可追溯修复**，仅登记并前向生效 |
 | 负责人 | 人工（具名批准者） |
 | **处置（2026-11-22）** | `TA-0005` 成为**首条真正的前置批准**：测试提交 `38997ca`（19:52:16）早于实现 `3f230a8`（19:53:34），门禁 1 的时序层对**新变更**已可满足。`TA-0006` 补记 V2/V3 既有测试集的事后验收（17 文件 / 34 需求），明确标注不冒充前置批准。**V3 历史仍然红**，判定理由由「完全没有批准」变为「批准晚于实现」——如实保留。 |
@@ -305,6 +323,7 @@
 | 描述 | 门禁 4 要求"prompt/model 变更须先 replay 固定评估集过质量阈值"。但：① `eval/eval_cases.json` 尚未建立（口径待 `OQ-005`）；② 仓库当前**没有任何 prompt 文件**（`prompts/` 为空），因此门禁的触发条件本身不成立 |
 | 影响 | 6 道门禁中唯一**无法实装**的一道。脚本已实现 fail-closed：一旦检测到 prompt/model 变更而评估集缺失，即**阻断**——但目前该路径从未被真正行使 |
 | 补法 | ① 关闭 `OQ-005` 定评估集口径；② 建立 `eval/eval_cases.json`（≥20 条）+ `eval/eval_runner.py`；③ 在 `config.yaml` 声明质量阈值；④ P8 接入真实 LLM 后建立 `prompts/prompt_v1.0.yaml` |
+| **状态** | `closed` · `eval/eval_cases.json` 25 条 + `OQ-005` 已关闭；门禁 4 已具备判据 · **处置**：无 |
 | **重开条件** | P7（评估集）或 P8（真实 prompt）开始时 |
 | 负责人 | D + B |
 | **处置（已执行，2026-10-06）** | ✅ **已关闭**。`OQ-005` 已关闭（口径 = agent 自造 + 人类审查，阈值 0.95）；`eval/eval_cases.json` 建成 **25 条**（11 MUST_PASS / 14 MUST_FAIL）；`eval/eval_runner.py` 可一键 replay 并输出通过率 + 违规数 + p95；`config.yaml` 新增 `eval` 段（阈值单点来源）。**门禁 4 由此首次具备判据**。判定口径与分母分离的设计决策另立 `ADR-003`。 |
@@ -322,6 +341,7 @@
 | 已就位、只差实现 | 该元素的**设计已完备**：`asr-register.md` 的 `ASR-ADS-04/14/A3-01/A3-02`、`invariants.md` 的 `INV-ADS-002/003/004/005/014`、`AGENTS.md` ④ 的 4 个模块文件与 ⑤ 的集成契约、`runtime-policy-catalog.md` 的 `RP-003`~`010` 均已就绪。**缺的是代码，不是设计。** |
 | 补法 | 实现顺序 P4 `selector` → P5 `app` → P6 `render` + `audit`。**前置条件**：① 人工批准 ADR-001/002；② 关闭 `OQ-009`（"解释"的领域口径）；③ 关闭 `OQ-004`（置信度阈值）。三者未决前动工即返工 |
 | **处置（已执行，2026-10-06）** | ✅ **已关闭**。三个前置条件全部满足（ADR-001/002 转为 `Accepted`，`OQ-004`/`OQ-009` 关闭），随后按 `docs/plans/P4-selector.md`（人类批准）实现 P4：`src/selector/` 已落地 6 个模块（`client` / `parser` / `context` / `explanation` / `types` / `__init__`），新增 3 个测试模块共 45 个测试。**课程开题的「至少一个真实 AI 组件」要求已满足。** |
+| **状态** | `closed` · `src/selector/` 6 个模块已落地，含 `MockLLM` 确定性离线路径 · **处置**：无 |
 | **重开条件** | 已关闭。剩余元素（`render`/`audit`/`app`）的缺口另立 `TD-022` |
 | 负责人 | B（架构与 AI）+ C（应用与集成） |
 
@@ -337,6 +357,7 @@
 | 影响 | ① **D8 的「full application source code」仍未满足**；② 系统**仍无法完成一次端到端推荐**——候选集与选择可用，但缺「编排 → 输出 → 证据」三段；③ 与之绑定的 10 条需求与 8 条不变量仍无测试证据（见 `acceptance-coverage-map.yaml`），含 `REQ-ADS-FR-003`（降级 no_ad）、`FR-004`（渲染）、`GOV-001`（审计）、`NFR-PERF-001`（超时四元素）、`SEC-001`（注入 gate） |
 | 已就位、只差实现 | 三个元素的**设计已完备**：`AGENTS.md` ④ 的模块清单与 ⑤ 的集成契约、`runtime-policy-catalog.md` 的 `RP-001`~`017`（尤其 `RP-008`/`009` 的 fallback 与 timeout）、`trace-matrix.md` §1 的 **22 条运行时 monitor** 定义、`memory-design.md` §2 S1 的审计「只写不读」约束 |
 | 补法 | P5 实现 `src/app/`（编排 + 6 条降级路径 + timeout gate + 阈值判定）→ P6 实现 `src/render/` + `src/audit/`（含 monitor 落地）。**自 `TD-001` 起，22 条 monitor 的落地主要落在此处。** |
+| **状态** | `closed` · `src/render/` 与 `src/audit/` 已实现，`python -m app` 端到端可跑通 · **处置**：无 |
 | **重开条件** | 立即（P5 可开工：ADR 已批、OQ 已关，无剩余硬阻塞）。按 `Prompt.md` 的流程先出执行计划再实现 |
 | 负责人 | C（应用与集成）+ D（证据与 monitor） |
 | **处置（已执行，2026-10-06）** | ✅ **已关闭**。P5 实现 `src/app/`（编排 + 10 条降级路径 + timeout gate + 阈值判定 + 注入门 + 配置校验），P6 实现 `src/render/`（两形态 schema）与 `src/audit/`（JSONL 审计 + 22 条 monitor 登记）。**端到端已跑通**（`python -m app --time-slot night --device mobile --tag student` → 广告形态 + 审计记录）。新增 4 个测试模块共 85 个测试（套件 131 → 216）。 |
@@ -353,6 +374,7 @@
 | 影响 | 门禁 1 对本批测试将 **FAIL**（批准时间不早于实现开始）——**这是门禁在正确工作**，不是缺陷。 |
 | 缓解（已做） | ① 在 `TA-0003` 中**显式标注为反例**，说明人类指示与倒置理由；② **不使用假的更早 `approved_at`** —— 伪造治理证据比留着缺口更糟；③ 本条目登记影响，供 D6 报告如实叙述。 |
 | 补法 | 两条路，须人工选择：**(甲)** 接受为一次性例外并在 D6 报告中说明（理由是"人类明确要求先跑通"）；**(乙)** 对 P7/P8 **恢复"先批测试再实现"**，以证明流程可被遵守（更有说服力）。**建议 (乙)** —— 一次例外可解释，两次即成为习惯。 |
+| **状态** | `open` · `TA-0003` 的 `approved_at` 如实晚于实现，门禁 1 对 P5/P6 批次继续 FAIL —— 条目自述这是门禁在正确工作 · **处置**：与 TD-021 同一收敛动作 |
 | **重开条件** | P7（评估集）或 P8（真实 LLM）开工前 |
 | 负责人 | A（产品与流程）+ D（质量与治理） |
 
@@ -367,6 +389,7 @@
 | 描述 | `AGENTS.md` ④ 为 `src/app/` 声明了 3 个文件（`pipeline.py` / `sanitize.py` / `cli.py`），实际有 5 个：多出 `config.py`（配置加载与**启动期校验**，落地 `TD-006`）与 `__main__.py`（`python -m app` 入口）。 |
 | 影响 | **S1 检查不受影响**（S1 是**包级**的：一个架构元素一个包；包内辅助文件不违规）。但**文档与实现存在不一致**：AGENTS.md ④ 声称的清单不再是完整的。这与"AGENTS.md 由架构工件装配而成"的前提冲突——如果实现可以有表外文件，该表的权威性就被削弱了。 |
 | 补法 | 二选一：**(甲)** 更新 `AGENTS.md` ④ 补上这两个文件并说明其角色（推荐——它们是真实且必要的）；**(乙)** 把 `config.py` 并入 `pipeline.py`、`__main__.py` 的逻辑并入 `cli.py`。注意 `AGENTS.md` 变更须人工批准（它是 D3 交付物）。 |
+| **状态** | `closed` · `AGENTS.md` ④ 已补入 `src/app/config.py` 与 `src/app/__main__.py`，并把 `eval/`、`scripts/mutation_check.py` 登记入表 · **处置**：无 |
 | **重开条件** | 下次更新 `AGENTS.md` 时（与 D3 收尾一并做） |
 | 负责人 | A（产品与流程）+ C（应用与集成） |
 | **处置（已执行，2026-10-06，采方案甲）** | ✅ **已关闭**。随 `docs/plans/P7-eval.md` 批准一并处理：`AGENTS.md` ④ 补入 `src/app/config.py` 与 `src/app/__main__.py`，并加注"二者是 pipeline / cli 的**支撑文件**，不各自构成独立元素"；③ 权限表补入 `eval/` 与两个增量可改文件；① 的过时措辞（"剩余模块"）一并修正。**同时把 `eval/` 与 `scripts/mutation_check.py` 登记入表**，使 P7 新增顶层包不产生同类漂移。 |
@@ -383,6 +406,7 @@
 | 影响 | ① 历史上无法追溯合规（与 `TD-018` 同源）；② 门禁 1 在"变更集不含实现代码"时**退化为通过**（因无实现时间可比对），故当前不会阻断——但这意味着该门禁的**时序判定在无实现的 PR 上不生效**。这是刻意的宽松，避免文档类 PR 被误拦。 |
 | 缓解（已做） | ① 悖论在 `test-approvals.yaml` 文件头、`branch-protection.md` §6 **显式声明，不掩盖**；② 门禁 1 对**此后新增**的测试严格前置批准（登记 → 批准 → 再实现）；③ `check_test_approval.py` 在批准者为占位符时**拒绝采信**该记录。 |
 | 补法 | 无完全解法。可考虑的改进：把门禁 1 实现为"**测试文件必须先于实现文件出现在变更集中**"（比较两者的首次提交时间），而非依赖外部批准记录。该改进需在 D7 后续迭代中评估 |
+| **状态** | `open` · 引导悖论仍在：`TA-0001` 的 `approved_at` 晚于 `test_banned_words.py` 创建时间，门禁 1 对历史批次仍红。属如实保留的已知缺口 · **处置**：`RW-19` 前须由人类决定计量口径（不改判据） |
 | **重开条件** | 下次迭代门禁 1 的判定方式时 |
 | 负责人 | D |
 
@@ -400,6 +424,7 @@
 | 补法 | **须人工决定**：把 `eval/` 加入受保护路径清单（改动须 ADR + 人工评审）。 |
 | **处置（已执行，2026-10-06，方案甲）** | ✅ **已关闭**。人类在三方案中选择「**新建 `ADR-004`**」（符合 `ADR-002` 的冻结语义）。<br>· `ADR-004` D1 把**验证平面**的 **10 条**路径纳入受保护（`eval/` 2 条 + `scripts/` 6 条 + `acceptance-coverage-map.yaml` + 检查器）—— **不只 `eval/`**，因为审查发现同一漏洞模式波及整个验证平面。<br>· 受保护路径总数 **9 → 19**。<br>· `check_safety_paths.py` 改为**标记驱动的多 ADR 合并**（`ADR-002` 原文的路径表**一字未改**，仅加标记）。<br>· **已实测**：改 `eval/eval_cases.json` 无 ADR → **阻断**；附 `ADR-004` → **放行**。 |
 | **残留** | 新立 `TD-028`（清单"忘放标记"是静默失败） |
+| **状态** | `closed` · `ADR-004` 已把验证平面 10 条路径纳入受保护；受保护路径 9 → 19；改判据即变绿路径已被 `check_safety_paths.py` 阻断（已实测） · **处置**：无（残留另立 TD-028） |
 | 负责人 | D（质量与治理）+ A（产品与流程） |
 
 ---
@@ -415,6 +440,7 @@
 | 缓解（已做） | ① CI 阶段强制（已实测 FAIL 行为）；② `mcp-tool-manifest.md` §4 与 `.agent/rules.md` §5.3 **显式声明该局限**，不假装 hook 已完整；③ 分支保护文档给出 `enforce_admins` 等收紧手段（待管理员启用）。 |
 | 补法 | 安装 `.git/hooks/pre-commit`（或 `.pre-commit-config.yaml`），调用 `check_safety_paths.py` 与 `check_ai_use_log.py`。**注**：`.git/hooks/` 不在版本控制内，故须同时提供**可复现的安装脚本**。 |
 | **处置（部分执行，2026-10-06）** | ⚠️ **安装器已就位，hook 尚未安装**。已产出 `scripts/install_hooks.py`（含 `--check` / `--uninstall`，且**拒绝覆盖非本脚本安装的 hook**）。**但在 agent 会话中无法完成安装** —— 沙箱不允许子进程写入 `.git/hooks/`（实测 `PermissionError`）。<br>**须由你在自己的环境中执行一次**：<br>`python scripts/install_hooks.py`<br>之后可用 `--check` 验证（已安装时退出码 0）。<br>**当前状态**：`--check` 报"未安装"，即 safety-critical 拦截**仍只在 CI 阶段生效**。 |
+| **状态** | `open` · `scripts/install_hooks.py` 已就位且支持 `--check`；但 `.git/hooks/pre-commit` 从未安装（沙箱下 agent 无法写入） · **处置**：`RW-02`（**只有本机能做**：`python scripts/install_hooks.py`） |
 | **重开条件** | 你执行安装脚本后即可关闭本条目 |
 | 负责人 | D（质量与治理）+ **你（执行安装）** |
 
@@ -430,6 +456,7 @@
 | 影响 | 公约 §5 因此只能算**部分满足**。实际风险：评审读 README 会以为项目比实际落后（该项目已发生过）。 |
 | 缓解（已做） | ① `.agent/rules.md` §5.1 给出 8 项清单；② §5.2 如实列出 4 次漂移作为"新鲜度不会自动维持"的证据；③ §5.3 把本条标为"未实现"而非宣称已保证；④ `fitness_functions.py` 的 TRACE 检查覆盖了其中一部分（追踪矩阵 ↔ 需求注册表）。 |
 | 补法 | 写 `scripts/check_doc_freshness.py`，做**可机械判定的子集**：① `AGENTS.md` ④ 的文件清单 ↔ `src/` 实际文件（双向）；② `README.md` 交付物状态表 ↔ `trace-matrix.md` 的 Status 分布；③ blueprint §4 的"现状"列 ↔ 目录是否存在。**不可机械判定的部分**（如"措辞是否过时"）保持人工。 |
+| **状态** | `open` · `scripts/check_doc_freshness.py` 不存在；条目自述的 4 次漂移仍在，本次核查又发现 2 处（README 的 live 节与目录树的 `prompts/` 行） · **处置**：`RW-03`（须先立 ADR，`scripts/` 属 ADR-004 保护路径） |
 | **重开条件** | 下次文档同步时，或 **D6 报告写作时**（报告需要准确的现状描述） |
 | 负责人 | D（质量与治理）+ A（产品与流程） |
 
@@ -445,6 +472,7 @@
 | 影响 | 这是"机制依赖人工记得做某事"的典型脆弱点。**失败方向是危险的**：忘放标记 → 保护变少 → 无声。开发中已实测到该模式的**近亲**：`ADR-004` 的说明段里引用了标记字符串，朴素匹配把它当成了标记，导致清单被解析错（已用严格整行匹配修复）。这说明"标记识别"本身容易出错。 |
 | 缓解（已做） | ① 改用**严格整行匹配**（`^\s*<marker>\s*$`）而非子串匹配；② `--show-paths` 打印**清单来源的 ADR 文件名**，忘放标记在人工审查中可见；③ `ADR-004` D3 把流程写清。 |
 | 补法 | 让 `fitness_functions.py` 断言：**每份含路径表（首列为反引号路径）的 ADR 都必须带标记**。这样新增 ADR 忘放标记即 FAIL。 |
+| **状态** | `open` · `fitness_functions.py` 仍未断言每份含路径表的 ADR 都必须带标记；严格整行匹配只缓解了近亲故障，忘放标记仍未机械发现 · **处置**：须在 `fitness_functions.py` 增量实现 |
 | **重开条件** | 下次新增受保护 ADR 时（或实现上述断言时） |
 | 负责人 | D（质量与治理） |
 
@@ -461,12 +489,30 @@
 | 治理债（流程违规） | `TD-013` | 1 |
 | **合计（含已关闭条目编号）** | | **28** |
 
-> **状态统计（脚本核对）**：编号 `TD-001`~`TD-028` 共 28 条，**已关闭 7 条**
-> （`TD-015` 部分、`TD-016` medical 死规则、`TD-019` 门禁 4 不可用、
-> `TD-020` AI 组件缺失、`TD-022` 元素 ⑤–⑦ 为空、`TD-024` 模块表漂移、
-> **`TD-025` 评估集无保护**）
-> → **仍开放 21 条**。编号**不回收** —— 关闭的条目保留在册以便审计决策历史
+> **状态统计（2026-11-24 逐条核对）**：`TD-001`~`TD-028` 共 **28 条**，
+> 每条均有统一的 **`状态` 字段**（`open` / `closed`）与**可机械核对的事实依据**。
+>
+> | 状态 | 数量 | 条目 |
+> |---|---|---|
+> | `closed` | **12** | `TD-002`、`003`、`004`、`006`、`013`、`016`、`017`、`019`、`020`、`022`、`024`、`025` |
+> | `open` | **16** | `TD-001`、`005`、`007`、`008`、`009`、`010`、`011`、`012`、`014`、`015`、`018`、`021`、`023`、`026`、`027`、`028` |
+>
+> **与旧统计的差异（3 条，逐条给出改判依据）**：
+>
+> | 条目 | 旧口径 | 新口径 | 改判依据 |
+> |---|---|---|---|
+> | `TD-006` | 开放 | **`closed`** | `src/app/config.py` 已实现启动期 `ConfigError` + 类型/范围校验（`test/offline/test_app_pipeline.py` 有反例），不再只是 schema 校验 |
+> | `TD-015` | **已关闭（部分）** | **`open`** | 解耦素材 `ad_010`/`ad_011`/`ad_012` 确已进 `data/ads.json`，但 `test/offline/test_compliance.py:168` 与 `:175` **仍用 `ad_003` / `ad_006`**——这两条正是被素材级 `not_night`/`not_campus` 先拦下的样本，规则级分支仍未被独立行使。条目自述的重开条件是"补上测试后关闭"，测试未补 |
+> | `TD-013` | 开放 | **`closed`** | 条目讲的是"agent 在 `AGENTS.md` 生效前修改了受保护路径"这一**事后披露**事件；披露本身即该条目的闭环动作，前向约束已由 `scripts/check_safety_paths.py` 强制。若团队认为披露不等于闭环，改回 `open` 即可（无代码影响） |
+>
+> **其余 25 条与旧口径一致**（`TD-003`/`016`/`017`/`019`/`020`/`022`/`024`/`025` 原判 `closed` 保持，
+> 另 4 条原判开放但条目内已有 `处置（已执行）` 行、仅缺统一字段的，本次一并记为 `closed`：`TD-002`/`004`/`006`/`013`）。
+>
+> 编号**不回收** —— 关闭的条目保留在册以便审计决策历史
 > （与 `requirements.yaml` 的 `OQ` 关闭策略一致）。
+>
+> **16 条 `open` 已全部映射到 `docs/plans/REMAINING-WORK.md` 的 `RW-xx`**，
+> 每条条目的 `状态` 行末即为去向，**不再存在"无人负责的开放债"**。
 
 **分类健康度**：本项目**没有** `prompt rot`、`hallucinated dependencies`、`untouchable code`、
 `hidden dependencies`、`agent-induced bloat` 五类债务。
