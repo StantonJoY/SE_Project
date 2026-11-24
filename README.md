@@ -35,15 +35,15 @@ CS5351 Agentic Software Engineering Project · 2026-2027
 | # | 交付物 | 状态 | 说明 |
 |---|---|---|---|
 | **D1** | 机器可读需求 + Schema | ✅ 完成 | `requirements.yaml`（22 基线 + 19 候选）+ `req-schema.json` + 双向一致性校验 |
-| **D2** | 架构工件（11 类） | ✅ 完成 | 5 份 CORE（blueprint / invariants / trace-matrix / memory-design / ADR×2）全就位；另含 ASR 登记册、concern cluster、runtime-policy-catalog |
-| **D3** | 编码治理 | ✅ **完成** | `AGENTS.md` + `structural-constraints.md` + **`mcp-tool-manifest.md`**（工具与角色授权）+ **`.opencode/permissions.jsonc`**（机器可读权限模型，含 guard rules 与 enforcement）+ **`.opencode/rules.md`**（R1–R10 常驻行为规则，human-only）+ **`.agent/rules.md`**（五项公约：抽象上限 / 依赖约束 / 测试独立性 / safety-critical 须 ADR / 上下文新鲜度） |
+| **D2** | 架构工件（11 类） | ✅ 完成 | 5 份 CORE（blueprint / invariants / trace-matrix / memory-design / ADR-001 + ADR-002）全就位；另含 ASR 登记册、concern cluster、runtime-policy-catalog |
+| **D3** | 编码治理 | ✅ **完成** | `AGENTS.md` + `structural-constraints.md` + **`docs/code-governance/mcp-tool-manifest.md`**（工具与角色授权）+ **`.opencode/permissions.jsonc`**（机器可读权限模型，含 guard rules 与 enforcement）+ **`.opencode/rules.md`**（R1–R10 常驻行为规则，human-only）+ **`.agent/rules.md`**（五项公约：抽象上限 / 依赖约束 / 测试独立性 / safety-critical 须 ADR / 上下文新鲜度） |
 | **D4** | 验证治理 | ✅ 完成 | `verification-constraints.md`、`review-memo.md`、`debt-register.md`、`bug-diary.md` + Tier 1 fitness function |
 | **D5** | Agent 会话记录 | ✅ **完成** | `transcripts/` 已归档 **6 份原始会话**（`raw/`，逐帧 zstd，未改写）+ **7 份可读稿**。D5 主记录为 `2026-10-06-v1-build-and-governance.md`（从零构建 V1：56 轮 / 1149 次工具调用 / 16 次审批）。其中 **4 份**附人工干预索引（INT-xx 编号表），**2 份为完整原始导出**（10-06、11-17，人类消息以对话原文保留）；详见 [`transcripts/README.md`](transcripts/README.md) |
 | **D6** | 报告 `Report.md` | ⏳ **进行中** | 姓名/学号、相对贡献表（均值 1.0）、每人自评（300–500 词，**不能代写**）由团队成员分别填写 |
 | **D7** | GitHub 仓库 + 6 道门禁 | ⚠️ **部分** | `ci.yml` + 6 个门禁检查器 + `CODEOWNERS` + `docs/branch-protection.md`；分支保护**已启用**（required checks + code owner review），直推被拒有实测日志（§9）。**仍待补**：§8 两条 PR 批准规则（`docs/` 免批准、`src/` 须 owner 批准）尚无验证记录；门禁 1「Test approval」尚未加入 required checks |
-| **D8** | 源码与测试 | ✅ **完成** | **9 个架构元素全部实现**（ads / scene / compliance / selector / render / audit / app / eval / scripts）；模块名与架构元素一致 ✅；测试布局 offline/live 分离 ✅。**679 个离线测试**（`HANDOVER-V3.md` §10）+ **33/33 变异验证** |
+| **D8** | 源码与测试 | ✅ **完成** | **9 个架构元素全部实现**（`src/` 下 ①–⑦ ads / scene / compliance / selector / render / audit / app，⑧ bidding，⑨ corpus）；模块名与架构元素一致 ✅；测试布局 offline/live 分离 ✅。**679 个离线测试**（`HANDOVER-V3.md` §10）+ **33/33 变异验证** |
 | **D9** | 静态 Prompt `Prompt.md` | ✅ 完成 | 启动指令 + 执行计划五要素模板（`docs/execution-plan-template.md`）；明确"停下来等人工批准" |
-| — | **评估与验证资产** | ✅ 完成 | `eval/` 固定评估集 **57 条**（V1 25 + V2 18 + V3 14）+ replay runner（分母分离 / 违规零容忍，见 `ADR-003`）；`src/corpus/` RAG 语料层（V3）；`scripts/mutation_check.py` |
+| — | **评估与验证资产** | ✅ 完成 | `eval/` 固定评估集 **57 条**（V1 25 + V2 18 + V3 14）+ replay runner（分母分离 / 违规零容忍，见 `ADR-003`）；`src/corpus/` RAG 语料层（V3）；`scripts/mutation_check.py`（33 条变异） |
 
 > **D2–D5 的演进说明**：上表 D2/D4 的「5 份 CORE / 4 件套」为 V1 口径。V2、V3 轮次按课程
 > **append-only** 要求各自新增 `docs/HANDOVER-V2.md`、`HANDOVER-V3.md` 与 ADR-004~006，
