@@ -255,7 +255,34 @@ gap rather than backdate a timestamp.
 
 #### MEMBER B — self-evaluation
 
-> **[To be written by MEMBER B. Do not submit this placeholder.]**
+I formed the team, bringing three other students together when the assignment allowed us to
+choose our own groups.
+
+Before any code existed, I settled what the project had to hand in. I went through the course
+specification and turned it into the team's working shape: which artifacts were required, how the
+repository would be laid out to hold them, and how each round of work would be logged. That held
+for the rest of the project.
+
+The round I led myself was V3, and it was defined before anything was built. V1 and V2 were done
+and nothing had been written down for V3, so its scope was mine to set. Three calls shaped it.
+First, scope: the agent started by proposing retrieval, embeddings and a vector store, and I cut
+that, since ranking by similarity is another course's problem and our compliance chain is a hard
+filter that a score cannot feed into. Second, structure: I set the split into must-do,
+recommended and optional, and every later item had a place to go. Third, evidence: I asked
+whether the agent had actually read the corpus it was writing requirements against. It had looked
+at the field definitions and one sample row. I handed over thirty real records, and that is when
+the draft's projection rule broke on records with an empty genre list, and when a severity field
+that reads zero on most violent titles turned out to be useless as an age filter. Both
+corrections made it into the final requirements. My two drafts are cited in the repository as the
+source of the V3 requirements, and their fifteen entries map onto the nineteen that were
+registered.
+
+The rest of my work was catching the project up on itself. Gate 5 had been failing on every pull
+request on a module that could not be imported, and my own diagnosis of it was wrong until two
+pull requests opened in the same hour, one green and one red, disagreed with me. I also fixed the
+README's counts, gave all twenty-eight debt entries a status, and wrote four architecture
+documents the course asks for that the repository did not have.
+
 
 #### MEMBER C — self-evaluation
 
