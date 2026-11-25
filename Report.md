@@ -7,7 +7,7 @@
 | Repository | `github.com/StantonJoY/SE_Project` |
 | Delivered commit | `8b5a17a` (merge of PR #3, `v3` → `main`), plus `a9c79d8` (branch-protection preparation) |
 | Report version | 1.0 — 2026-11-22 |
-| Team | [MEMBER A] (PM, architecture/AI), [MEMBER B], [MEMBER C], [MEMBER D] |
+| Team | Shen Jiyun (60989886, PM / architecture / AI), [MEMBER B], [MEMBER C], [MEMBER D] |
 | Submission file | `[STUDENT_ID].md` |
 
 ---
@@ -70,17 +70,45 @@ corresponding design, and each one is traceable to an ADR decision. For example
 D3 (projection bypass), and `REQ-ADS-NFR-SAFETY-008/009/010` (content grading) produced
 ADR-006 D4 (grading lives inside the existing `scene` step, not as a sixth step).
 
-### 1.4 Open questions were closed, not carried
+### 1.4 Open questions: four closed, five decided in practice, one waiting on a person
 
-Ten open questions (`OQ-001`…`OQ-010`) were resolved during the rounds and are recorded with
-their resolutions. Two that shaped the delivery:
+Ten open questions were opened (`OQ-001`…`OQ-010`). Four carry an explicit `status: closed`
+in the registry; five were decided in practice and are recorded in the ADR they produced; one
+is still open because it depends on human acceptance, not on the team. We report the split
+rather than claiming all ten are closed:
 
-- **OQ-005** — how large the fixed evaluation set must be. Resolved as "at least 20 cases per
-  round, with negatives explicitly counted separately".
-- **OQ-009** — whether explanations must state *why this one*. Resolved as yes for V1, and
-  the explanation path is structurally isolated from the decision path (ADR-001).
+| State | Questions | Where the decision lives |
+|---|---|---|
+| Closed in the registry | `OQ-004` (confidence threshold), `OQ-005` (evaluation-set scope), `OQ-009` (definition of "explanation"), `OQ-010` (sandbox `tmp_path` limitation) | `requirements.yaml` `open_questions[].status` |
+| Decided in practice, status field not yet flipped | `OQ-001` (model provider), `OQ-002` (banned-word list scope), `OQ-003` (ad-material size), `OQ-006` (pay-as-bid vs. Vickrey), `OQ-007` (score formula) | ADR-001 (provider boundary), ADR-005 (`pay-as-bid`, `relevance × bid`), `data/` contents |
+| Still open | `OQ-008` (formal human acceptance of the V2 round) | `docs/v2-approval-status.yaml` |
 
-### 1.5 What "done" means
+Two that shaped the delivery: **OQ-005** fixed the evaluation-set size ("at least 20 cases per
+round, negatives counted separately"), and **OQ-009** fixed that an explanation must state
+*why this one* — which is why the explanation path is structurally isolated from the decision
+path (ADR-001).
+
+### 1.5 Requirement types, priorities, and what the numbers mean
+
+The registry is typed, and the type is not cosmetic: it decides which fields are mandatory.
+The distribution is deliberately skewed toward invariants, because in a system whose AI
+component must be constrained by deterministic code, the non-negotiable rules *are* the design.
+
+| Type | Count | Mandatory extra field | Why it exists |
+|---|---|---|---|
+| Invariant | 26 | `fallback` (concrete action when violated) | Forces fail-closed thinking instead of "detect and log" |
+| Functional | 14 | `enforcement` (the symbol that implements it) | Prevents documented-but-unimplemented requirements |
+| Quality | 8 | `metric {name, unit, threshold, direction}` | Makes "good enough" checkable |
+| Governance | 6 | `enforcement` | Keeps the process artifacts themselves verifiable |
+| Security | 3 | `enforcement` | Injection surface and credential boundary |
+| Performance | 2 | `metric` | Latency budget for corpus mode |
+| Cost | 2 | `metric` | Prompt-token ceiling per request |
+
+Priority uses MoSCoW: **58 must**, **3 should**, zero could/won't. Rather than leave the
+tradeoff implicit, `requirements.yaml` now carries a `prioritization` block listing four
+concrete tradeoffs (ADR-007), each tied to the requirement IDs it affects.
+
+### 1.6 What "done" means
 
 A requirement is not done when code exists. It is done when the trace matrix names the
 component, the coverage map names at least one test, and — for invariants — a mutation entry
@@ -188,13 +216,41 @@ shows `bidding/`, `ads/` and `scene/` untouched.
 
 ---
 
+### 2.7 The V2 settlement path, step by step
+
+V2 is where the authority chain is easiest to get wrong, so the data flow is written out
+explicitly. Each step names the artifact that owns it.
+
+| # | Step | Owner | What travels | Failure behaviour |
+|---|---|---|---|---|
+| 1 | Load bids sidecar | `bidding.validate_bids` | `ad_id`, `bid_cents`, `budget_cents`, `status` | Malformed or out-of-range bid → whole sidecar rejected, request fails loudly |
+| 2 | Pre-select candidates | `AdRepository.filter_by_scene` (+ V3 `candidate_ids`) | `Ad` objects | Empty set → `no_ad / no_candidates` |
+| 3 | Ask for relevance | `selector.relevance` client | `scene` + candidate summaries | Timeout/parse error → `no_ad` (`RP-004`), never a guess |
+| 4 | Verify affordability | `bidding.ledger.budgets()` | Remaining budget per `ad_id` | Inactive or unaffordable bids are removed before the auction |
+| 5 | Choose winner | `bidding.engine.choose_winner` | `relevance × bid`, ties by ascending `ad_id` | No positive score → `no_ad / no_relevant_candidates` |
+| 6 | **Compliance gate** | `compliance.run_compliance` (FINAL AUTHORITY) | The winning `Ad` | Rejected → `no_ad / compliance_rejected`, **nothing is charged** |
+| 7 | Settle | `bidding.ledger.finalize` | charge, result, evidence | One SQLite transaction; any fault → full rollback, `status_unknown` |
+| 8 | Render + audit | `render.schema_v2` / ledger audit row | `ad` + `auction` block | Schema-invalid result → `no_ad`, never a partial output |
+
+Two properties are worth stating because they are the reason for the ordering:
+
+- **Money is computed before compliance but committed after it.** Step 6 can still reject the
+  winner; step 7 only runs on approval. The ledger therefore never records a charge for an ad
+  that compliance refused.
+- **Repetition is free, divergence is not.** `request_id` is the idempotency key: the same id
+  with the same inputs returns the stored response without a second charge, while the same id
+  with different inputs returns `request_conflict` and charges nothing. Both behaviours are
+  covered by tests, not by convention.
+
+---
+
 ## 3. Team Organization and Contributions
 
 ### 3.1 Roles
 
 | Member | Role | Primary scope |
 |---|---|---|
-| [MEMBER A] | PM / architecture / AI | Theme and iteration direction, process-artifact system, V1 and V3 implementation |
+| Shen Jiyun (60989886) | PM / architecture / AI | Theme and iteration direction, process-artifact system, V1 and V3 implementation |
 | [MEMBER B] | Architecture / AI review | Requirements and ADR review, prompt and model decisions |
 | [MEMBER C] | Application / integration | V2 auction and ledger integration, CLIs |
 | [MEMBER D] | Quality / governance | Independent test execution, evidence packaging, gate verification |
@@ -206,7 +262,7 @@ share and the derived factor, because a factor alone forces the reader to revers
 
 | Member | Share | Relative factor | Note |
 |---|---|---|---|
-| [MEMBER A] | [TBD]% | [TBD] | PM; V1 and V3 implementation; process-artifact system |
+| Shen Jiyun (60989886) | [TBD]% | [TBD] | PM; V1 and V3 implementation; process-artifact system |
 | [MEMBER B] | [TBD]% | [TBD] | |
 | [MEMBER C] | [TBD]% | [TBD] | |
 | [MEMBER D] | [TBD]% | [TBD] | |
@@ -218,10 +274,10 @@ placeholder row values are not filled in by an agent.*
 ### 3.3 Self-evaluations
 
 > **Note to the reader:** the course requires each member's self-evaluation to be written by
-> that member. The paragraph below is a draft prepared by [MEMBER A] from the repository
-> record and must be restated in the member's own words before submission.
+> that member. The paragraph below was drafted from the repository record by Shen Jiyun's
+> assistant and is to be restated in his own words before submission.
 
-#### MEMBER A — self-evaluation (draft, 300–500 words)
+#### Shen Jiyun (60989886) — self-evaluation
 
 I was the team's PM, and my work fell into three buckets: direction, system, and code.
 
@@ -439,6 +495,29 @@ module counts across rounds.
 
 ---
 
+### 5.4 What mutation testing changed
+
+Coverage told us which lines ran. Mutation told us whether the assertions would notice if the
+line were wrong — and the first run found four "counterexamples" that passed even with the
+implementation deliberately broken. Three representative entries from the final set of 33:
+
+| Mutation | What it breaks | Test that must fail | Verdict when injected |
+|---|---|---|---|
+| `MUT-V3-BID-TEN-PERCENT` | Derives bids at 10% instead of 5% | `test_bid_is_five_percent_of_price` | Fails with `assert 50 != 75` |
+| `MUT-V3-LABELS-NO-WARNINGS` | Content grading reads only `descriptors` | `test_among_us_rejected_by_warnings_side` | Fails (the record has empty descriptors) |
+| `MUT-V3-SEED-UNBOUNDED` | Seeds 100× budget | `test_twenty_impressions_exhaust_budget` | Fails with `assert 1980 == 0` |
+
+The injections never touch the working tree: they are applied to module attributes in a
+subprocess, and the harness only accepts a **genuine assertion failure** — an import error or a
+fixture crash does not count as a kill. That distinction matters; without it, injecting an
+`ImportError` would "prove" every test suite is effective.
+
+One entry was retired during V3 for being untestable by construction: `INV-ADS-009` requires
+revising the architecture rather than patching code, which has no code path to break. It is
+recorded as declared-but-not-mutation-backed rather than quietly counted as covered.
+
+---
+
 ## 6. Review, QA and CI/CD
 
 ### 6.1 Pipeline
@@ -497,6 +576,84 @@ Review was structured as a memo with an explicit verdict (`docs/review-memo.md`)
 comment thread. The V2 memo returned CHANGES REQUIRED on four items before acceptance, and the
 V3 review produced the finding list above. Pull requests #2 and #3 are the two integration
 points; #3 carried 21 commits and the full evidence package.
+
+---
+
+### 6.6 What the system actually did (measured, not estimated)
+
+All numbers below are from runs on the delivered commit; each is reproducible with the command
+noted in Appendix B.
+
+**Content grading across scene tiers** (same time slot `afternoon`, same device `desktop`,
+30 candidates per tier — the tiers select different candidate sets, so pass counts are not
+directly comparable across rows):
+
+| Tier | Candidates | Passed compliance | Rejected | Dominant rejection reason |
+|---|---|---|---|---|
+| `family` | 30 | 21 | 9 | `Violence` present in `content_warnings` |
+| `campus` (student) | 30 | 10 | 20 | `Violence` (campus blocks it, family's candidate set simply contains fewer) |
+| `competitive` (gamer) | 30 | 24 | 6 | `Gore`, `Nudity`, `Sexual Content` |
+
+The `campus` row is the one that justifies the union rule: a descriptor-only filter admits
+records whose `content_descriptors` is empty but whose `content_warnings` lists violence.
+
+**Corpus-mode latency** (5,000 rows, single process):
+
+| Stage | Time |
+|---|---|
+| Config load | ~5 ms |
+| Corpus load (2.1 MB + 3.4 MB JSONL) | 234–292 ms |
+| Deterministic top-K selection | ~40 ms |
+| Projection to `Ad` (30 items) | <1 ms |
+| Compliance (30 candidates) | 2–3 ms |
+| V1 CLI end-to-end (including interpreter start) | ~0.74 s |
+
+**Budget drain under repeated auction** (V2, one ledger, 300-cent bid = 5% of $59.99):
+
+| Request | Budget before | Budget after |
+|---|---|---|
+| `req-1` | 6000 | 5700 |
+| `req-2` | 5700 | 5400 |
+| `req-3` | 5400 | 5100 |
+
+Twenty impressions exhaust the budget exactly; the 21st is refused with `InsufficientBudget`
+and produces no charge. Requests 1–3 above are the first three of that sequence.
+
+**Fixed evaluation replays**: V1 25 cases, V2 18, V3 14 — pass rate 1.0000 in all three, zero
+violations (compliance escapes, out-of-set selections, audit-count errors, schema errors,
+explanation-isolation violations). p95 latency for the V3 partition is under 5 ms because it
+uses the deterministic mock client.
+
+---
+
+### 6.7 Branch protection: what we configured and what we measured
+
+Static configuration is not evidence. Protection was verified by running the same command
+(direct push to `main`, same account) before and after each change:
+
+| Stage | Configuration | Direct push to `main` |
+|---|---|---|
+| Before | no rule on `main` | succeeded (`66b1ab4..c6bda63`) |
+| After enabling the rule | 6 required status checks, no bypass | **rejected**: `push declined due to repository rule violations`, `6 of 6 required status checks are expected` |
+| After adding the owner to the bypass list | rule unchanged, owner exempt | succeeded again (`52717b6..20d5856`) |
+
+The final configuration separates "code must be reviewed" from "docs must not be blocked":
+
+| Setting | Value | Consequence |
+|---|---|---|
+| Require a pull request | on | no direct pushes by non-owners |
+| Required approvals | **0** | any PR can merge once checks pass |
+| Require review from Code Owners | on | only paths listed in `.github/CODEOWNERS` require an approval |
+| `CODEOWNERS` coverage | `src/`, `data/`, `scripts/`, `eval/`, `test/`, `.github/`, `AGENTS.md`, blueprint | `docs/` is deliberately **unlisted** |
+| Required checks | Gate 2, 3, 4, 5, 5b, 6 | Gate 1 excluded while the historical gap is open |
+| Bypass list | repository owner | the owner can still push docs directly |
+
+The tradeoff is stated rather than hidden: because the owner is on the bypass list, the rule
+constrains *other* accounts but not the owner. Machine enforcement of "code must be reviewed"
+therefore applies to everyone except the account that built the system — which is honest for a
+four-person course project and would not be acceptable in production. The measurement
+(the three-row table above) is kept in `docs/branch-protection.md` §9 so that the claim can be
+re-checked instead of trusted.
 
 ---
 
@@ -569,6 +726,51 @@ tag-matching over famous titles 10/10 — is the evidence we were missing.
 - **The 5% fee is a demo rule**, not a billing model; there is no reconciliation.
 - **V2's candidate ceiling of four** makes the auction thin in corpus mode.
 - **Gate 1 is red for the V3 history** and will remain so; the mechanism works going forward.
+
+---
+
+### 7.8 Process quality evidence: volatility, defects, ambiguity
+
+The course asks for evidence that the *process* was managed, not only that the product works.
+Three measures, all with data in the repository.
+
+**Requirement volatility.** 61 requirements were added across three rounds and **none were
+deleted**; superseded identifiers are preserved in `legacy_id_map` so the history stays
+auditable.
+
+| Round | Added | Deleted | Note |
+|---|---|---|---|
+| V1 | 22 | 0 | Seven architectural elements, closed set of 14 ads |
+| V2 | 19 | 0 | Auction + atomic ledger; V1 requirements untouched |
+| V3 | 20 | 0 | Corpus, content grading, pricing; V1/V2 requirements untouched |
+
+Volatility appears as **rejected scope**, not as churn: two RAG-direction requirements were
+drafted and then withdrawn (`docs/req/requirements-v3-rag-draft.md` is kept as the negative
+record), and four tradeoffs are now explicit in `requirements.yaml` (§1.4 and ADR-007).
+
+**Defect trends.** Eight significant defects were recorded. Each one is mapped to the
+invariant gap it exposed and to the check that now covers it — this is why the checks exist,
+not a list assembled afterwards:
+
+| Defect | Area | Invariant gap exposed | Check added |
+|---|---|---|---|
+| `BUG-001` | tests | Test depended on host temp directory | I/O boundary stubbing rule |
+| `BUG-002` | registry | Schema conditional made `asr_id` globally required | Validator rejects orphan ASRs |
+| `BUG-003` | registry | A requirement can enforce several ASRs | Bidirectional consistency check |
+| `BUG-004` | registry | YAML `>` parsed as folded scalar | Coverage map is parsed by the validator |
+| `BUG-005` | tests | Hard-coded material count coupled tests to data | Count derived from the loader |
+| `BUG-006` | compliance | Banned-word hit depended on file order | Longest-match + codepoint tie-break, permutation test |
+| `BUG-007` | compliance | Loader fail-closed posture differed by module | Uniform fail-closed contract (`TD-014`) |
+| `BUG-008` | packaging | `src/audit/` never entered the repository (gitignore `audit/`) | `check_repo_completeness.py` |
+
+The trend across rounds is the interesting part: V1 defects were **test and registry**
+defects; V2/V3 defects shifted to **packaging and evidence** defects (CI running zero jobs,
+CRLF-hashed manifest, untracked documents). That shift is what the gate set grew to cover.
+
+**Ambiguity.** Ten open questions were opened during requirements work. Four were closed
+explicitly, five were resolved by the ADR they produced, and one (`OQ-008`, formal human
+acceptance of V2) remains open because it needs a person, not a decision. The registry keeps
+closed questions instead of deleting them, so the decision history stays readable.
 
 ---
 
