@@ -161,8 +161,8 @@ audit  ────────────────────────�
 
 ### 4.1 本项目的落实
 
-- **路径清单的唯一来源**：`docs/architecture/adr-002-fail-closed-and-governance.md` §2 D4
-  **加上** `docs/architecture/adr-004-verification-plane-protection.md` D1（验证平面）。
+- **路径清单的唯一来源**：`docs/architecture/adr/002-fail-closed-and-governance.md` §2 D4
+  **加上** `docs/architecture/adr/004-verification-plane-protection.md` D1（验证平面）。
   `scripts/check_safety_paths.py --show-paths` 可打印当前 **19 条**及**清单来源的 ADR**。
 - **强制方式**：提交信息须**引用 ADR ID**，否则 CI **FAIL**（已实测）。
 - **不在此重复清单** —— 两处列举必然漂移（`BUG-007` 的教训：同类规则分散在多处必然漂移）。

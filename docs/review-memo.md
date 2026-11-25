@@ -87,7 +87,7 @@
 | 项 | 内容 |
 |---|---|
 | **验证命令与结果** | `validate_requirements.py` → **PASS**（22 基线 / 19 候选）<br>`fitness_functions.py` → **PASS**（S1–S3、V1–V4、TRACE）<br>`pytest test/offline` → **66 passed, 0 error** |
-| **新增文件清单** | `docs/req/requirements.yaml`、`docs/req/req-schema.json`、`docs/architecture/{asr-register,invariants,trace-matrix,memory-design,concern-clusters,runtime-policy-catalog,adr-001-guarded-hybrid,adr-002-fail-closed-and-governance}.md`、`architecture-blueprint.md`、`docs/code-governance/{structural-constraints,verification-constraints,acceptance-coverage-map.yaml}`、`docs/debt-register.md`、`docs/bug-diary.md`、`scripts/fitness_functions.py` |
+| **新增文件清单** | `docs/req/requirements.yaml`、`docs/req/req-schema.json`、`docs/architecture/{asr-register,invariants,trace-matrix,memory-design,concern-clusters,runtime-policy-catalog,adr/001-guarded-hybrid,adr/002-fail-closed-and-governance}.md`、`architecture-blueprint.md`、`docs/code-governance/{structural-constraints,verification-constraints,acceptance-coverage-map.yaml}`、`docs/debt-register.md`、`docs/bug-diary.md`、`scripts/fitness_functions.py` |
 | **依赖变更** | `pyproject.toml` dev 依赖新增 `PyYAML>=6.0` |
 | **未提交残留** | ⚠️ `scripts/_renumber_v2_candidates.py`（一次性脚本，应删）、`.dsh_write_probe.tmp`（权限探查残留，应删）——见 `TD-012` |
 | **AI 使用日志**（课程门禁第 6 条） | ❌ **未更新**——`docs/ai-use-log.yaml` 尚未创建。**按门禁规则，改动代码/工件而未更新 AI-use 日志应被阻塞** |
@@ -235,7 +235,7 @@
 | 规格一致性 | 通过：61 条需求（V1 22 + V2 19 + V3 20）全部有 `enforcement` 与测试证据 | `req/requirements.yaml`、`acceptance-coverage-map.yaml` |
 | 架构一致性 | 通过：9 个元素与 S1 一致；`bidding/`、`ads/`、`scene/` 在 V3 中零改动 | `git diff origin/main...v3`、`fitness_functions.py` |
 | 代码与测试质量 | 通过：679 项离线测试、33/33 变异、三套 replay 违规 0 | `docs/testing/V3-Test-Report.md` |
-| 操作元数据 | 通过：AI 使用日志已更新；ADR-006 已 `Accepted`；`CODEOWNERS` 已落地 | `ai-use-log.yaml`、`adr-006-*.md`、`.github/CODEOWNERS` |
+| 操作元数据 | 通过：AI 使用日志已更新；ADR-006 已 `Accepted`；`CODEOWNERS` 已落地 | `ai-use-log.yaml`、`adr/006-*.md`、`.github/CODEOWNERS` |
 | 真实模型 | PASS_WITH_LIMITATIONS：结构 30/30；标题诱导 5/5、名作对照 5/5 按标签选择 | `docs/testing/V3-Live-Prompt-Semantic-Report.md` |
 
 **独立测试发现（8 项）**：F-001（manifest 哈希与文件不符，根因是生成器在 Windows 写出 CRLF）、
@@ -413,7 +413,7 @@ F-004（未跟踪文档阻断完整回归）、F-006（stdout 非 UTF-8）、F-0
 #### PR #2 · V2 竞价与原子账本
 
 **范围**：`src/bidding/`（模型 + 引擎 + 账本）、`src/app/pipeline_v2.py`、`src/app/cli_v2.py`、
-`eval/v2_*`、`docs/architecture/adr-005-*`；同时修复 CI（workflow 级 `${{ runner.temp }}` 非法引用）。
+`eval/v2_*`、`docs/architecture/adr/005-*`；同时修复 CI（workflow 级 `${{ runner.temp }}` 非法引用）。
 
 - **规格一致性**：19 条 V2 需求逐条有 `enforcement` 与测试（`test_bidding_v2` / `test_pipeline_v2`）；PASS。
 - **架构一致性**：竞价插在"模型建议"与"合规否决"之间，合规章受否决权未被削弱（`INV-V2-003` 有反例）；

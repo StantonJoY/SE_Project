@@ -103,7 +103,7 @@ def read_adr_paths() -> tuple[dict[str, bool], list[str]]:
     contributors: list[str] = []
     if not ADR_DIR.is_dir():
         return {}, []
-    for adr in sorted(ADR_DIR.glob("adr-*.md")):
+    for adr in sorted(list(ADR_DIR.glob("adr-*.md")) + list((ADR_DIR / "adr").glob("*.md"))):
         lines = adr.read_text(encoding="utf-8").splitlines()
         for i, line in enumerate(lines):
             if not PATH_TABLE_MARKER_RE.match(line):

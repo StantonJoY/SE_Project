@@ -4,7 +4,7 @@
 > **定义**：内存设计属于架构范畴，包含 checkpoint、durable store 与跨线程知识，
 > 并与 ADR、Invariant Register、Trace Matrix、Runtime Policy Catalog 相连。
 > **状态**：草案待批 · 版本：V1（`docs/architecture/` 轮次）· 日期：2026-10-06
-> **上游**：`adr-001-guarded-hybrid.md`、`adr-002-fail-closed-and-governance.md`、`invariants.md`
+> **上游**：`adr/001-guarded-hybrid.md`、`adr/002-fail-closed-and-governance.md`、`invariants.md`
 
 ---
 

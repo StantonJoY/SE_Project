@@ -1,4 +1,9 @@
-# Prompt.md — 当前 V2 启动指令
+# Prompt.md — 当前 V3 启动指令（D9）
+
+> **V3 状态（2026-11-25）**：本文件是**静态启动指令**（课程 D9）。
+> 现行的版本化运行时提示词在 [`prompts/prompt_v1.1.yaml`](prompts/prompt_v1.1.yaml)，
+> 对应代码常量 `src/selector/context.py`（`ctx-v1.1`）与 `src/selector/relevance.py`（`relevance-v2.2`）。
+> 下面 V2 段保留为历史快照。
 
 > **V2 当前指令（2026-10-31）**：原课程 PDF、真实用户指令及 `docs/plans/V2-execution.md` 为本轮依据。以下 V2 段优先于后面的 V1 历史快照；历史文字保留供审计，不把其 docs2、整包冻结或尚未启动描述当作当前门槛。`.opencode/rules.md` 保持 human-only。
 
@@ -55,8 +60,8 @@ AGENTS.md                                    ← 治理入口：读什么 / 能�
 docs/req/requirements.yaml                   ← 需求单一来源
 docs/architecture/asr-register.md            ← 哪些需求强制结构决策（A1）
 docs/architecture/invariants.md              ← 16 条不变量与 fail-closed fallback（A2）
-docs/architecture/adr-001-guarded-hybrid.md  ← 权威边界：谁决策、谁检查、谁必须不行动
-docs/architecture/adr-002-fail-closed-and-governance.md
+docs/architecture/adr/001-guarded-hybrid.md  ← 权威边界：谁决策、谁检查、谁必须不行动
+docs/architecture/adr/002-fail-closed-and-governance.md
 architecture-blueprint.md                    ← 11 节可执行约束
 docs/architecture/trace-matrix.md            ← 每条需求的强制组件 + 测试 + 运行时 monitor
 docs/architecture/runtime-policy-catalog.md  ← 17 条失败策略（RP-001~017）

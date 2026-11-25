@@ -28,10 +28,10 @@
 
 | 想知道 | 读 |
 |---|---|
-| 权威边界（AI 为什么不能决定展示） | [`architecture/adr-001-guarded-hybrid.md`](architecture/adr-001-guarded-hybrid.md) |
-| 失败语义与治理 | [`architecture/adr-002-fail-closed-and-governance.md`](architecture/adr-002-fail-closed-and-governance.md) |
-| V2 竞价为什么另起入口 | [`architecture/adr-005-v2-atomic-auction.md`](architecture/adr-005-v2-atomic-auction.md) |
-| V3 语料边界与 5% 定价 | [`architecture/adr-006-v3-corpus-boundary.md`](architecture/adr-006-v3-corpus-boundary.md)（D1–D9） |
+| 权威边界（AI 为什么不能决定展示） | [`architecture/adr/001-guarded-hybrid.md`](architecture/adr/001-guarded-hybrid.md) |
+| 失败语义与治理 | [`architecture/adr/002-fail-closed-and-governance.md`](architecture/adr/002-fail-closed-and-governance.md) |
+| V2 竞价为什么另起入口 | [`architecture/adr/005-v2-atomic-auction.md`](architecture/adr/005-v2-atomic-auction.md) |
+| V3 语料边界与 5% 定价 | [`architecture/adr/006-v3-corpus-boundary.md`](architecture/adr/006-v3-corpus-boundary.md)（D1–D9） |
 | 需求 → 组件 → 测试 → monitor | [`architecture/trace-matrix.md`](architecture/trace-matrix.md) |
 | 上下文与记忆 | [`architecture/memory-design.md`](architecture/memory-design.md) |
 
@@ -79,23 +79,27 @@
   `docs/code-governance/acceptance-coverage-map.yaml` 三处为准。
 ---
 
-## 7. 文档全表（57 份）
+---
 
-> 上文的分类索引只列常用入口；这里是**全部文档**，保证没有"写了但没人知道在哪"的文件。
+## 7. 文档全表
+
+> 分类索引只列常用入口；这里是**全部文档**，保证没有"写了但没人知道在哪"的文件。
+> 结构按课程第 5 节：`docs/architecture/adr/NNN-*.md`、`docs/code-governance/`、`docs/req/`。
 
 | 文件 | 标题 |
 |---|---|
-| [`architecture/adr-001-guarded-hybrid.md`](architecture/adr-001-guarded-hybrid.md) | ADR-001：采用 Guarded Hybrid 架构（AI 解释，代码裁决） |
-| [`architecture/adr-002-fail-closed-and-governance.md`](architecture/adr-002-fail-closed-and-governance.md) | ADR-002：Fail-Closed 终态、证据不可协商与失败归因治理 |
-| [`architecture/adr-003-evaluation-set-as-architecture.md`](architecture/adr-003-evaluation-set-as-architecture.md) | ADR-003：评估集作为一等架构资产 —— 判定口径、分母分离与阈值语义 |
-| [`architecture/adr-004-verification-plane-protection.md`](architecture/adr-004-verification-plane-protection.md) | ADR-004：评估与验证资产纳入受保护路径清单（ADR-002 D4 的补充） |
-| [`architecture/adr-005-v2-atomic-auction.md`](architecture/adr-005-v2-atomic-auction.md) | ADR-005：V2 确定性竞价与原子预算结算 |
-| [`architecture/adr-006-v3-corpus-boundary.md`](architecture/adr-006-v3-corpus-boundary.md) | ADR-006：V3 轮次接入与真实语料边界 |
-| [`architecture/adr-007-requirements-prioritization.md`](architecture/adr-007-requirements-prioritization.md) | ADR-007：需求优先级（MoSCoW）与显式取舍记录 |
-| [`architecture/adr-008-layered-context-and-assembly.md`](architecture/adr-008-layered-context-and-assembly.md) | ADR-008：分层上下文结构与装配流水线 |
+| [`architecture/adr/001-guarded-hybrid.md`](architecture/adr/001-guarded-hybrid.md) | ADR-001：采用 Guarded Hybrid 架构（AI 解释，代码裁决） |
+| [`architecture/adr/002-fail-closed-and-governance.md`](architecture/adr/002-fail-closed-and-governance.md) | ADR-002：Fail-Closed 终态、证据不可协商与失败归因治理 |
+| [`architecture/adr/003-evaluation-set-as-architecture.md`](architecture/adr/003-evaluation-set-as-architecture.md) | ADR-003：评估集作为一等架构资产 —— 判定口径、分母分离与阈值语义 |
+| [`architecture/adr/004-verification-plane-protection.md`](architecture/adr/004-verification-plane-protection.md) | ADR-004：评估与验证资产纳入受保护路径清单（ADR-002 D4 的补充） |
+| [`architecture/adr/005-v2-atomic-auction.md`](architecture/adr/005-v2-atomic-auction.md) | ADR-005：V2 确定性竞价与原子预算结算 |
+| [`architecture/adr/006-v3-corpus-boundary.md`](architecture/adr/006-v3-corpus-boundary.md) | ADR-006：V3 轮次接入与真实语料边界 |
+| [`architecture/adr/007-requirements-prioritization.md`](architecture/adr/007-requirements-prioritization.md) | ADR-007：需求优先级（MoSCoW）与显式取舍记录 |
+| [`architecture/adr/008-layered-context-and-assembly.md`](architecture/adr/008-layered-context-and-assembly.md) | ADR-008：分层上下文结构与装配流水线 |
 | [`architecture/asr-register.md`](architecture/asr-register.md) | ASR 登记册（Architecturally Significant Requirements Register） |
 | [`architecture/concern-clusters.md`](architecture/concern-clusters.md) | Concern Cluster（关注点聚类） |
 | [`architecture/evaluation-logbook.md`](architecture/evaluation-logbook.md) | Evaluation Logbook — 架构选择的累积证据（D2.9，optional） |
+| [`architecture/evaluation-table.md`](architecture/evaluation-table.md) | 候选方案评估表（Candidate Evaluation Table，D2 #8） |
 | [`architecture/invariants.md`](architecture/invariants.md) | 不变量登记册（Invariant Register） |
 | [`architecture/memory-design.md`](architecture/memory-design.md) | 记忆与状态设计说明（Memory / State Design Note） |
 | [`architecture/option-ledger.md`](architecture/option-ledger.md) | Option Ledger — 被否决的架构选项与重开条件（D2.11，optional） |
@@ -103,7 +107,6 @@
 | [`architecture/risk-list.md`](architecture/risk-list.md) | Risk List — 假设、可能变成的缺陷与复核触发点（D2.10，optional） |
 | [`architecture/runtime-policy-catalog.md`](architecture/runtime-policy-catalog.md) | 运行时策略目录（Runtime Policy Catalog） |
 | [`architecture/trace-matrix.md`](architecture/trace-matrix.md) | 追踪矩阵（Trace Matrix） |
-| [`architecture/v2-candidate-evaluation.md`](architecture/v2-candidate-evaluation.md) | V2 候选方案评估（AI proxy 技术评审，正式人工验收待完成） |
 | [`branch-protection.md`](branch-protection.md) | 分支保护配置（Branch Protection）— D7 交付物 |
 | [`bug-diary.md`](bug-diary.md) | 缺陷日记（Bug Diary） |
 | [`code-governance/coverage-v1-summary-snapshot.md`](code-governance/coverage-v1-summary-snapshot.md) | V1 覆盖汇总历史原文 |
@@ -120,6 +123,7 @@
 | [`plans/P7-eval.md`](plans/P7-eval.md) | 执行计划清单 · P7 — 固定评估集 + 版本溯源 + 变异验证 |
 | [`plans/REMAINING-WORK.md`](plans/REMAINING-WORK.md) | 剩余工作清单（分配用） |
 | [`plans/REPORT-REQUIREMENTS.md`](plans/REPORT-REQUIREMENTS.md) | 报告（D6）的硬性要求与现状对照 |
+| [`plans/SUBMISSION-CHECKLIST.md`](plans/SUBMISSION-CHECKLIST.md) | 提交打包清单（ZIP） |
 | [`plans/TD-001-monitor-wiring.md`](plans/TD-001-monitor-wiring.md) | TD-001 补监控方案（运行时 monitor 接线） |
 | [`plans/V2-execution.md`](plans/V2-execution.md) | V2 执行计划与真实授权边界 |
 | [`plans/V3-execution.md`](plans/V3-execution.md) | V3 执行计划（Execution Plan）· 真实语料接入 |
@@ -141,4 +145,14 @@
 | [`testing/V3-Test-Execution.md`](testing/V3-Test-Execution.md) | V3 测试执行记录 |
 | [`testing/V3-Test-Report.md`](testing/V3-Test-Report.md) | V3 阶段性测试报告 |
 | [`testing/V3-V1-Live-Prompt-Semantic-Report.md`](testing/V3-V1-Live-Prompt-Semantic-Report.md) | V1 Live Prompt Semantic Quality Report |
-| [`plans/SUBMISSION-CHECKLIST.md`](plans/SUBMISSION-CHECKLIST.md) | 提交打包清单（ZIP） |
+
+## 8. 其他顶层工件
+
+| 路径 | 作用 |
+|---|---|
+| [`../Prompt.md`](../Prompt.md) | 静态启动指令（D9） |
+| [`../prompts/prompt_v1.0.yaml`](../prompts/prompt_v1.0.yaml) | V1 冻结运行时提示词（ctx-v1） |
+| [`../prompts/prompt_v1.1.yaml`](../prompts/prompt_v1.1.yaml) | 现行运行时提示词（ctx-v1.1 + relevance-v2.2） |
+| [`../AGENTS.md`](../AGENTS.md) | 编码 agent 治理入口（D3） |
+| [`../architecture-blueprint.md`](../architecture-blueprint.md) | 主约束文档（D2.1） |
+| [`../Report.md`](../Report.md) | 过程报告与自评（D6） |

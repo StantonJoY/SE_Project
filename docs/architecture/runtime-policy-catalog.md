@@ -3,7 +3,7 @@
 > 课程对应：note 行 1506–1514（P64）。行业名称包括 runbook（SRE）、playbook（incident response）、FMEA（safety-critical）。
 > **规则**：每条失败模式都要有既定策略，**无歧义**；**每条降级路径都必须映射到响应**。
 > **状态**：草案待批 · 版本：V1（`docs/architecture/` 轮次）· 日期：2026-10-06
-> **上游**：`adr-002-fail-closed-and-governance.md`（fail-closed 终态）、`docs/architecture/invariants.md`
+> **上游**：`adr/002-fail-closed-and-governance.md`（fail-closed 终态）、`docs/architecture/invariants.md`
 
 ---
 

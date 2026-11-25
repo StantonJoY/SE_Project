@@ -9,7 +9,7 @@
 
 报告的字段与语义见 `eval/eval_runner.py` 的 `_write_report`；
 判定规则（分母分离、违规零容忍、阈值语义）见
-`docs/architecture/adr-003-evaluation-set-as-architecture.md`。
+`docs/architecture/adr/003-evaluation-set-as-architecture.md`。
 
 > 报告写入失败**不影响判定**（`eval_runner` 会打印警告但退出码不变）——
 > 判定由内存中的 `ReplayReport` 决定，落盘只是留证。

@@ -1,3 +1,16 @@
+# 候选方案评估表（Candidate Evaluation Table，D2 #8）
+
+> 课程 D2 第 8 项要求"用一张对比表说明所选架构为何胜出"。本仓库分三轮累积，
+> 完整对比分散在三处，本文件是入口：
+
+| 轮次 | 候选 | 对比与打分在哪 | 结论 |
+|---|---|---|---|
+| V1 | A1 Raw LLM / A2 Guarded Hybrid / A3 Orchestrated | `docs/architecture/adr/001-guarded-hybrid.md` §3–§4（C1/C2/C3 三维 W/M/S 打分） | A2 胜出：C1、C2 强，C3 最简 |
+| V2 | 固定价 / 次价（Vickrey）/ pay-as-bid | 下文本文件（2026-10-31 技术评审） | pay-as-bid：可解释、可审计、无策略空间 |
+| V3 | RAG 向量检索 / 规则标签匹配 / 混合 | `docs/architecture/option-ledger.md`（13 条被否方案）+ `docs/architecture/adr/006-v3-corpus-boundary.md` D6/D7 | 规则标签匹配：零外部依赖、可复现 |
+
+---
+
 # V2 候选方案评估（AI proxy 技术评审，正式人工验收待完成）
 
 来源：原 19 条 V2 需求、docs/plans/V2-execution.md、ADR-005；评审不声称具名人工批准。

@@ -236,7 +236,7 @@
 
 ## 7. Permissions（文件级访问）
 
-见 `adr-002-fail-closed-and-governance.md` §2 D4 的 safety-critical 路径清单。
+见 `adr/002-fail-closed-and-governance.md` §2 D4 的 safety-critical 路径清单。
 机器可读形式待建：`.opencode/permissions.jsonc`（D3 交付物）。
 **强制机制**：Permission（WHO，始终强制）+ pre-commit hook（WHEN，事件触发），**两者都需要**。
 
@@ -288,7 +288,7 @@
 | 替换架构元素 | 旧条目标 `status: OBSOLETED` + `replaced_by` 指针，**绝不物理删除**（课程行 4637） |
 | 测试失败归因 | **遵守 ADR-002 D3**：结构测试通过而行为测试失败 → **改架构（ADD-R），不要 patch 代码** |
 
-**ADR 重开触发器**：见 `adr-001-*.md` §6 与 `adr-002-*.md` §6，全部为可度量形式。
+**ADR 重开触发器**：见 `adr/001-*.md` §6 与 `adr/002-*.md` §6，全部为可度量形式。
 
 > **架构债务不得静默**（课程行 5246）：任何捷径或偏离必须记入 `docs/debt-register.md` 并带重开条件。
 
@@ -317,7 +317,7 @@ SE_Project/
 └── docs/
     ├── HANDOVER.md
     ├── req/                       # D1：requirements.yaml + req-schema.json
-    ├── architecture/              # D2：asr-register / invariants / adr-001 / adr-002（本文件在根）
+    ├── architecture/              # D2：asr-register / invariants / adr/001 / adr/002（本文件在根）
     ├── code-governance/           # D3/D4：structural / verification / mcp-manifest（待建）
     ├── design/                    # technical-design-v1.md（其架构性内容正迁往 architecture/）
     ├── review-memo.md             # D4（待建）

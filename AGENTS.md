@@ -78,8 +78,8 @@
 | 1 | `docs/req/requirements.yaml` | 需求单一来源；ID、fit criterion、`enforced_by` |
 | 2 | `docs/architecture/asr-register.md` | 哪些需求强制结构决策（A1）；18 ASR + 4 impl |
 | 3 | `docs/architecture/invariants.md` | **16 条不变量 + fallback**；不可协商的边界 |
-| 4 | `docs/architecture/adr-001-guarded-hybrid.md` | **权威边界**：谁决策、谁检查、谁必须不行动 |
-| 5 | `docs/architecture/adr-002-fail-closed-and-governance.md` | 失败语义、证据不可协商、权限+hook |
+| 4 | `docs/architecture/adr/001-guarded-hybrid.md` | **权威边界**：谁决策、谁检查、谁必须不行动 |
+| 5 | `docs/architecture/adr/002-fail-closed-and-governance.md` | 失败语义、证据不可协商、权限+hook |
 | 6 | `architecture-blueprint.md` | 主约束文档：11 节（权威、工作流、权限、验证、可观测、变更策略） |
 | 7 | `docs/architecture/trace-matrix.md` | 每条需求的强制组件 + 测试证据 + **运行时 monitor** |
 | 8 | `docs/architecture/memory-design.md` | 状态与保留策略（V1 无状态，但**上下文装配受它约束**） |

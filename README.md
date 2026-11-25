@@ -38,7 +38,7 @@ CS5351 Agentic Software Engineering Project · 2026-2027
 | **D2** | 架构工件（11 类） | ✅ 完成 | 5 份 CORE（blueprint / invariants / trace-matrix / memory-design / ADR-001 + ADR-002）全就位；另含 ASR 登记册、concern cluster、runtime-policy-catalog |
 | **D3** | 编码治理 | ✅ **完成** | `AGENTS.md` + `structural-constraints.md` + **`docs/code-governance/mcp-tool-manifest.md`**（工具与角色授权）+ **`.opencode/permissions.jsonc`**（机器可读权限模型，含 guard rules 与 enforcement）+ **`.opencode/rules.md`**（R1–R10 常驻行为规则，human-only）+ **`.agent/rules.md`**（五项公约：抽象上限 / 依赖约束 / 测试独立性 / safety-critical 须 ADR / 上下文新鲜度） |
 | **D4** | 验证治理 | ✅ 完成 | `verification-constraints.md`、`review-memo.md`、`debt-register.md`、`bug-diary.md` + Tier 1 fitness function |
-| **D5** | Agent 会话记录 | ✅ **完成** | `transcripts/` 已归档 **6 份原始会话**（`raw/`，逐帧 zstd，未改写）+ **7 份可读稿**。D5 主记录为 `2026-10-06-v1-build-and-governance.md`（从零构建 V1：56 轮 / 1149 次工具调用 / 16 次审批）。其中 **4 份**附人工干预索引（INT-xx 编号表），**2 份为完整原始导出**（10-06、11-17，人类消息以对话原文保留）；详见 [`transcripts/README.md`](transcripts/README.md) |
+| **D5** | Agent 会话记录 | ✅ **完成** | `transcripts/` 已归档 **6 份原始会话**（`raw/`，逐帧 zstd，未改写）+ **7 份可读稿**。D5 主记录为 `60989886ShenJiyun-2026-10-06-v1-build-and-governance.md`（从零构建 V1：56 轮 / 1149 次工具调用 / 16 次审批）。其中 **4 份**附人工干预索引（INT-xx 编号表），**2 份为完整原始导出**（10-06、11-17，人类消息以对话原文保留）；详见 [`transcripts/README.md`](transcripts/README.md) |
 | **D6** | 报告 `Report.md` | ⏳ **进行中** | 姓名/学号、相对贡献表（均值 1.0）、每人自评（300–500 词，**不能代写**）由团队成员分别填写 |
 | **D7** | GitHub 仓库 + 6 道门禁 | ⚠️ **部分** | `ci.yml` + 6 个门禁检查器 + `CODEOWNERS` + `docs/branch-protection.md`；分支保护**已启用**（required checks + code owner review），直推被拒有实测日志（§9）。**仍待补**：§8 两条 PR 批准规则（`docs/` 免批准、`src/` 须 owner 批准）尚无验证记录；门禁 1「Test approval」尚未加入 required checks |
 | **D8** | 源码与测试 | ✅ **完成** | **9 个架构元素全部实现**（`src/` 下 ①–⑦ ads / scene / compliance / selector / render / audit / app，⑧ bidding，⑨ corpus）；模块名与架构元素一致 ✅；测试布局 offline/live 分离 ✅。**679 个离线测试**（`HANDOVER-V3.md` §10）+ **33/33 变异验证** |
@@ -72,7 +72,7 @@ CS5351 Agentic Software Engineering Project · 2026-2027
 
 **权威边界**：LLM 只能从候选集内选择，不得自创广告；compliance 管道不可被任何路径绕过。
 **失败语义**：本项目无运行时人类复核环节，故降级终态统一为 `no_ad`（fail-closed）。
-设计依据见 `docs/architecture/adr-001-guarded-hybrid.md` 与 `adr-002-fail-closed-and-governance.md`。
+设计依据见 `docs/architecture/adr/001-guarded-hybrid.md` 与 `adr/002-fail-closed-and-governance.md`。
 
 ## 版本演进
 
@@ -131,7 +131,7 @@ CS5351 Agentic Software Engineering Project · 2026-2027
 | 架构蓝图（CORE） | `architecture-blueprint.md` | **仓库根目录**，11 节可执行约束 |
 | 追踪矩阵（CORE） | `docs/architecture/trace-matrix.md` | 需求 → 组件 → 测试 → **运行时 monitor** |
 | 记忆/状态设计（CORE） | `docs/architecture/memory-design.md` | V1 无状态的论证与后果 |
-| ADR | `docs/architecture/adr-001..004-*.md` | ①Guarded Hybrid ②fail-closed 与治理 ③评估集为一等架构资产 ④**验证平面保护** |
+| ADR | `docs/architecture/adr/001..004-*.md` | ①Guarded Hybrid ②fail-closed 与治理 ③评估集为一等架构资产 ④**验证平面保护** |
 | 运行时策略目录 | `docs/architecture/runtime-policy-catalog.md` | 17 条失败策略（`RP-001`~`017`） |
 | 编码代理治理入口 | `AGENTS.md` | 由架构工件装配而成（非散文撰写） |
 | 结构/验证约束 | `docs/code-governance/` | S1–S3、V1–V4、三层验证、角色分离 |

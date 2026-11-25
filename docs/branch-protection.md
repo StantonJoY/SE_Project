@@ -28,7 +28,7 @@
 
 ## 2. 受保护路径清单（唯一来源）
 
-**不在此处硬编码** —— 清单从 `docs/architecture/adr-002-fail-closed-and-governance.md` §2 D4 解析，
+**不在此处硬编码** —— 清单从 `docs/architecture/adr/002-fail-closed-and-governance.md` §2 D4 解析，
 由 `scripts/check_safety_paths.py --show-paths` 输出。当前结果：
 
 | 路径 | 强制 ADR？ |

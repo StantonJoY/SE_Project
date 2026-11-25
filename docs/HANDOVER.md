@@ -74,7 +74,7 @@
 >
 > **CORE 工件进度**（课程规定 5 份）：**5/5 全部完成** ——
 > `architecture-blueprint.md` ✅、`docs/architecture/invariants.md` ✅、`docs/architecture/trace-matrix.md` ✅、
-> `docs/architecture/memory-design.md` ✅、`docs/architecture/adr-001/002-*.md` ✅（扁平命名，非 `adr/` 子目录）。
+> `docs/architecture/memory-design.md` ✅、`docs/architecture/adr/001/002-*.md` ✅（扁平命名，非 `adr/` 子目录）。
 >
 > **架构债 21 条**（编号 `TD-001`~`TD-022`，其中 3 条已关闭）：见 `docs/debt-register.md`。
 > **`TD-001` 最严重**：22 条需求的运行时 monitor 全部未实现（落地主要在 P6）。

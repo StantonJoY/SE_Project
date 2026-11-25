@@ -941,10 +941,10 @@ Gate 1（测试批准）会 FAIL：V2 测试没有具名人类的前置批准记
 | 13 | `pwsh` | Inspect session record schemas | ✅ === turn/start === {"type":"turn/start","seq":4,"time":1794916652980,"data":{"tu… |
 | 14 | `write` | D:\CityU\SE\project\_export.js | ✅ <path>D:\CityU\SE\project\_export.js</path> <type>file</type> <content> Created … |
 | 15 | `pwsh` | Export transcript to markdown and check ignore rules | ✅ written: D:\CityU\SE\project\SE_Project\transcripts\2026-11-17-main-v2-integrati… |
-| 16 | `read` | D:\CityU\SE\project\SE_Project\transcripts\2026-11-17-main-v2-integration.md | ✅ <path>D:\CityU\SE\project\SE_Project\transcripts\2026-11-17-main-v2-integration.… |
+| 16 | `read` | D:\CityU\SE\project\SE_Project\transcripts\60989886ShenJiyun-2026-11-17-main-v2-integration.md | ✅ <path>D:\CityU\SE\project\SE_Project\transcripts\2026-11-17-main-v2-integration.… |
 | 17 | `write` | D:\CityU\SE\project\_export.js | ✅ <path>D:\CityU\SE\project\_export.js</path> <type>file</type> <content> Updated … |
 | 18 | `pwsh` | Re-export transcript with fixes | ✅ written: D:\CityU\SE\project\SE_Project\transcripts\2026-11-17-main-v2-integrati… |
-| 19 | `read` | D:\CityU\SE\project\SE_Project\transcripts\2026-11-17-main-v2-integration.md | ✅ <path>D:\CityU\SE\project\SE_Project\transcripts\2026-11-17-main-v2-integration.… |
+| 19 | `read` | D:\CityU\SE\project\SE_Project\transcripts\60989886ShenJiyun-2026-11-17-main-v2-integration.md | ✅ <path>D:\CityU\SE\project\SE_Project\transcripts\2026-11-17-main-v2-integration.… |
 | 20 | `edit` | D:\CityU\SE\project\_export.js | ✅ The file D:\CityU\SE\project\_export.js has been updated successfully. |
 | 21 | `pwsh` | Re-export and copy raw session file | ✅  |
 

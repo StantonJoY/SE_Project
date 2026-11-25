@@ -181,5 +181,5 @@ prompt 是概率性的——**安全关键规则绝不写在 prompt 里**（note
 
 本 ADR 只界定权威边界（AI 建议 / 代码裁决）。**模型每一轮看到什么**——六层结构、
 五步装配流水线、2000 token 上限与 85% 压缩阈值、压缩后的约束重注入策略——
-由 [ADR-008](adr-008-layered-context-and-assembly.md) 单独记录（课程 D2 第 2 条的点名项）。
+由 [ADR-008](adr/008-layered-context-and-assembly.md) 单独记录（课程 D2 第 2 条的点名项）。
 

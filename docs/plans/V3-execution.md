@@ -117,7 +117,7 @@ target_files_pr3: ["src/corpus/pricing.py", "scripts/build_bids_v3.py", "data/bi
                    "src/app/pipeline_v2.py", "test/offline/test_v3_pricing*.py"]
 target_files_pr4: ["scripts/fitness_functions.py", "docs/architecture/*.md",
                    "docs/req/requirements.yaml", "eval/*", "docs/ai-use-log.yaml"]
-target_files_pr0: ["docs/req/requirements.yaml", "docs/architecture/adr-006-*.md",
+target_files_pr0: ["docs/req/requirements.yaml", "docs/architecture/adr/006-*.md",
                    "docs/architecture/invariants.md", "docs/code-governance/acceptance-coverage-map.yaml"]
 allowed_imports: ["json", "pathlib", "dataclasses", "typing", "collections.abc", "yaml"]
 prohibited_imports: ["requests", "urllib", "random", "time", "audit", "selector", "compliance"]
@@ -199,7 +199,7 @@ PR-0 ──▶ PR-1 ──▶ PR-2 ──▶ PR-3 ──▶ PR-4
 
 | # | 动作 | 产出 | 自验 |
 |---|---|---|---|
-| 0.1 | 写 ADR-006：沿用 `docs/` 的理由、只读语料、投影旁路、合规只动 2 个函数、`scope.out` 的 RAG 条改判 | `docs/architecture/adr-006-v3-corpus-boundary.md` | `check_safety_paths.py --show-paths` 能解析到新清单 |
+| 0.1 | 写 ADR-006：沿用 `docs/` 的理由、只读语料、投影旁路、合规只动 2 个函数、`scope.out` 的 RAG 条改判 | `docs/architecture/adr/006-v3-corpus-boundary.md` | `check_safety_paths.py --show-paths` 能解析到新清单 |
 | 0.2 | 注册表追加 **20 条**（`version: "V3"`，ID 续 ADS 编号）+ `evolution_rounds` 加 V3 + 改 `scope.out` | `docs/req/requirements.yaml` | `validate_requirements.py` PASS，条数 41 → 58 |
 | 0.3 | 不变量登记 `INV-V3-001..008` | `docs/architecture/invariants.md` | `validate_requirements.py` 的双向一致性不掉 |
 | 0.4 | 覆盖表登记 20 条的测试去向 | `acceptance-coverage-map.yaml` | `fitness_functions.py` PASS |

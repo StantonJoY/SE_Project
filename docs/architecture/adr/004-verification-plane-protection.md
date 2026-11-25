@@ -221,7 +221,7 @@
 |---|---|
 | `docs/debt-register.md` 的 `TD-025` | 本 ADR 关闭该条目；新增 `TD-028` |
 | `scripts/check_safety_paths.py` | 本 ADR D4 的落地（标记驱动的多 ADR 合并） |
-| `docs/architecture/adr-002-*.md` §2 D4 | 仅新增标记，路径表未改 |
+| `docs/architecture/adr/002-*.md` §2 D4 | 仅新增标记，路径表未改 |
 | `docs/code-governance/mcp-tool-manifest.md` §3 | 路径授权表须同步体现新增保护 |
 | `.opencode/permissions.jsonc` 的 P-009 | 原标 `eval/` 为 `unprotected`、指向 `TD-025` —— 须更新为 `safety_critical` |
 | `.agent/rules.md` §5.1 | 上下文新鲜度清单 —— 本 ADR 属须同步项 |

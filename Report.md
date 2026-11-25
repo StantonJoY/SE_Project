@@ -856,9 +856,9 @@ that question machine-checkable, and then to publish the places where the answer
 |---|---|
 | 61 requirements, typed and validated | `docs/req/requirements.yaml`, `docs/req/req-schema.json`, `scripts/validate_requirements.py` |
 | 36 invariants with fallbacks | `docs/architecture/invariants.md`, `docs/code-governance/acceptance-coverage-map.yaml` |
-| Authority boundaries | `docs/architecture/adr-001-guarded-hybrid.md`, `docs/architecture/adr-002-fail-closed-and-governance.md` |
-| V2 separation | `docs/architecture/adr-005-*` |
-| V3 corpus boundary and pricing | `docs/architecture/adr-006-v3-corpus-boundary.md` (D1–D9) |
+| Authority boundaries | `docs/architecture/adr/001-guarded-hybrid.md`, `docs/architecture/adr/002-fail-closed-and-governance.md` |
+| V2 separation | `docs/architecture/adr/005-*` |
+| V3 corpus boundary and pricing | `docs/architecture/adr/006-v3-corpus-boundary.md` (D1–D9) |
 | 679 tests, 33 mutations | `test/offline/`, `scripts/mutation_check.py` |
 | 57 evaluation cases | `eval/eval_cases.json`, `eval/v2_cases.json`, `eval/v3_cases.json` |
 | Independent test evidence | `docs/testing/V3-Test-Report.md`, `evidence/v3/` |

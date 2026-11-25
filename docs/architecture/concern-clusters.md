@@ -211,7 +211,7 @@ Deterministic Authority (C1)                        ← 最高
 | **B — Guarded Hybrid**（ADR-001 选定） | 确定性管道位于 AI 之后 | 闭集选择 + 严格 schema | `no_ad` 单一路径 | C1/C2 Strong；C3 最简 → **选定** |
 | **C — Orchestrated**（多 Agent + 人工复核） | 多重复核 + 人工终审 | AI 建议 + 评审路由 | `REVIEW` 队列 + checkpoint | C1 Strong 但 **C3 Complexity = Weak**；**推迟** |
 
-> 上述 A/B/C 与 `adr-001-guarded-hybrid.md` §3–§4 的评价准则打分一致。
+> 上述 A/B/C 与 `adr/001-guarded-hybrid.md` §3–§4 的评价准则打分一致。
 > 更完整的候选评价表（10 维准则 + W/M/S 打分）属课程 Step 3 产物 `eval-table.md`，本文件只给生成轴。
 
 ---
@@ -256,7 +256,7 @@ Deterministic Authority (C1)                        ← 最高
 | §2 优先级 | 课程 note 行 528 | ADR 评价准则权重 |
 | §3 冲突裁决 | 课程 note 行 530–538 | `runtime-policy-catalog.md`、`architecture-blueprint.md` §3 |
 | §4 假设 | 课程 note 行 540–547 | `risk-list.md`（待建） |
-| §5 候选轴 | `adr-001-guarded-hybrid.md` §3–4 | `eval-table.md`（课程 Step 3，待建） |
+| §5 候选轴 | `adr/001-guarded-hybrid.md` §3–4 | `eval-table.md`（课程 Step 3，待建） |
 | §6 转移检查 | 课程 note 行 2027–2037 | 7 步循环 Step 1 |
 
 

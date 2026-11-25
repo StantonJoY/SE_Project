@@ -114,7 +114,7 @@ sources:
 
 # ---------------------------------------------------------------------------
 # 优先级与显式取舍（课程 D1 原文：Prioritization uses MoSCoW, and states the
-# tradeoff explicitly）。决定见 docs/architecture/adr-007-requirements-prioritization.md
+# tradeoff explicitly）。决定见 docs/architecture/adr/007-requirements-prioritization.md
 # ---------------------------------------------------------------------------
 prioritization:
   method: "MoSCoW"

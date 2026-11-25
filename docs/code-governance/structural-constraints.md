@@ -3,7 +3,7 @@
 > **D3 交付物** · 课程对应：note 行 3686–3712（P181）、行 5387–5394
 > **消费者**：BUILD agent（生成前）、VERIFICATION agent（生成后）、HUMAN REVIEWER（只复核 P0 违规）
 > **状态**：草案待批 · 版本：V1（`docs/architecture/` 轮次）· 日期：2026-10-06
-> **上游**：`architecture-blueprint.md`、`docs/architecture/adr-001/002-*.md`、`docs/architecture/invariants.md`
+> **上游**：`architecture-blueprint.md`、`docs/architecture/adr/001/002-*.md`、`docs/architecture/invariants.md`
 > **机械化实现**：`scripts/fitness_functions.py`（CI Tier 1 结构门，**独立于任何 LLM**）
 
 > 课程关键原则（note 行 3753）：**结构约束管 ORGANIZATION，验证约束管 EVIDENCE。**

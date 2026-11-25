@@ -124,7 +124,7 @@ entries:
     tool: "DSH（deepseek harness）"
     role: "build"
     task: "D2/D3/D4：产出 5 份 CORE 工件（ADR-001/002、blueprint、trace-matrix、memory-design）与治理文件（结构/验证约束、fitness function、覆盖映射、债务册、缺陷日记、评审备忘录、AGENTS.md）"
-    artifacts: ["architecture-blueprint.md", "AGENTS.md", "docs/architecture/adr-001-guarded-hybrid.md", "docs/architecture/adr-002-fail-closed-and-governance.md", "docs/architecture/trace-matrix.md", "docs/architecture/memory-design.md", "docs/architecture/runtime-policy-catalog.md", "docs/code-governance/", "docs/debt-register.md", "docs/bug-diary.md", "docs/review-memo.md", "scripts/fitness_functions.py"]
+    artifacts: ["architecture-blueprint.md", "AGENTS.md", "docs/architecture/adr/001-guarded-hybrid.md", "docs/architecture/adr/002-fail-closed-and-governance.md", "docs/architecture/trace-matrix.md", "docs/architecture/memory-design.md", "docs/architecture/runtime-policy-catalog.md", "docs/code-governance/", "docs/debt-register.md", "docs/bug-diary.md", "docs/review-memo.md", "scripts/fitness_functions.py"]
     outcome: "accepted"
     human_approval: "人类指示「接着做」「先补 core」"
     notes: "评审备忘录判定 CHANGES REQUIRED（PR 规模超标、AI-use 日志未更新、安全路径无人工批准、无具名所有者）。本 entry 即为补齐 AI-use 日志门禁的动作。"
@@ -148,7 +148,7 @@ entries:
     tool: "DSH（deepseek harness）"
     role: "plan"
     task: "关闭 OQ-004/OQ-009/OQ-010；ADR-001/002 转为 Accepted；起草并获批 P4 执行计划；按门禁 1 预登记 P4 测试"
-    artifacts: ["docs/architecture/adr-001-guarded-hybrid.md", "docs/architecture/adr-002-fail-closed-and-governance.md", "docs/plans/P4-selector.md", "docs/test-approvals.yaml", "docs/req/requirements.yaml", "docs/req/req-schema.json", "docs/architecture/asr-register.md", "docs/architecture/concern-clusters.md", "docs/execution-plan-template.md", "Prompt.md"]
+    artifacts: ["docs/architecture/adr/001-guarded-hybrid.md", "docs/architecture/adr/002-fail-closed-and-governance.md", "docs/plans/P4-selector.md", "docs/test-approvals.yaml", "docs/req/requirements.yaml", "docs/req/req-schema.json", "docs/architecture/asr-register.md", "docs/architecture/concern-clusters.md", "docs/execution-plan-template.md", "Prompt.md"]
     outcome: "accepted"
     human_approval: "人类指示：解释口径 = 「为什么选这条」；置信度 = 0.5；批准者 = Shane；并确认「看过了没问题，继续推进」"
     notes: >-
@@ -226,7 +226,7 @@ entries:
     tool: "DSH（deepseek harness）"
     role: "plan"
     task: "起草 P7 执行计划；关闭 OQ-005；建立 ADR-003（评估集作为一等架构资产）；按门禁 1 预登记 P7 测试（TA-0004）"
-    artifacts: ["docs/plans/P7-eval.md", "docs/architecture/adr-003-evaluation-set-as-architecture.md", "docs/test-approvals.yaml", "docs/req/requirements.yaml", "architecture-blueprint.md", "AGENTS.md", "config.yaml", "src/selector/context.py", "src/app/pipeline.py"]
+    artifacts: ["docs/plans/P7-eval.md", "docs/architecture/adr/003-evaluation-set-as-architecture.md", "docs/test-approvals.yaml", "docs/req/requirements.yaml", "architecture-blueprint.md", "AGENTS.md", "config.yaml", "src/selector/context.py", "src/app/pipeline.py"]
     outcome: "accepted"
     human_approval: "人类批准计划，并确认：OQ-005 口径 = agent 自造为主 + 人类审查后可增改；通过率阈值 0.95（FAIL 也是有效观测）；并指示「新造 ADR，评测也是重要决策」"
     notes: >-
@@ -270,7 +270,7 @@ entries:
     tool: "DSH（deepseek harness）"
     role: "build"
     task: "补齐 D3 缺失的 4 个治理文件；产出本地 hook 安装器；按人类选定的方案甲新建 ADR-004 把验证平面纳入受保护路径"
-    artifacts: ["docs/code-governance/mcp-tool-manifest.md", ".opencode/permissions.jsonc", ".opencode/rules.md", ".agent/rules.md", "scripts/install_hooks.py", "docs/architecture/adr-004-verification-plane-protection.md", "scripts/check_safety_paths.py", "docs/architecture/adr-002-fail-closed-and-governance.md", "docs/debt-register.md", "README.md"]
+    artifacts: ["docs/code-governance/mcp-tool-manifest.md", ".opencode/permissions.jsonc", ".opencode/rules.md", ".agent/rules.md", "scripts/install_hooks.py", "docs/architecture/adr/004-verification-plane-protection.md", "scripts/check_safety_paths.py", "docs/architecture/adr/002-fail-closed-and-governance.md", "docs/debt-register.md", "README.md"]
     outcome: "accepted"
     human_approval: "人类批准 D3 文件；对 TD-025 在三个方案中选择「甲 —— 新建 ADR-004」（符合 ADR-002 的冻结语义）"
     notes: >-
@@ -376,7 +376,7 @@ entries:
     tool: "native collaboration + orchestration helpers"
     role: "review"
     task: "按真实用户授权执行计划，记录重定向、拒绝、代理批准、额度中断及可导出的工具记录"
-    artifacts: ["docs/plans/V2-execution.md", "docs/architecture/adr-005-v2-atomic-auction.md"]
+    artifacts: ["docs/plans/V2-execution.md", "docs/architecture/adr/005-v2-atomic-auction.md"]
     outcome: "pending"
     evidence: "docs/review-memo.md"
     review_kind: "ai_proxy"
@@ -430,7 +430,7 @@ entries:
       - "data/corpus/{items,tags}.jsonl + manifest.json"
       - "data/bids-corpus.json + data/scene-content-rules.yaml"
       - "config-v3.yaml + eval/v3_runner.py + docs/HANDOVER-V3.md"
-      - "docs/architecture/adr-006-v3-corpus-boundary.md"
+      - "docs/architecture/adr/006-v3-corpus-boundary.md"
     outcome: "pending"
     evidence: "docs/HANDOVER-V3.md；eval/v3_runner.py 14/14；pytest 675 passed；mutation_check 33/33"
     review_kind: "ai_proxy"
