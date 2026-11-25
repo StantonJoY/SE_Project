@@ -262,15 +262,15 @@ share and the derived factor, because a factor alone forces the reader to revers
 
 | Member | Share | Relative factor | Note |
 |---|---|---|---|
-| Shen Jiyun (60989886) | 31.25% (5/16) | **1.25** | PM; theme and iteration direction; process-artifact system; V1 and V3 implementation |
-| Gong Yuebin (60652349) | 22.92% (11/48) | **0.917** | Architecture / AI review |
-| Zhang Qiyan (60805659) | 22.92% (11/48) | **0.917** | Application / integration |
-| Gao Zhechun (60880776) | 22.92% (11/48) | **0.917** | Quality / governance |
-| **Average** | **100%** | **1.000** | (1.25 + 0.917 × 3) / 4 = 1.0 |
+| Shen Jiyun (60989886) | 33.33% (1/3) | **1.333** | PM; theme and iteration direction; process-artifact system; V1 and V3 implementation |
+| Gong Yuebin (60652349) | 22.22% (2/9) | **0.889** | Architecture / AI review |
+| Zhang Qiyan (60805659) | 22.22% (2/9) | **0.889** | Application / integration |
+| Gao Zhechun (60880776) | 22.22% (2/9) | **0.889** | Quality / governance |
+| **Average** | **100%** | **1.000** | (1.333 + 0.889 × 3) / 4 = 1.0 |
 
-The shares are exact fractions: 5/16 for the first member and 11/48 for each of the other
-three (11/48 × 3 + 5/16 = 1). The decimals shown are rounded for readability; the factors are
-derived from the fractions, not from the rounded percentages.
+The shares are exact fractions: 1/3 for the first member and 2/9 for each of the other three
+(2/9 × 3 + 1/3 = 1). The decimals shown are rounded for readability; the factors are derived
+from the fractions, not from the rounded percentages.
 
 Three things are worth stating explicitly, because a contribution table is the one section
 where vagueness costs marks:
@@ -286,9 +286,10 @@ where vagueness costs marks:
   the requirement registry and the iteration plan, who implemented V1 and V3, who implemented and
   settled the V2 auction, who ran the independent test pass and packaged the evidence. We did not
   use raw hours, because agent-assisted work makes hours a poor proxy for contribution.
-- **Why nobody is near the extremes.** The largest factor is 1.25 and the smallest 0.917. The
-  course allows clamping for extreme cases such as a free rider; with this spread no clamping is
-  needed, and every member is above 0.9 — the report is not being used to punish anyone.
+- **Why nobody is near the extremes.** The largest factor is 1.333 and the smallest 0.889 — a
+  spread of roughly ±30% around the mean. The course allows clamping for extreme cases such as a
+  free rider; with this spread no clamping is needed. The practical consequence is worth stating
+  openly: at a project mark of 75 the factors translate to 100.0 / 66.7 / 66.7 / 66.7.
 
 ### 3.3 Self-evaluations
 
