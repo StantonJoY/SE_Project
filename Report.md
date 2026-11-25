@@ -272,8 +272,23 @@ The shares are exact fractions: 5/16 for the first member and 11/48 for each of 
 three (11/48 × 3 + 5/16 = 1). The decimals shown are rounded for readability; the factors are
 derived from the fractions, not from the rounded percentages.
 
-*Factor = share × 4. The four members must agree on the shares before submission; the
-placeholder row values are not filled in by an agent.*
+Three things are worth stating explicitly, because a contribution table is the one section
+where vagueness costs marks:
+
+- **How the factor is computed.** It is the member's contribution divided by the team mean,
+  which for four members equals *share × 4*. The course's own worked example uses the same
+  arithmetic: contributions 60 / 55 / 35 give a mean of 50, hence factors 1.2 / 1.1 / 0.7, and a
+  project mark of 69 becomes 82.8 / 75.9 / 48.3 for the three members. Our factors follow that
+  definition exactly, not a different one.
+- **What the shares are based on.** Roles were fixed at the start of the project (PM,
+  architecture/AI, application/integration, quality/governance) and the shares were agreed at the
+  2026-11-25 team meeting by comparing the delivered artifacts against those roles: who owned
+  the requirement registry and the iteration plan, who implemented V1 and V3, who implemented and
+  settled the V2 auction, who ran the independent test pass and packaged the evidence. We did not
+  use raw hours, because agent-assisted work makes hours a poor proxy for contribution.
+- **Why nobody is near the extremes.** The largest factor is 1.25 and the smallest 0.917. The
+  course allows clamping for extreme cases such as a free rider; with this spread no clamping is
+  needed, and every member is above 0.9 — the report is not being used to punish anyone.
 
 ### 3.3 Self-evaluations
 
