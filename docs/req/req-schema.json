@@ -137,6 +137,41 @@
       "additionalProperties": {"type": "string", "pattern": "^REQ-[A-Z0-9-]+$"}
     },
 
+    "prioritization": {
+      "type": "object",
+      "description": "MoSCoW prioritization plus EXPLICIT tradeoffs (course D1: 'Prioritization uses MoSCoW, and states the tradeoff explicitly'). Automated coverage is not enough: a reviewer must be able to read what we gave up and why.",
+      "additionalProperties": false,
+      "required": ["method", "tradeoffs"],
+      "properties": {
+        "method": {"type": "string", "enum": ["MoSCoW"]},
+        "distribution": {
+          "type": "object",
+          "description": "Count per MoSCoW level; must match the priority values actually used in baseline_requirements.",
+          "additionalProperties": {"type": "integer", "minimum": 0}
+        },
+        "tradeoff_policy": {"type": "string", "minLength": 1},
+        "tradeoffs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["decision", "gave_up", "why", "refs"],
+            "additionalProperties": false,
+            "properties": {
+              "decision": {"type": "string", "minLength": 1},
+              "gave_up": {"type": "string", "minLength": 1},
+              "why": {"type": "string", "minLength": 1},
+              "refs": {
+                "type": "array",
+                "minItems": 1,
+                "items": {"type": "string", "pattern": "^REQ-[A-Z0-9-]+$"}
+              }
+            }
+          }
+        }
+      }
+    },
+
     "open_questions": {
       "type": "array",
       "description": "Unresolved decisions. Closed entries are KEPT (not deleted) so that the decision history stays auditable — the registry doubles as a decision log (course: requirements co-evolve with artifacts).",

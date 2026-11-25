@@ -113,6 +113,46 @@ sources:
     note: "A1~A5 五动作、11 类架构工件、Capstone 评分量规；架构需求分类依据。"
 
 # ---------------------------------------------------------------------------
+# 优先级与显式取舍（课程 D1 原文：Prioritization uses MoSCoW, and states the
+# tradeoff explicitly）。决定见 docs/architecture/adr-007-requirements-prioritization.md
+# ---------------------------------------------------------------------------
+prioritization:
+  method: "MoSCoW"
+  distribution:
+    must: 58
+    should: 3
+  tradeoff_policy: >-
+    must = 不满足则系统不可交付（安全边界、确定性、可审计、可复现）；
+    should = 影响覆盖面或演示效果，但不阻断交付；
+    could / won't 一律登记在 scope.out，并写明 deferred_to 与 rationale。
+    任何 must 要降级为 should，须先立 ADR 并记录"降级后失去什么"。
+  tradeoffs:
+    - decision: "V3 用确定性标签匹配，替代 RAG / 向量检索召回"
+      gave_up: "长尾语义匹配能力（同义标签、跨语言描述、用户没说出口的意图）"
+      why: >-
+        RAG 需引入向量库与嵌入服务，会破坏零外部依赖与可复现边界，
+        且验证平面绑定 docs/ 路径（ADR-006 D6/D7）。代价是候选召回质量上限被标签词表锁死。
+      refs: ["REQ-ADS-ARCH-013", "REQ-ADS-FR-009"]
+    - decision: "广告费 = 游戏定价 5%，且不做对账"
+      gave_up: "真实计费正确性（含税、退款、跨币种、恶意刷量）"
+      why: >-
+        演示级口径。真实计费会引入货币换算、舍入与对账三条新失败路径，
+        且无支付方参与时无法验证（ADR-006 D5）。
+      refs: ["REQ-ADS-FR-012"]
+    - decision: "V2 语料模式的候选上限压到 4 条"
+      gave_up: "竞价环节的候选多样性（拍卖只在 4 条里选）"
+      why: >-
+        V2 用 UTF-8 字节估算 token，比 V1 的 len/3 保守约 3 倍；
+        2000 预算下第 5 条即超限，只能牺牲候选数量（ADR-006 D8）。
+      refs: ["REQ-ADS-ARCH-016"]
+    - decision: "门禁 1 对 V3 历史保持红色，不回填批准日期"
+      gave_up: "一条全绿的门禁记录（评审时会被逐条追问）"
+      why: >-
+        V3 测试实现于 2026-11-17，具名批准只能在之后作出；伪造日期或放宽校验器
+        都会让门禁退化为装饰。缺口如实登记为 TD-018，并以 TA-0005 建立前向机制。
+      refs: ["REQ-ADS-NFR-QA-002", "REQ-ADS-GOV-003"]
+
+# ---------------------------------------------------------------------------
 # A1 产物（ASR 登记册）与 A2 产物（不变量登记册）的机器可读回指
 # 一致性由 scripts/validate_requirements.py 双向校验
 # ---------------------------------------------------------------------------
