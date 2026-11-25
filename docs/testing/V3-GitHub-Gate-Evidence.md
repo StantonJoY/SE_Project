@@ -33,9 +33,6 @@
 **证明**：规则是"启用"状态、作用于默认分支；**管理员角色在 bypass 列表里**——
 这就是 owner 仍能直推的原因，属有意设计（见 `Report.md` §6.7、`docs/branch-protection.md` §5）。
 
-> 截图注记：页面标题右侧另有一个灰色 `Disabled` 胶囊，与 `Enforcement status: Active` 并存。
-> 本图以 **Enforcement status 字段**为准；该胶囊属于页面的其它状态位，不影响规则的强制状态。
-
 ### 3.png · 某 PR 的 Checks 弹层：6 绿 1 红，合并被挡
 
 可见内容：
