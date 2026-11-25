@@ -659,6 +659,13 @@ four-person course project and would not be acceptable in production. The measur
 (the three-row table above) is kept in `docs/branch-protection.md` §9 so that the claim can be
 re-checked instead of trusted.
 
+**Figures.** Three screenshots carry the visual evidence: the ruleset page (which checks are
+required, and that the owner is on the bypass list), the PR #3 checks panel (Gate 1 red, the
+other six green, plus the merge state), and the Actions run list (seven jobs today versus a run
+that reported success with zero jobs). They live in
+`evidence/v3/v3-20261125-github-gates/{1,2,3}.png`; what each one supports is itemised in
+`docs/testing/V3-GitHub-Gate-Evidence.md`.
+
 ---
 
 ## 7. Challenges and Rework

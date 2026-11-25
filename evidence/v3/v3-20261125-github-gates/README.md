@@ -1,34 +1,32 @@
 # GitHub 门禁实证（2026-11-25）
 
-> 截图清单与拍摄说明见 [`docs/testing/V3-GitHub-Gate-Evidence.md`](../../../docs/testing/V3-GitHub-Gate-Evidence.md)。
-> 本目录只放截图；每张图对应一个 GitHub 页面与一条可核对的仓库主张。
+> 说明与拍摄要点见 [`docs/testing/V3-GitHub-Gate-Evidence.md`](../../../docs/testing/V3-GitHub-Gate-Evidence.md)。
+> 本目录只放**三张图**，其余主张用文字描述（避免重复截图）。
 
-## 清单
-
-| 图 | 页面 | 证明 |
+| 文件 | 页面 | 覆盖的主张 |
 |---|---|---|
-| A1 | PR #3 的 Checks 面板 | Gate 1 红、其余 6 道绿 |
-| A2 | PR #3 页面底部 | 红色检查阻止了合并按钮 |
-| A3 | 本地终端 | 直推被规则拒绝（开关前后对照） |
-| A4 | 只改 `docs/` 的 PR | 文档 PR 免批准 |
-| A5 | 改 `src/` 的 PR | 代码 PR 需 owner 批准 |
-| B1 | Actions 某次 run | 同一 run 内 7 个 job |
-| B2 | 某 job 详情 | 步骤与耗时（变异 ~50 s、回归 ~30 s） |
-| B3 | 历史 run 对比 | 0 job 的"绿色假象" vs 修复后 7 job |
-| C1 | Settings → Rules | 规则、目标分支、6 个 required checks、bypass list |
-| C2 | Settings → Branches | 保护规则存在 |
-| C3 | Branches 列表 | `main` 的 Protected 徽章 |
+| `1.png` | `Settings → Rules` 规则详情 | 规则存在；6 个 required checks 的具体名字；bypass list 含 owner；禁止 force push |
+| `2.png` | PR #3（Checks + 合并区） | Gate 1 红 / 其余 6 道绿；合并状态；是否需要 Code Owner 评审 |
+| `3.png` | Actions 运行列表 | 七道门禁是七个独立 job；0-job 旧 run 与 7-job 新 run 对照 |
 
 ## 命名
 
-`<级别><序号>-<一句话>.png`，例如 `A3-direct-push-rejected.png`。
+固定为 `1.png` / `2.png` / `3.png`（与说明文档 §4 一致）。补拍续图用 `3b.png` 这类后缀，不要重编号。
 
 ## 打码
 
-截图内不得出现密钥、token、个人邮箱。需要遮挡时用**纯色块**，不要用模糊（模糊可被还原）。
+截图内不得出现密钥、token、个人邮箱。遮挡用**纯色块**，不要用模糊（模糊可被还原）。
+
+## 不截图的部分（文字说明在 docs 里）
+
+| 主张 | 文字出处 |
+|---|---|
+| 直推被拒（开关前后对照） | `docs/branch-protection.md` §9.3 |
+| 文档 PR 免评审 / 代码 PR 需 owner | `docs/branch-protection.md` §3 |
+| job 耗时（变异 ~50 s、回归 ~30 s） | `evidence/v3/*/` 的 junit 与 stdout |
 
 ## 诚实边界
 
-- A3 证明"规则对该账号生效"；owner 在 bypass list 中，**日常直推仍放行**（见 `Report.md` §6.7、`docs/branch-protection.md` §5）。
-- A4/A5 证明"CODEOWNERS 覆盖与否的差别"，不证明"所有 PR 都被人工逐条审过"。
-- B3 只证明"当时 job 数为 0"；根因（workflow 级 `env` 引用 `runner.temp`）的修复在提交 `8d9a14c`。
+- `1.png` 的 bypass list 说明 owner 可绕过：规则约束其他成员，owner 豁免（已披露）。
+- `2.png` 是"红着合入"的知情记录，不是"红着被拦"；拦截能力由直推被拒的日志证明。
+- `3.png` 中 0-job 的根因是 workflow 级 `env` 引用 `runner.temp`，修复在 `8d9a14c`。
