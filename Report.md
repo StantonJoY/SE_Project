@@ -105,7 +105,7 @@ component must be constrained by deterministic code, the non-negotiable rules *a
 | Cost | 2 | `metric` | Prompt-token ceiling per request |
 
 Priority uses MoSCoW: **58 must**, **3 should**, zero could/won't. Rather than leave the
-tradeoff implicit, `requirements.yaml` now carries a `prioritization` block listing four
+tradeoff implicit, `docs/req/requirements.yaml` now carries a `prioritization` block listing four
 concrete tradeoffs (ADR-007), each tied to the requirement IDs it affects.
 
 ### 1.6 What "done" means
@@ -293,7 +293,7 @@ bypass the gate, and both were rejected on the same grounds.
 
 **System.** I built the process artifacts that make the claims checkable: a 61-entry
 requirement registry, 36 invariants with explicit fallbacks, ADRs for every protected path, a
-trace matrix, six CI gates plus mutation verification, an AI-use log, and named human test
+trace matrix, seven CI gates (six checks plus mutation verification), an AI-use log, and named human test
 approvals. These are not decoration. The first mutation run found four "counterexamples" that
 could not fail: they asserted behaviour that the implementation would satisfy even when
 deliberately broken. Separately, CI had reported success seven times while in fact running
@@ -429,7 +429,7 @@ the "no outside knowledge" clause works.
 | Silent CI | Seven runs reported "no jobs" between 2026-10-11 and the fix | Reading the job list, not the badge |
 | CRLF-hashed manifest | Corpus hashes were computed on Windows line endings, so a LF checkout disagreed | Independent test run on another machine |
 | Prompt without scene semantics | The model saw `family` as an opaque token | Review of the rendered prompt |
-| Corrupted identifiers | First V3 draft used an ID prefix the validator rejects | `validate_requirements.py` |
+| Corrupted identifiers | First V3 draft used an ID prefix the validator rejects | `scripts/validate_requirements.py` |
 
 Each of these is recorded in `docs/bug-diary.md` or `docs/debt-register.md` with the invariant
 gap it exposed.
@@ -458,10 +458,10 @@ Every link is machine-checked by a different script, so a single broken link can
 
 | Script | What it would catch |
 |---|---|
-| `validate_requirements.py` | Unknown ID, duplicate, missing fallback, enforcement pointing at nothing |
+| `scripts/validate_requirements.py` | Unknown ID, duplicate, missing fallback, enforcement pointing at nothing |
 | `scripts/fitness_functions.py` | Element/module drift (S1), deletion of an element (S2), missing ADR references (S3), missing round criteria (V1–V4) |
 | `check_safety_paths.py` | A protected path changed without an accompanying ADR |
-| `check_test_approval.py` | Tests changed without a prior named human approval |
+| `scripts/check_test_approval.py` | Tests changed without a prior named human approval |
 | `check_semantic_eval.py` | Prompt/auction changes without replay |
 | `check_ai_use_log.py` | AI-assisted code changes not recorded |
 | `check_repo_completeness.py` | Files on disk that never entered the repository |
@@ -530,9 +530,9 @@ recorded as declared-but-not-mutation-backed rather than quietly counted as cove
 
 | Job | What it runs |
 |---|---|
-| Gate 1 · Test approval | `check_test_approval.py` |
+| Gate 1 · Test approval | `scripts/check_test_approval.py` |
 | Gate 2 · Static analysis | `ruff check`, `mypy` |
-| Gate 3 · Schema | `validate_requirements.py` |
+| Gate 3 · Schema | `scripts/validate_requirements.py` |
 | Gate 4 · Semantic evaluation | `check_semantic_eval.py` (triggers replay on prompt/auction changes) |
 | Gate 5 · Regression | full offline suite, 679 tests |
 | Gate 5b · Mutation verification | 33 injections, each in a subprocess |
@@ -750,7 +750,7 @@ auditable.
 
 Volatility appears as **rejected scope**, not as churn: two RAG-direction requirements were
 drafted and then withdrawn (`docs/req/requirements-v3-rag-draft.md` is kept as the negative
-record), and four tradeoffs are now explicit in `requirements.yaml` (§1.4 and ADR-007).
+record), and four tradeoffs are now explicit in `docs/req/requirements.yaml` (§1.4 and ADR-007).
 
 **Defect trends.** Eight significant defects were recorded. Each one is mapped to the
 invariant gap it exposed and to the check that now covers it — this is why the checks exist,
@@ -778,6 +778,32 @@ closed questions instead of deleting them, so the decision history stays readabl
 
 ---
 
+### 7.9 How the process itself was optimised
+
+The course asks not only what process we used but how we improved it. Three changes were made
+in response to evidence, not in response to a plan:
+
+| Trigger (evidence) | Change to the process | Rounds affected |
+|---|---|---|
+| A designer could not state which requirement a module implemented | Requirements became typed, and `enforcement` became a mandatory pointer to a real symbol; the validator rejects a pointer to nothing | V1 → V2 |
+| Four "counterexamples" passed under deliberate breakage | Mutation verification became a blocking gate; every declared invariant must have an injection that kills its test | V1 → V2 |
+| CI reported success seven times while running zero jobs | "Job count > 0" became the first thing checked on any CI investigation; the workflow-level `env` mistake was written into the handover as a pitfall | V2 |
+| The same rule was written in three places and drifted (`16` vs `36` invariants) | Data files and counts are derived from a single source; a documentation-consistency audit now has a recorded procedure | V3 |
+| Tests and implementation were written in the same session | Test-first with a named human approval (`TA-*`), enforced by a gate whose timing layer compares approval time with the earliest implementation commit | V3 (forward only) |
+| The owner could not push a doc fix without a PR | Branch protection was split: required checks for everyone, Code Owner approval only for code paths, `docs/` deliberately unlisted | V3 |
+
+Two of these are worth naming as **process optimisations that cost something**: mutation
+verification adds roughly 50 seconds to every run, and the approval gate turns a one-step
+change into three (test → approval → implementation). We kept both because their failure mode
+is silent: a green suite that proves nothing, and a merge record that attests to an approval
+that never happened.
+
+The pattern across all six rows is the same: **the artefact that enforces discipline is the
+easiest one to postpone**, because postponing it has no visible cost until the moment it is
+needed. Each change above was made after that moment had already passed once.
+
+---
+
 ## 8. Conclusion
 
 The project's contribution is not the recommendation engine itself — a five-step gate and a
@@ -798,7 +824,7 @@ that question machine-checkable, and then to publish the places where the answer
 |---|---|
 | 61 requirements, typed and validated | `docs/req/requirements.yaml`, `docs/req/req-schema.json`, `scripts/validate_requirements.py` |
 | 36 invariants with fallbacks | `docs/architecture/invariants.md`, `docs/code-governance/acceptance-coverage-map.yaml` |
-| Authority boundaries | `docs/architecture/adr-001-guarded-hybrid.md`, `adr-002-fail-closed-and-governance.md` |
+| Authority boundaries | `docs/architecture/adr-001-guarded-hybrid.md`, `docs/architecture/adr-002-fail-closed-and-governance.md` |
 | V2 separation | `docs/architecture/adr-005-*` |
 | V3 corpus boundary and pricing | `docs/architecture/adr-006-v3-corpus-boundary.md` (D1–D9) |
 | 679 tests, 33 mutations | `test/offline/`, `scripts/mutation_check.py` |
