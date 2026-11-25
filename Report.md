@@ -7,7 +7,7 @@
 | Repository | `github.com/StantonJoY/SE_Project` |
 | Delivered commit | `8b5a17a` (merge of PR #3, `v3` → `main`), plus `a9c79d8` (branch-protection preparation) |
 | Report version | 1.0 — 2026-11-22 |
-| Team | Shen Jiyun (60989886, PM / architecture / AI), [MEMBER B], [MEMBER C], [MEMBER D] |
+| Team | Shen Jiyun (60989886), Gong Yuebin (60652349), Zhang Qiyan (60805659), [MEMBER D] |
 | Submission file | `[STUDENT_ID].md` |
 
 ---
@@ -251,8 +251,8 @@ Two properties are worth stating because they are the reason for the ordering:
 | Member | Role | Primary scope |
 |---|---|---|
 | Shen Jiyun (60989886) | PM / architecture / AI | Theme and iteration direction, process-artifact system, V1 and V3 implementation |
-| [MEMBER B] | Architecture / AI review | Requirements and ADR review, prompt and model decisions |
-| [MEMBER C] | Application / integration | V2 auction and ledger integration, CLIs |
+| Gong Yuebin (60652349) | Architecture / AI review | Requirements and ADR review, prompt and model decisions |
+| Zhang Qiyan (60805659) | Application / integration | V2 auction and ledger integration, CLIs |
 | [MEMBER D] | Quality / governance | Independent test execution, evidence packaging, gate verification |
 
 ### 3.2 Relative contribution
@@ -262,11 +262,15 @@ share and the derived factor, because a factor alone forces the reader to revers
 
 | Member | Share | Relative factor | Note |
 |---|---|---|---|
-| Shen Jiyun (60989886) | [TBD]% | [TBD] | PM; V1 and V3 implementation; process-artifact system |
-| [MEMBER B] | [TBD]% | [TBD] | |
-| [MEMBER C] | [TBD]% | [TBD] | |
-| [MEMBER D] | [TBD]% | [TBD] | |
-| **Average** | **100%** | **1.00** | Σfactor / 4 = 1.0 |
+| Shen Jiyun (60989886) | 31.25% (5/16) | **1.25** | PM; theme and iteration direction; process-artifact system; V1 and V3 implementation |
+| Gong Yuebin (60652349) | 22.92% (11/48) | **0.917** | Architecture / AI review |
+| Zhang Qiyan (60805659) | 22.92% (11/48) | **0.917** | Application / integration |
+| [MEMBER D] | 22.92% (11/48) | **0.917** | Quality / governance |
+| **Average** | **100%** | **1.000** | (1.25 + 0.917 × 3) / 4 = 1.0 |
+
+The shares are exact fractions: 5/16 for the first member and 11/48 for each of the other
+three (11/48 × 3 + 5/16 = 1). The decimals shown are rounded for readability; the factors are
+derived from the fractions, not from the rounded percentages.
 
 *Factor = share × 4. The four members must agree on the shares before submission; the
 placeholder row values are not filled in by an agent.*
@@ -309,7 +313,7 @@ approves them, and only then is the implementation written. Gate 1 still reports
 V3 history because those tests were written before the protocol existed. I chose to report that
 gap rather than backdate a timestamp.
 
-#### MEMBER B — self-evaluation
+#### Gong Yuebin (60652349) — self-evaluation
 
 I formed the team, bringing three other students together when the assignment allowed us to
 choose our own groups.
@@ -340,7 +344,7 @@ README's counts, gave all twenty-eight debt entries a status, and wrote four arc
 documents the course asks for that the repository did not have.
 
 
-#### MEMBER C — self-evaluation
+#### Zhang Qiyan (60805659) — self-evaluation
 
 I was responsible for iterating on and extending V2. Building on V1, I used Codex agents to develop a deterministic, single-winner advertising auction and persistent budget management. The model provided relevance scores, while the code ranked candidates using relevance multiplied by bid, resolved ties by advertisement ID, and charged the winner its own bid. Compliance checks retained the final authority to reject an advertisement before charging. SQLite ensured that budget updates, request results, and audit records were committed together, while request replay prevented duplicate charges. I also used the agents to check the implementation against the course specification and V2 handover document, run regression tests and fixed-case evaluations, organize verification materials, and prepare the GitHub submission. A subsequent CI configuration fix enabled GitHub Actions to run the checks. The missing evidence of pre-implementation human test approval remained documented as a process limitation.
 
