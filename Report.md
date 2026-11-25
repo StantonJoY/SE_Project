@@ -7,7 +7,7 @@
 | Repository | `github.com/StantonJoY/SE_Project` |
 | Delivered commit | `8b5a17a` (merge of PR #3, `v3` → `main`), plus `a9c79d8` (branch-protection preparation) |
 | Report version | 1.0 — 2026-11-22 |
-| Team | Shen Jiyun (60989886), Gong Yuebin (60652349), Zhang Qiyan (60805659), [MEMBER D] |
+| Team | Shen Jiyun (60989886), Gong Yuebin (60652349), Zhang Qiyan (60805659), Gao Zhechun (student ID pending) |
 | Submission file | `[STUDENT_ID].md` |
 
 ---
@@ -253,7 +253,7 @@ Two properties are worth stating because they are the reason for the ordering:
 | Shen Jiyun (60989886) | PM / architecture / AI | Theme and iteration direction, process-artifact system, V1 and V3 implementation |
 | Gong Yuebin (60652349) | Architecture / AI review | Requirements and ADR review, prompt and model decisions |
 | Zhang Qiyan (60805659) | Application / integration | V2 auction and ledger integration, CLIs |
-| [MEMBER D] | Quality / governance | Independent test execution, evidence packaging, gate verification |
+| Gao Zhechun (student ID pending) | Quality / governance | Independent test execution, evidence packaging, gate verification |
 
 ### 3.2 Relative contribution
 
@@ -265,7 +265,7 @@ share and the derived factor, because a factor alone forces the reader to revers
 | Shen Jiyun (60989886) | 31.25% (5/16) | **1.25** | PM; theme and iteration direction; process-artifact system; V1 and V3 implementation |
 | Gong Yuebin (60652349) | 22.92% (11/48) | **0.917** | Architecture / AI review |
 | Zhang Qiyan (60805659) | 22.92% (11/48) | **0.917** | Application / integration |
-| [MEMBER D] | 22.92% (11/48) | **0.917** | Quality / governance |
+| Gao Zhechun (student ID pending) | 22.92% (11/48) | **0.917** | Quality / governance |
 | **Average** | **100%** | **1.000** | (1.25 + 0.917 × 3) / 4 = 1.0 |
 
 The shares are exact fractions: 5/16 for the first member and 11/48 for each of the other
@@ -350,7 +350,7 @@ I was responsible for iterating on and extending V2. Building on V1, I used Code
 
 This group assignment differed from those in other courses and offered a fresh approach to project work. However, as AI becomes more capable, I feel that users’ interventions have a diminishing influence on the results of relatively straightforward tasks. During my V2 work, I tried different prompts and found little difference in the outputs. Nevertheless, I deliberately adopted more detailed conversational prompts partly to improve the presentation and make the amount of work involved more visible. This made me question how effectively the length or detail of a conversation demonstrates a student’s contribution. I considered using a weaker agent or model, but then wondered why I should choose an older, less capable tool when a better one was available simply to demonstrate my own ability. To me, that would be like applying an outdated standard after the circumstances had changed. My greatest gain from this project was the thinking that took place while using AI. Following the implementation, asking questions about its behavior, and examining the verification results helped me understand the project’s components and how they worked together.
 
-#### MEMBER D — self-evaluation
+#### Gao Zhechun (student ID pending) — self-evaluation
 
 My main contribution was independent quality assurance across the whole project, not only the final V3 round. I treated each delivered version as a separate test target and verified that it could be reproduced outside the original development workspace. For V1, I created an isolated test directory, confirmed the Conda environment and editable package path, and ran the deterministic offline tests, fixed evaluation replay, CLI scenarios, and evidence collection. I also checked the audit output and the fail-closed behaviour for invalid scenes. The V1 work established the testing pattern I reused later: verify the environment first, preserve the command output, record the exit code, and keep the evidence traceable.
 
