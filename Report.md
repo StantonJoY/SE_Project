@@ -659,12 +659,21 @@ four-person course project and would not be acceptable in production. The measur
 (the three-row table above) is kept in `docs/branch-protection.md` §9 so that the claim can be
 re-checked instead of trusted.
 
-**Figures.** Three screenshots carry the visual evidence: the ruleset page (which checks are
-required, and that the owner is on the bypass list), the PR #3 checks panel (Gate 1 red, the
-other six green, plus the merge state), and the Actions run list (seven jobs today versus a run
-that reported success with zero jobs). They live in
-`evidence/v3/v3-20261125-github-gates/{1,2,3}.png`; what each one supports is itemised in
-`docs/testing/V3-GitHub-Gate-Evidence.md`.
+**Figures.** Three screenshots carry the visual evidence, all from the delivered repository:
+
+- `1.png` — the pull-request list: **16 closed** PRs and **2 open** ones, both open PRs showing
+  `6/7` checks with a red mark, i.e. a PR cannot reach "mergeable" while one gate is red;
+- `2.png` — the ruleset page for `main`: enforcement **Active**, target **Default**, and the
+  bypass list containing **Repository admin** (the reason the owner can still push, disclosed in
+  the previous paragraph);
+- `3.png` — one PR's checks popover: **6 successful, 1 failing**, the failure being
+  `Gate 5 · Regression` after 26 s, while `Gate 1 · Test approval` passes in 12 s. That single
+  image shows three things at once: seven gates run as seven separate jobs (12–26 s each), a red
+  gate blocks the merge, and a documentation-only change set passes the approval gate without
+  needing an approval.
+
+They live in `evidence/v3/v3-20261125-github-gates/{1,2,3}.png`; what each one supports is
+itemised in `docs/testing/V3-GitHub-Gate-Evidence.md`.
 
 ---
 
