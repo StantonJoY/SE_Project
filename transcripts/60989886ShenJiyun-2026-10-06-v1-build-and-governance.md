@@ -1,4 +1,4 @@
-# Agent 会话记录 · 2026-10-06-v1-build-and-governance
+# Agent 会话记录 · 60989886ShenJiyun-2026-10-06-v1-build-and-governance
 
 > **D5 交付物** · 由 `transcripts/tools/export-session.js` 从 DSH 会话存储导出，仅排版，不改写内容。
 > 省略模型内部 `reasoning` 块；助手正文超长截断；工具参数与结果截断并以 `…` 标注。
@@ -2176,8 +2176,8 @@ P4 完成。**课程开题硬性要求的「真实 AI 组件」已落地。**
 > - `docs/architecture/asr-register.md` — A1: 18 ASR + 4 impl; §9 has V2 pre-judgments (9 ASR预判) written **without backticks** to avoid orphan-ASR check.
 > - `docs/architecture/invariants.md` — A2: **16 invariants** (INV-ADS-001..016), six fields each, fail-closed fallbacks; §1 fail-closed direction declaration; §2.4 coverage table.
 > - `docs/architecture/concern-clusters.md` — A5: 5 clusters (C1 Deterministic Authority, C5 Degradation, C4 Evidence, C3 Closed-Set Selection, C2 Input Contract), priority C1>C5>C4>C3>C2, 6 conflict rulings, 7 assumptions A-01..A-07.
-> - `docs/architecture/adr-001-guarded-hybrid.md` — C1/C2/C3 criteria, 2 rejected candidates, 7 re-open triggers (T1 compliance_escape_count>0 etc.).
-> - `docs/architecture/adr-002-fail-closed-and-governance.md` — D1 no_ad fail-closed; D2 audit non-negotiable; D3 failure attribution; D4 permission+hook; **§2 D4 protected path table (parsed by check_safety_paths.py)**: `src/compliance/`, `src/ads/schema.py`, `data/ads.json`, `data/banned_words.json`, `data/scene_rules.json`, `docs/architecture/invariants.md`, `docs/req/requirements.yaml`, `test/offline/`, `src/selector/`.
+> - `docs/architecture/adr/001-guarded-hybrid.md` — C1/C2/C3 criteria, 2 rejected candidates, 7 re-open triggers (T1 compliance_escape_count>0 etc.).
+> - `docs/architecture/adr/002-fail-closed-and-governance.md` — D1 no_ad fail-closed; D2 audit non-negotiable; D3 failure attribution; D4 permission+hook; **§2 D4 protected path table (parsed by check_safety_paths.py)**: `src/compliance/`, `src/ads/schema.py`, `data/ads.json`, `data/banned_words.json`, `data/scene_rules.json`, `docs/architecture/invariants.md`, `docs/req/requirements.yaml`, `test/offline/`, `src/selector/`.
 > - `docs/architecture/trace-matrix.md` — 22 rows × 5 columns (REQ/Type/Status, Architectural Consequence, Enforcing Component, Test/Evidence, Runtime Monitor); Status vocabulary mapping table; §4 three decision chains; §5 debt TD-001..005.
 > - `docs/architecture/memory-design.md` — 6 fields; V1 stateless; S1 audit (write-only, never re-read), S2 ads, S3 config; no checkpoint/store; M1–M3 consequences; §5 retention + PII of `user_tags`; TD-006..008.
 > - `docs/architecture/runtime-policy-catalog.md` — **RP-001..RP-017**, one per failure mode; RP-016 invariant-violation catch-all; RP-017 banned_check status.
@@ -2637,7 +2637,7 @@ Step 0/1 完成。最后一件事：**门禁 2 报了一个真实冲突**，我�
 
 **门禁 2 现在通过** —— 且是通过"检测到 ADR 文件存在"这个机制通过的，不是靠我在提交信息里塞个字符串。
 
-## `ADR-003` 已建：[adr-003-evaluation-set-as-architecture.md](<SE/project/SE_Project/docs/architecture/adr-003-evaluation-set-as-architecture.md>)
+## `ADR-003` 已建：[adr-003-evaluation-set-as-architecture.md](<SE/project/SE_Project/docs/architecture/adr/003-evaluation-set-as-architecture.md>)
 
 你的判断我采纳了，而且我认为它比"补个数据文件"准确得多——**评估集决定"什么算对"，这就是权威**。所以 ADR 里有三条实质决策，而不只是"我们建了个评估集"：
 
@@ -2926,7 +2926,7 @@ property 覆盖本身**有效**（实测 `passed` 变 True）。所以问题在�
 | [eval_cases.json](<SE/project/SE_Project/eval/eval_cases.json>) | **25 条**评估集（11 `MUST_PASS` / 14 `MUST_FAIL`），每条带 `basis` + `anchors` |
 | [eval_runner.py](<SE/project/SE_Project/eval/eval_runner.py>) | 一键 replay：完整管道 + 分母分离 + 违规独立判据 + p95 |
 | [mutation_check.py](<SE/project/SE_Project/scripts/mutation_check.py>) | 变异验证：**13/13 条不变量**注入违规后测试确实失败 |
-| [ADR-003](<SE/project/SE_Project/docs/architecture/adr-003-evaluation-set-as-architecture.md>) | 评估集的判定口径与阈值语义 |
+| [ADR-003](<SE/project/SE_Project/docs/architecture/adr/003-evaluation-set-as-architecture.md>) | 评估集的判定口径与阈值语义 |
 
 **当前实测**：`pass_rate=1.0000 violations=0 p95=0.0038s passed=True`
 

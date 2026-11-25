@@ -1,4 +1,4 @@
-# Agent 会话记录 · 2026-11-17-main-v2-integration
+# Agent 会话记录 · 60989886ShenJiyun-2026-11-17-main-v2-integration
 
 > **D5 交付物** · 由 `transcripts/tools/export-session.js` 从 DSH 会话存储导出，仅排版，不改写内容。
 > 省略模型内部 `reasoning` 块；助手正文超长截断；工具参数与结果截断并以 `…` 标注。

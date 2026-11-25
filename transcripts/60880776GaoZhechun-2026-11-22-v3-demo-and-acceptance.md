@@ -1,4 +1,4 @@
-# Agent 会话记录 · 2026-11-22 V3 最终验收 Demo
+# Agent 会话记录 · 60880776GaoZhechun-2026-11-22-v3-demo-and-acceptance
 
 > **D5 补充记录** · OpenCode 测试与验证会话
 > 保留关键人工干预、助手步骤、测试命令和结果；省略重复目录列表、重复终端输出和模型内部 reasoning。
