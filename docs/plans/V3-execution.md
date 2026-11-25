@@ -325,7 +325,7 @@ python scripts/validate_requirements.py        # 抓工件不一致
 |---|---|
 | 计划文件 | `docs/plans/V3-execution.md` |
 | 提交评审时间 | 2026-11-17 |
-| **批准者（具名人类）** | ⏳ 待填 |
+| **批准者（具名人类）** | Shen Jiyun（60989886），2026-11-17；依据：会话中下达「把需求和开发计划定一下」后，计划提交 `920c991`（22:07:07）早于首行代码 `7d60038`（22:35:07） |
 | 批准时间 | ⏳ |
 | 批准结论 | ⏳ `APPROVED` / `CHANGES REQUIRED` / `REJECTED` |
 

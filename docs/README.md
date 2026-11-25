@@ -77,3 +77,68 @@
 - 本索引不放状态数字（数字会过期），只放"去哪找"。
 - 数字口径以 `docs/architecture/invariants.md`、`docs/req/requirements.yaml`、
   `docs/code-governance/acceptance-coverage-map.yaml` 三处为准。
+---
+
+## 7. 文档全表（57 份）
+
+> 上文的分类索引只列常用入口；这里是**全部文档**，保证没有"写了但没人知道在哪"的文件。
+
+| 文件 | 标题 |
+|---|---|
+| [`architecture/adr-001-guarded-hybrid.md`](architecture/adr-001-guarded-hybrid.md) | ADR-001：采用 Guarded Hybrid 架构（AI 解释，代码裁决） |
+| [`architecture/adr-002-fail-closed-and-governance.md`](architecture/adr-002-fail-closed-and-governance.md) | ADR-002：Fail-Closed 终态、证据不可协商与失败归因治理 |
+| [`architecture/adr-003-evaluation-set-as-architecture.md`](architecture/adr-003-evaluation-set-as-architecture.md) | ADR-003：评估集作为一等架构资产 —— 判定口径、分母分离与阈值语义 |
+| [`architecture/adr-004-verification-plane-protection.md`](architecture/adr-004-verification-plane-protection.md) | ADR-004：评估与验证资产纳入受保护路径清单（ADR-002 D4 的补充） |
+| [`architecture/adr-005-v2-atomic-auction.md`](architecture/adr-005-v2-atomic-auction.md) | ADR-005：V2 确定性竞价与原子预算结算 |
+| [`architecture/adr-006-v3-corpus-boundary.md`](architecture/adr-006-v3-corpus-boundary.md) | ADR-006：V3 轮次接入与真实语料边界 |
+| [`architecture/adr-007-requirements-prioritization.md`](architecture/adr-007-requirements-prioritization.md) | ADR-007：需求优先级（MoSCoW）与显式取舍记录 |
+| [`architecture/adr-008-layered-context-and-assembly.md`](architecture/adr-008-layered-context-and-assembly.md) | ADR-008：分层上下文结构与装配流水线 |
+| [`architecture/asr-register.md`](architecture/asr-register.md) | ASR 登记册（Architecturally Significant Requirements Register） |
+| [`architecture/concern-clusters.md`](architecture/concern-clusters.md) | Concern Cluster（关注点聚类） |
+| [`architecture/evaluation-logbook.md`](architecture/evaluation-logbook.md) | Evaluation Logbook — 架构选择的累积证据（D2.9，optional） |
+| [`architecture/invariants.md`](architecture/invariants.md) | 不变量登记册（Invariant Register） |
+| [`architecture/memory-design.md`](architecture/memory-design.md) | 记忆与状态设计说明（Memory / State Design Note） |
+| [`architecture/option-ledger.md`](architecture/option-ledger.md) | Option Ledger — 被否决的架构选项与重开条件（D2.11，optional） |
+| [`architecture/permission-model.md`](architecture/permission-model.md) | Permission Model — 角色级文件读写权限（D2.6） |
+| [`architecture/risk-list.md`](architecture/risk-list.md) | Risk List — 假设、可能变成的缺陷与复核触发点（D2.10，optional） |
+| [`architecture/runtime-policy-catalog.md`](architecture/runtime-policy-catalog.md) | 运行时策略目录（Runtime Policy Catalog） |
+| [`architecture/trace-matrix.md`](architecture/trace-matrix.md) | 追踪矩阵（Trace Matrix） |
+| [`architecture/v2-candidate-evaluation.md`](architecture/v2-candidate-evaluation.md) | V2 候选方案评估（AI proxy 技术评审，正式人工验收待完成） |
+| [`branch-protection.md`](branch-protection.md) | 分支保护配置（Branch Protection）— D7 交付物 |
+| [`bug-diary.md`](bug-diary.md) | 缺陷日记（Bug Diary） |
+| [`code-governance/coverage-v1-summary-snapshot.md`](code-governance/coverage-v1-summary-snapshot.md) | V1 覆盖汇总历史原文 |
+| [`code-governance/mcp-tool-manifest.md`](code-governance/mcp-tool-manifest.md) | MCP Tool Manifest —— 编码 agent 可调用的工具与角色授权（D3） |
+| [`code-governance/structural-constraints.md`](code-governance/structural-constraints.md) | 结构性约束（Structural Constraints） |
+| [`code-governance/verification-constraints.md`](code-governance/verification-constraints.md) | 验证约束（Verification Constraints） |
+| [`debt-register.md`](debt-register.md) | 技术债登记册（Debt Register） |
+| [`design/technical-design-v1.md`](design/technical-design-v1.md) | 场景化广告推荐引擎 — V1 技术实现方案 |
+| [`execution-plan-template.md`](execution-plan-template.md) | 执行计划清单（Execution Plan Manifest）— 模板 |
+| [`HANDOVER-V2.md`](HANDOVER-V2.md) | V1 → V2 交接文档（Handover to Next Developer） |
+| [`HANDOVER-V3.md`](HANDOVER-V3.md) | V3 交付说明（Handover · 给测试同学） |
+| [`HANDOVER.md`](HANDOVER.md) | CS5351 项目交接文档（HANDOVER） |
+| [`plans/P4-selector.md`](plans/P4-selector.md) | 执行计划清单 · P4 — `src/selector/` AI 建议层 |
+| [`plans/P7-eval.md`](plans/P7-eval.md) | 执行计划清单 · P7 — 固定评估集 + 版本溯源 + 变异验证 |
+| [`plans/REMAINING-WORK.md`](plans/REMAINING-WORK.md) | 剩余工作清单（分配用） |
+| [`plans/REPORT-REQUIREMENTS.md`](plans/REPORT-REQUIREMENTS.md) | 报告（D6）的硬性要求与现状对照 |
+| [`plans/TD-001-monitor-wiring.md`](plans/TD-001-monitor-wiring.md) | TD-001 补监控方案（运行时 monitor 接线） |
+| [`plans/V2-execution.md`](plans/V2-execution.md) | V2 执行计划与真实授权边界 |
+| [`plans/V3-execution.md`](plans/V3-execution.md) | V3 执行计划（Execution Plan）· 真实语料接入 |
+| [`req/requirements-v1-draft.md`](req/requirements-v1-draft.md) | 场景化广告推荐引擎 — V1 需求与功能点草案 |
+| [`req/requirements-v2-bidding-draft.md`](req/requirements-v2-bidding-draft.md) | 场景化广告推荐引擎 — V2 候选需求：报价竞价框架 |
+| [`req/requirements-v3-rag-draft.md`](req/requirements-v3-rag-draft.md) | 场景化广告推荐引擎 — V3 需求草案：检索增强（RAG）与真实语料 |
+| [`req/requirements-v3-se.md`](req/requirements-v3-se.md) | V3 需求规格（正式稿）· 真实语料接入 |
+| [`review-memo.md`](review-memo.md) | 评审备忘录（Review Memo） |
+| [`testing/V1-Demo-Screenshots.md`](testing/V1-Demo-Screenshots.md) | CS5351 V1 Mock / Offline 截图演示 |
+| [`testing/V1-Demo-Script.md`](testing/V1-Demo-Script.md) | CS5351 V1 Mock / Offline 截图演示 |
+| [`testing/V1-Test-Execution.md`](testing/V1-Test-Execution.md) | V1 测试执行记录 |
+| [`testing/V1-Test-Report.md`](testing/V1-Test-Report.md) | CS5351 V1 Mock / Offline 测试报告 |
+| [`testing/V3-Demo-Screenshots.md`](testing/V3-Demo-Screenshots.md) | CS5351 V3 Screenshot Demo |
+| [`testing/V3-Demo-Script.md`](testing/V3-Demo-Script.md) | CS5351 V3 Screenshot Demo Script |
+| [`testing/V3-Documentation-Consistency-Audit.md`](testing/V3-Documentation-Consistency-Audit.md) | V3 文档一致性审查（Documentation Consistency Audit） |
+| [`testing/V3-GitHub-Gate-Evidence.md`](testing/V3-GitHub-Gate-Evidence.md) | GitHub 门禁实证：三张图 + 文字说明 |
+| [`testing/V3-Live-Prompt-Semantic-Report.md`](testing/V3-Live-Prompt-Semantic-Report.md) | V3 Live Prompt Semantic Quality Report |
+| [`testing/V3-Test-Documents-README.md`](testing/V3-Test-Documents-README.md) | V3 测试文档索引 |
+| [`testing/V3-Test-Execution.md`](testing/V3-Test-Execution.md) | V3 测试执行记录 |
+| [`testing/V3-Test-Report.md`](testing/V3-Test-Report.md) | V3 阶段性测试报告 |
+| [`testing/V3-V1-Live-Prompt-Semantic-Report.md`](testing/V3-V1-Live-Prompt-Semantic-Report.md) | V1 Live Prompt Semantic Quality Report |
+| [`plans/SUBMISSION-CHECKLIST.md`](plans/SUBMISSION-CHECKLIST.md) | 提交打包清单（ZIP） |

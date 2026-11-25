@@ -1,7 +1,7 @@
 # ADR-007：需求优先级（MoSCoW）与显式取舍记录
 
-> **状态**：`Proposed`（待具名人类批准）
-> **日期**：2026-11-25 · **决策者**：A（产品/流程）+ B（架构）· **批准人**：⏳ 待填
+> **状态**：**`Accepted`**（2026-11-25 由人类所有者批准）
+> **日期**：2026-11-25 · **决策者**：A（产品/流程）+ B（架构）· **批准人**：Shen Jiyun（60989886）
 > **触及的受保护路径**：`docs/req/requirements.yaml`、`docs/req/req-schema.json`
 > **关联**：课程 D1 原文「Prioritization uses MoSCoW, and states the tradeoff explicitly」；
 > `INV-ADS-010`（需求变更须 ADR）；`TD-018`（门禁 1 历史缺口，见取舍 #4）
@@ -76,8 +76,9 @@ prioritization:
 
 | 项 | 内容 |
 |---|---|
-| 批准人（具名人类） | ⏳ |
-| 批准时间 | ⏳ |
-| 结论 | ⏳ `Accepted` / `CHANGES REQUIRED` |
+| 批准人（具名人类） | Shen Jiyun（60989886，仓库所有者） |
+| 批准时间 | 2026-11-25 |
+| 结论 | `Accepted` |
+| 备注 | 本记录由 agent 依人类指示录入，不是 agent 自我批准；依据为人类在会话中对该决策的确认 |
 
 > **No agent may self-approve**（课程 §11.3）。
