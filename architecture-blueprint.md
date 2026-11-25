@@ -18,7 +18,7 @@
 
 | 在范围内 | 不在范围内（`requirements.yaml` scope.out） |
 |---|---|
-| 本地 JSON 素材库加载与校验 | RAG / 向量检索（V3） |
+| 本地 JSON 素材库加载与校验 | RAG / 向量检索（V3 已评估并弃用，见 ADR-006 D6/D7） |
 | 场景输入校验（时段/设备/用户标签） | 真实广告投放平台 / 实时竞价（V3+） |
 | LLM 闭集选择（候选集内） | LLM 自由生成文案（V3） |
 | 确定性合规过滤（**五步**纯函数管道） | 用户画像 / 多轮上下文记忆（V3） |
@@ -298,31 +298,46 @@
 
 ```
 SE_Project/
-├── README.md                      # 项目介绍
-├── AGENTS.md                      # D3 编码代理治理入口（待建，由本蓝图派生，非散文撰写）
-├── architecture-blueprint.md      # 本文件（课程要求位于根目录）
-├── Prompt.md                      # D9 静态启动 prompt（待建）
-├── Report.md                      # D6 报告（待建）
-├── config.yaml                    # 配置单一来源（阈值、超时、路径）
+├── README.md                        # 本文件（项目介绍）
+├── AGENTS.md                        # D3 编码 agent 治理入口
+├── architecture-blueprint.md        # D2.1 主约束文档（课程要求位于根目录）
+├── Prompt.md                        # D9 静态启动指令
+├── Report.md                        # D6 过程报告 + 四份自评
+├── config.yaml / config-v2.yaml / config-v3.yaml   # V1 / V2 / V3 配置单一来源
 ├── pyproject.toml
-├── data/                          # ads / banned_words / scene_rules（safety-critical）
-├── src/                           # ads / scene / compliance / selector / render / audit / app
+├── .agent/rules.md                  # D3 项目公约
+├── .opencode/                       # D3 permissions.jsonc + rules.md
+├── .github/workflows/ci.yml         # D4/D7 七道阻塞门禁
+├── .github/CODEOWNERS               # D7 评审归属（docs/ 刻意不列）
+├── data/                            # 素材 / 违禁词 / 场景规则 / 5,000 条语料 / 内容分级（safety-critical）
+├── src/                             # 9 个架构元素
+│   └── ads scene compliance selector render audit bidding corpus app
 ├── test/
-│   ├── offline/                   # 确定性测试（不调 LLM）
-│   └── live/                      # 依赖 API 的测试（待建）
-├── eval/                          # eval_cases.json + eval_runner.py（待建）
-├── prompts/                       # 版本化运行时 prompt（待建）
-├── scripts/                       # validate_requirements.py、demo_p1.py
-├── transcripts/                   # D5 agent 会话记录（待建）
+│   ├── offline/                     # 确定性测试（31 模块 / 679 用例）
+│   └── live/                        # 真实 API 探针（不在 CI 默认路径）
+├── eval/                            # 固定评估集 57 条（V1 25 / V2 18 / V3 14）+ 三套 replay runner
+├── scripts/                         # 校验器、门禁检查器、变异验证、语料与报价生成
+├── prompts/                         # D9 版本化运行时提示词（prompt_v1.0 / v1.1）
+├── transcripts/                     # D5 会话记录（7 份 raw + 7 份可读稿，按 <学号><姓名>-<日期>-<主题> 命名）
+├── evidence/                        # 实测证据（门禁截图、junit、审计输出）
 └── docs/
-    ├── HANDOVER.md
-    ├── req/                       # D1：requirements.yaml + req-schema.json
-    ├── architecture/              # D2：asr-register / invariants / adr/001 / adr/002（本文件在根）
-    ├── code-governance/           # D3/D4：structural / verification / mcp-manifest（待建）
-    ├── design/                    # technical-design-v1.md（其架构性内容正迁往 architecture/）
-    ├── review-memo.md             # D4（待建）
-    ├── debt-register.md           # D4（待建）
-    └── bug-diary.md               # D4（待建）
+    ├── req/                         # D1 requirements.yaml + req-schema.json
+    ├── architecture/                # D2 工件
+    │   ├── adr/                     # ADR-001…008（课程要求 adr/NNN-<choice>.md）
+    │   ├── invariants.md · trace-matrix.md · memory-design.md
+    │   ├── option-ledger.md · permission-model.md · evaluation-logbook.md
+    │   ├── risk-list.md · evaluation-table.md · runtime-policy-catalog.md
+    │   └── asr-register.md · concern-clusters.md
+    ├── code-governance/             # D3/D4 结构约束、验证约束、工具权限、覆盖映射
+    ├── testing/                     # V3 测试与证据（报告、执行记录、门禁截图清单）
+    ├── plans/                       # 执行计划、剩余工作、提交清单
+    ├── ai-use-log.yaml              # 门禁 6 载体
+    ├── test-approvals.yaml          # 门禁 1 载体
+    ├── v2-approval-status.yaml      # V2 验收状态
+    ├── v3-approval-status.yaml      # V3 验收状态
+    ├── branch-protection.md         # 分支保护配置与实证
+    ├── review-memo.md · debt-register.md · bug-diary.md
+    └── HANDOVER.md · HANDOVER-V2.md · HANDOVER-V3.md
 ```
 
 **轮次目录规则**（课程行 1531/1562）：`docs/architecture/` = V1 轮次；V2 启动时新建 `docs2/architecture/`，

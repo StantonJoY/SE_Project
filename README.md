@@ -80,7 +80,7 @@ CS5351 Agentic Software Engineering Project · 2026-2027
 |---|---|---|
 | V1 | 规则预筛 → LLM 闭集选择 → 合规过滤 → 渲染（无 RAG、无竞价） | **基线**（`docs/architecture/` 轮次） |
 | V2 | 报价竞价框架：LLM 降级为相关性建议，竞价引擎确定性定胜负 | 候选（归属 `docs2/` 轮次，未启动） |
-| V3 | RAG 场景向量召回 | 占位 |
+| V3 | 真实语料接入（只读 + 投影旁路）+ 内容分级 + 5% 定价接入竞价；**RAG 已评估并弃用**（ADR-006 D6/D7） | 已合入 `main`（PR #3） |
 
 > 课程要求每轮 ADD **append-only 且绝不合并轮次**：V1 工件在 `docs/architecture/`，
 > V2 启动时新建 `docs2/architecture/`，并将 V1 层标为 FROZEN。
@@ -196,49 +196,44 @@ python eval/eval_runner.py                                # 门禁 4 · 评估�
 
 ```
 SE_Project/
-├── README.md                    # 本文件
-├── AGENTS.md                    # D3 编码代理治理入口（由架构工件装配）
-├── architecture-blueprint.md    # D2 CORE · 主约束文档（课程要求位于根目录）
-├── Prompt.md                    # D9 静态启动 prompt
-├── Report.md                    # D6 报告（团队填写中）
-├── config.yaml                  # V1 配置单一来源
-├── config-v2.yaml               # V2 竞价与持久预算配置
-├── config-v3.yaml               # V3 RAG 语料配置
-├── pyproject.toml               # 依赖 + ruff/mypy/pytest/depcheck 配置
-├── .github/workflows/ci.yml     # D7 · 阻塞门禁 + fitness + 变异验证
-├── .github/CODEOWNERS           # D7 · 安全关键路径评审归属
-├── data/                        # 素材 / 违禁词 / 场景规则（safety-critical）
-├── src/                         # **9 个架构元素全部实现**
-│   ├── ads/                     # ① 素材契约 + 候选集构建
-│   ├── scene/                   # ② 场景输入契约
-│   ├── compliance/              # ③ FINAL AUTHORITY（五步纯函数管道）
-│   ├── selector/                # ④ AI 建议层（闭集选择 + 上下文装配 + 解释）
-│   ├── render/                  # ⑤ 输出契约（两形态判别联合 schema）
-│   ├── audit/                   # ⑥ 证据子系统（JSONL + 22 条 monitor 登记册）
-│   ├── bidding/                 # V2 竞价（Bid / 引擎 / 账本）
-│   ├── corpus/                  # ⑨ V3 RAG 语料层
-│   └── app/                     # ⑦ 编排 / CLI / 注入门 / 降级路径
+├── README.md                        # 本文件（项目介绍）
+├── AGENTS.md                        # D3 编码 agent 治理入口
+├── architecture-blueprint.md        # D2.1 主约束文档（课程要求位于根目录）
+├── Prompt.md                        # D9 静态启动指令
+├── Report.md                        # D6 过程报告 + 四份自评
+├── config.yaml / config-v2.yaml / config-v3.yaml   # V1 / V2 / V3 配置单一来源
+├── pyproject.toml
+├── .agent/rules.md                  # D3 项目公约
+├── .opencode/                       # D3 permissions.jsonc + rules.md
+├── .github/workflows/ci.yml         # D4/D7 七道阻塞门禁
+├── .github/CODEOWNERS               # D7 评审归属（docs/ 刻意不列）
+├── data/                            # 素材 / 违禁词 / 场景规则 / 5,000 条语料 / 内容分级（safety-critical）
+├── src/                             # 9 个架构元素
+│   └── ads scene compliance selector render audit bidding corpus app
 ├── test/
-│   ├── offline/                 # 确定性测试（31 个模块，679 个用例）
-│   └── live/                    # 依赖真实 API 的测试（**不在 CI 默认路径**）
-├── eval/                        # ⑧ **固定评估集 57 条**（V1 25 / V2 18 / V3 14）+ replay runner
-│   └── reports/                 # replay 报告（append-only）
-├── scripts/                     # ⑨ 校验器、门禁检查器、审计器、变异验证、演示
-├── transcripts/                 # D5 agent 会话记录（7 份原始 raw + 7 份可读稿 + 干预索引）
-├── evidence/                    # 分支保护实测日志、demo 截图、校验和
+│   ├── offline/                     # 确定性测试（31 模块 / 679 用例）
+│   └── live/                        # 真实 API 探针（不在 CI 默认路径）
+├── eval/                            # 固定评估集 57 条（V1 25 / V2 18 / V3 14）+ 三套 replay runner
+├── scripts/                         # 校验器、门禁检查器、变异验证、语料与报价生成
+├── prompts/                         # D9 版本化运行时提示词（prompt_v1.0 / v1.1）
+├── transcripts/                     # D5 会话记录（7 份 raw + 7 份可读稿，按 <学号><姓名>-<日期>-<主题> 命名）
+├── evidence/                        # 实测证据（门禁截图、junit、审计输出）
 └── docs/
-    ├── HANDOVER.md              # 交接文档
-    ├── req/                     # D1 需求（注册表 + Schema + 底稿）
-    ├── architecture/            # D2 架构工件（ASR/不变量/追踪/记忆/ADR×4/策略/簇）
-    ├── code-governance/         # D3/D4 结构约束、验证约束、验收覆盖映射
-    ├── plans/                   # 执行计划清单（P4 / P7）
-    ├── design/                  # 设计草案
-    ├── execution-plan-template.md  # D9 五要素模板
-    ├── ai-use-log.yaml          # 门禁 6 载体
-    ├── test-approvals.yaml      # 门禁 1 载体
-    ├── branch-protection.md     # 分支保护配置
-    ├── review-memo.md           # 评审备忘录
-    ├── debt-register.md         # 技术债登记（TD-001~028）
-    ├── HANDOVER-V2.md / -V3.md  # V2 / V3 轮次交接
-    └── bug-diary.md             # 缺陷日记
+    ├── req/                         # D1 requirements.yaml + req-schema.json
+    ├── architecture/                # D2 工件
+    │   ├── adr/                     # ADR-001…008（课程要求 adr/NNN-<choice>.md）
+    │   ├── invariants.md · trace-matrix.md · memory-design.md
+    │   ├── option-ledger.md · permission-model.md · evaluation-logbook.md
+    │   ├── risk-list.md · evaluation-table.md · runtime-policy-catalog.md
+    │   └── asr-register.md · concern-clusters.md
+    ├── code-governance/             # D3/D4 结构约束、验证约束、工具权限、覆盖映射
+    ├── testing/                     # V3 测试与证据（报告、执行记录、门禁截图清单）
+    ├── plans/                       # 执行计划、剩余工作、提交清单
+    ├── ai-use-log.yaml              # 门禁 6 载体
+    ├── test-approvals.yaml          # 门禁 1 载体
+    ├── v2-approval-status.yaml      # V2 验收状态
+    ├── v3-approval-status.yaml      # V3 验收状态
+    ├── branch-protection.md         # 分支保护配置与实证
+    ├── review-memo.md · debt-register.md · bug-diary.md
+    └── HANDOVER.md · HANDOVER-V2.md · HANDOVER-V3.md
 ```
