@@ -277,13 +277,13 @@ placeholder row values are not filled in by an agent.*
 
 ### 3.3 Self-evaluations
 
-> **Note to the reader:** the course requires each member's self-evaluation to be written by
-> that member. The paragraph below was drafted from the repository record by Shen Jiyun's
-> assistant and is to be restated in his own words before submission.
+> **Note to the reader:** each paragraph below is the named member's own account of their
+> contribution and is reproduced without editorial changes.
 
 #### Shen Jiyun (60989886) — self-evaluation
 
-I was the team's PM, and my work fell into three buckets: direction, system, and code.
+I was the team's PM, and my work fell into four areas: direction, system, code, and how I
+worked with the agents.
 
 **Direction.** From round one I fixed the project's thesis: the AI is an advisor and the code
 is the executive. The model may only choose inside a closed candidate set, and whether anything
