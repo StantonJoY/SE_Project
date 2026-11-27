@@ -229,6 +229,7 @@ SE_Project/
     ├── code-governance/             # D3/D4 结构约束、验证约束、工具权限、覆盖映射
     ├── testing/                     # V3 测试与证据（报告、执行记录、门禁截图清单）
     ├── plans/                       # 执行计划、剩余工作、提交清单
+    ├── presentation/                # 汇报幻灯片（18 页）与逐页讲稿
     ├── ai-use-log.yaml              # 门禁 6 载体
     ├── test-approvals.yaml          # 门禁 1 载体
     ├── v2-approval-status.yaml      # V2 验收状态

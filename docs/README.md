@@ -64,6 +64,7 @@
 | 想知道 | 读 |
 |---|---|
 | 每一轮怎么排的计划 | [`plans/`](plans/) |
+| 汇报（20 分钟幻灯片 + 逐页讲稿） | [\presentation/\](presentation/) |
 | 补监控（TD-001）的方案与步骤 | [`plans/TD-001-monitor-wiring.md`](plans/TD-001-monitor-wiring.md) |
 | 还剩什么活、怎么分 | [`plans/REMAINING-WORK.md`](plans/REMAINING-WORK.md) |
 | 报告（D6）的硬性要求与现状 | [`plans/REPORT-REQUIREMENTS.md`](plans/REPORT-REQUIREMENTS.md) |
