@@ -7,21 +7,51 @@
 
 ---
 
-## 1. 公告的 7 个方面 → 报告章节
+## 1. 老师公告（原文）
 
-| # | 公告要求 | 报告章节 | 幻灯片 |
-|---|---|---|---|
-| 1 | Requirements and specification | §1 | 3–4 |
-| 2 | Architectural design and integration | §2 | 5–6 |
-| 3 | Team coordination and individual contributions | §3 | 7 |
-| 4 | Human–agent interaction | §4 | 8–9 |
-| 5 | Traceability | §5 | 10–11 |
-| 6 | Code review, QA, CI/CD | §6 | 12–14 |
-| 7 | Challenges, rework, improvement | §7 | 15–16 |
+> Your group may select one or more members to deliver the presentation in person.
+>
+> The presentation should explain your team's software engineering process from start to finish.
+> Please cover the following areas:
+>
+> 1. **Requirements and specification**: How did you turn initial ideas into clear functional and
+>    non-functional requirements? How did you refine them and define how to verify that they were met?
+> 2. **Architectural design and integration**: What were the main design decisions for the new
+>    features? How did you guide their implementation and integrate them into the existing codebase
+>    while keeping complexity manageable?
+> 3. **Team coordination and individual contributions**: Explain how your team divided and
+>    coordinated the work, and summarize each member's actual contributions, such as requirements,
+>    design, agent supervision, implementation, testing, code review, or project management.
+> 4. **Human–agent interaction**: What were the agents' actual responsibilities, when and how were
+>    they invoked, and how did team members review, approve, correct, or redirect their output?
+> 5. **Traceability throughout development**: How did you maintain the links between requirements,
+>    design, code, and tests as new requirements, implementation changes, and bug fixes were
+>    introduced over the weeks?
+> 6. **Code review, quality assurance, and CI/CD**: What review strategies and tests did you use to
+>    assess the generated code? What CI/CD gate checks were implemented, and how did they prevent
+>    unsuitable changes from being merged or released?
+> 7. **Challenges, rework, and improvement**: What significant problems did you encounter, how did
+>    you resolve them, and what needed to be revised? Explain what your team learned and how you
+>    improved the development process.
 
 ---
 
-## 2. 分工与时间（**D 从第 10 页开始**）
+## 2. 逐条覆盖核对
+
+| # | 公告要求 | 是否覆盖 | 幻灯片 | 证据（可现场打开） |
+|---|---|---|---|---|
+| 1 | Requirements and specification | ✅ | 3–4 | `docs/req/requirements.yaml`（类型化 + `prioritization` 四条取舍） |
+| 2 | Architectural design and integration | ✅ | 5–6 | `architecture-blueprint.md` 权威链；`git diff` 证明 `ads/`、`scene/` 未动 |
+| 3 | Team coordination and individual contributions | ✅ | 7 | `Report.md` §3（角色 + 1.333 / 0.889×3） |
+| 4 | Human–agent interaction | ✅ | 8–9 | `docs/test-approvals.yaml`（TA-0005 时序）、`docs/review-memo.md`（BUG 表） |
+| 5 | Traceability throughout development | ✅ | 10–11 | 覆盖表 + `test_v3_pricing.py` + 变异 `assert 50 != 75` |
+| 6 | Code review, QA, CI/CD | ✅ | 12–14 | 七道门禁；`evidence/v3/v3-20261125-github-gates/{1,2,3}.png` |
+| 7 | Challenges, rework, improvement | ✅ | 15–16 | `Report.md` §7.9；`docs/debt-register.md`（四处不成立） |
+| — | 允许 1 人或多人现场讲 | ✅ | — | 已定 **A + D** 两人；D 从第 10 页接手 |
+
+**覆盖结论**：7 个方面全部有对应幻灯片与仓库证据；无遗漏项。
+
+## 3. 分工与时间（**D 从第 10 页开始**）
 
 | 页 | 幻灯片标题 | 讲者 | 累计时间 |
 |---|---|---|---|
@@ -49,7 +79,7 @@
 
 ---
 
-## 3. 逐页要点（只讲节点与框架）
+## 4. 逐页要点（只讲节点与框架）
 
 | 页 | 一句话要点 | 现场可打开的证据 |
 |---|---|---|
@@ -74,7 +104,7 @@
 
 ---
 
-## 4. 现场演示（2 分钟）
+## 5. 现场演示（2 分钟）
 
 ```bash
 # 1) 同一场景、两个档位 → 结果不同
@@ -92,7 +122,7 @@ python scripts/mutation_check.py --list | head
 
 ---
 
-## 5. Q&A 预演（全员在场）
+## 6. Q&A 预演（全员在场）
 
 | 问题 | 30 秒答案 |
 |---|---|
@@ -107,7 +137,7 @@ python scripts/mutation_check.py --list | head
 
 ---
 
-## 6. 准备清单
+## 7. 准备清单
 
 - [x] 时长 20 分钟（已确认）
 - [x] 讲者 A + D（已确认）；**D 从第 10 页接手**
