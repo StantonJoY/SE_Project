@@ -155,7 +155,7 @@ so a test cannot be "approved" after it was already written.
 
 ---
 
-### 13. ⑥ 门禁真的会拦 · 13:00–14:30
+### 13. ⑥ 门禁真的会拦 · 13:00–14:00
 
 **Say:** Configuration is not evidence, so we measured it. This is a direct push to `main` being
 rejected: `push declined due to repository rule violations`, six required checks.
@@ -169,7 +169,19 @@ merge. Note which gate is red: not the approval gate, the regression gate.
 
 ---
 
-### 14. ⑦ 三个转折 · 14:30–15:30
+### 14. ⑥ 规则页与 PR 列表 · 14:00–14:45
+
+**Say:** Two things are worth pointing at on this slide. The ruleset requires six checks on the
+default branch, and — deliberately — the owner sits on the bypass list, which is why I can still
+push a document directly. The pull-request list shows sixteen merged PRs and two open ones, both
+sitting at six of seven. The consequence is in the line at the bottom: documentation needs no
+approval, because `docs/` is not a Code-Owner path, but it never merges without green CI.
+
+**中文：** 讲两件事：六道必需检查 + owner 在 bypass（诚实披露）；docs/ 免审但必须过 CI。
+
+---
+
+### 15. ⑦ 三个转折 · 14:45–15:45
 
 **Say:** Three things changed how we worked. Four decorative counterexamples turned mutation
 verification into a blocking gate. The zero-job CI incident made "count the jobs" the first step
@@ -181,7 +193,7 @@ every run — and we kept it because its failure mode is silent.
 
 ---
 
-### 15. ⑦ 还不成立的地方 · 15:30–16:30
+### 16. ⑦ 还不成立的地方 · 15:45–16:45
 
 **Say:** We also want to be explicit about what does not hold. Gate 1 is red for the V3 history:
 those tests were written before the approval mechanism existed, and we chose to record the gap
@@ -193,18 +205,19 @@ All four are in the debt register with re-open conditions.
 
 ---
 
-### 16. 现场演示 · 16:30–18:30
+### 17. 现场演示（D 讲 + D 操作） · 16:45–18:45
 
 **Say:** Two minutes, three commands. First the same scene with two different audience tags —
 the family tier returns an ad, the student tier rejects most candidates, and the detail line
 names the tier and the blocked label. Then the V2 path: a 300-cent bid derived from a 59.99
 game, and a repeated request id that returns the same result without charging twice.
 
-**中文：** 先跑命令再解释，别边跑边说；准备好失败时的备用截图。
+**中文：** D 自己操作、自己讲解；先跑命令再解释，别边跑边说；准备好失败时的备用截图。
+**底部一句：** Before I hand back — this is the same system the report describes, running on the delivered commit.
 
 ---
 
-### 17. 收尾 · 18:30–19:30
+### 18. 收尾（D） · 18:45–19:30
 
 **Say:** Our contribution is not the recommendation engine — a five-step gate and a
 pay-as-bid auction are simple. It is the arrangement that keeps them honest: requirements that
@@ -212,7 +225,7 @@ fail the build when unimplemented, invariants that fail the build when unfalsifi
 implementation author may not read, and a gate that reports its own historical failure.
 That is the one sentence we would like you to take away.
 
-**中文：** 收尾回到开头那句话，不要再加新信息。
+**中文：** 由 D 收尾，回到开头那句话，不要再加新信息。
 
 ---
 
@@ -240,9 +253,12 @@ That is the one sentence we would like you to take away.
 | 5–6 | 架构与扩展 | A | 7:30 |
 | 7 | 团队与贡献 | A | 8:30 |
 | 8–9 | 人–agent 与 agent 的错 | A | 10:00 |
-| 10–11 | 可追溯 + 一条需求 | D | 12:00 |
-| 12–13 | 七道门禁 + 实测拦截 | D | 14:30 |
-| 14–15 | 转折 + 仍不成立 | D | 16:30 |
-| 16 | 现场演示 | D（A 操作终端） | 18:30 |
-| 17 | 收尾 | A | 19:30 |
+| **10–13** | **可追溯 → 一条需求 → 七道门禁 → 实测拦截（D 接手）** | **D** | 14:00 |
+| 14 | 规则页与 PR 列表 | D | 14:45 |
+| 15–16 | 三个转折 + 仍不成立 | D | 16:45 |
+| 17 | 现场演示（讲解 + 操作） | D | 18:45 |
+| 18 | 收尾 | D | 19:30 |
 | — | Q&A | 全员 | 20:00+ |
+
+> 交接点固定在**第 10 页**：A 讲完第 9 页说 “Now D will take you through traceability, the gates,
+> and what we changed.” 此后到结束全部由 D 承担，包括演示与收尾。
